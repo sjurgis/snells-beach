@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html lang="en-NZ">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Snells Beach</title>
+<style>
+  :root {
+    --sand: #f3eee4;
+    --ink: #143238;
+    --quiet: #3c5458;
+    --sea: #2f6d5e;
+    --rule: #d4cdc0;
+  }
+
+  * { box-sizing: border-box; }
+
+  html { -webkit-text-size-adjust: 100%; }
+
+  body {
+    margin: 0;
+    background: var(--sand);
+    color: var(--ink);
+    font-family: Georgia, "Iowan Old Style", "Palatino Linotype", Palatino, serif;
+    font-size: 1.125rem;
+    line-height: 1.55;
+  }
+
+  .page {
+    max-width: 40rem;
+    margin: 0 auto;
+    padding: 2.75rem 1.35rem 4.5rem;
+  }
+
+  header {
+    margin-bottom: 3.25rem;
+  }
+
+  .place {
+    margin: 0 0 0.7rem;
+    font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    font-size: 0.78rem;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--sea);
+  }
+
+  h1 {
+    margin: 0;
+    font-weight: normal;
+    font-size: clamp(2.7rem, 11vw, 4.4rem);
+    line-height: 0.92;
+    letter-spacing: -0.03em;
+  }
+
+  .updated {
+    margin: 1.35rem 0 0;
+    max-width: 34rem;
+    font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    font-size: 0.92rem;
+    line-height: 1.45;
+    color: var(--quiet);
+  }
+
+  .today {
+    margin: 0 0 3.5rem;
+    padding-top: 0.15rem;
+  }
+
+  .when {
+    margin: 0 0 0.55rem;
+    font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    font-size: 0.82rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--sea);
+  }
+
+  .today h2 {
+    margin: 0 0 1.15rem;
+    font-weight: normal;
+    font-size: clamp(2rem, 7vw, 2.85rem);
+    line-height: 1.12;
+    letter-spacing: -0.02em;
+  }
+
+  .today p,
+  .days p,
+  .guide p {
+    margin: 0 0 1rem;
+  }
+
+  .today p:last-child,
+  .day p:last-child,
+  .guide p:last-child {
+    margin-bottom: 0;
+  }
+
+  .water {
+    margin-top: 1.35rem;
+    color: var(--quiet);
+  }
+
+  .days {
+    margin: 0 0 1.5rem;
+    padding-top: 0.25rem;
+    border-top: 1px solid var(--rule);
+  }
+
+  .days > h2,
+  .guide > h2 {
+    margin: 2rem 0 1.35rem;
+    font-weight: normal;
+    font-size: 1.35rem;
+    letter-spacing: -0.01em;
+  }
+
+  .day {
+    padding: 1.35rem 0 1.45rem;
+    border-bottom: 1px solid var(--rule);
+  }
+
+  .day h3 {
+    margin: 0 0 0.45rem;
+    font-weight: normal;
+    font-size: 1.28rem;
+    line-height: 1.25;
+  }
+
+  .day p {
+    margin: 0;
+    color: var(--ink);
+  }
+
+  .sources {
+    margin: 1.5rem 0 0;
+    font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    font-size: 0.82rem;
+    line-height: 1.45;
+    color: var(--quiet);
+  }
+
+  .guide {
+    margin-top: 3.25rem;
+    padding-top: 0.25rem;
+    border-top: 1px solid var(--rule);
+    font-size: 0.98rem;
+    line-height: 1.6;
+    color: var(--quiet);
+  }
+
+  .guide p {
+    margin: 0 0 1.15rem;
+  }
+
+  .guide p strong {
+    font-weight: normal;
+    color: var(--ink);
+  }
+
+  footer {
+    margin-top: 3rem;
+    font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    font-size: 0.82rem;
+    color: var(--quiet);
+  }
+
+  footer p { margin: 0; }
+
+  @media (min-width: 720px) {
+    .page { padding: 4.5rem 2rem 5.5rem; }
+    body { font-size: 1.2rem; }
+    .today { margin-bottom: 4.25rem; }
+  }
+</style>
+</head>
+<body>
+  <div class="page">
+    <header>
+      <p class="place">Kawau Bay, Auckland</p>
+      <h1>Snells Beach</h1>
+      <p class="updated">Updated Monday 5 October 2026, 7:21am NZDT, from the Monday morning forecast. This is not a live feed.</p>
+    </header>
+
+    <main>
+      <section class="today" aria-labelledby="today-heading">
+        <p class="when">Today, Monday 5 October</p>
+        <h2 id="today-heading">Scotts Landing in the afternoon</h2>
+        <p>Go around the 3:21pm high (2.7 m). The wind is southeast at 20 knots, turning east at 20 knots early afternoon, then easing to 15 knots in the evening. That is straight into Snells and the northeast surf beaches. The harbour side of the peninsula is out of it.</p>
+        <p>The morning low is 8:56am (0.8 m), so Algies and Snells are empty then. The swell is not up: about 0.4 m of northeast swell at Te Arai, with short east wind sea around 1.1–1.3 m at 6 seconds. Do not drive to Omaha, Tāwharanui, Pakiri, or Te Arai. Backup: Mathesons Bay at Leigh for a sheltered all-tide swim; it is a weekday, so Matakana is fine.</p>
+        <p class="water">The water is about 16°C.</p>
+      </section>
+
+      <section class="days" aria-labelledby="days-heading">
+        <h2 id="days-heading">The next days</h2>
+
+        <article class="day">
+          <h3>Tuesday 6 October</h3>
+          <p>Scotts Landing again, around the 4:27pm high (2.7 m). The wind is east at 15 knots all day, and the open-coast swell is still about half a metre. Backup: Baddeleys or Campbells near that high. They sit on the south side of Tāwharanui, so an easterly is not in their face. That road goes through Matakana, but it is a Tuesday.</p>
+        </article>
+
+        <article class="day">
+          <h3>Wednesday 7 October</h3>
+          <p>Algies Bay from mid-afternoon through the 5:29pm high (2.7 m). The wind eases to southeast at 10 knots, then light and variable. This is the first pleasant day on the east shore. Low tide is 11:13am (0.8 m), so Martins Bay is the better earlier swim. Backup: Snells in the same afternoon window.</p>
+        </article>
+
+        <article class="day">
+          <h3>Thursday 8 October</h3>
+          <p>Martins Bay through the day. The inner gulf is about variable 5 knots. The highs are 6:01am (2.7 m) and 6:25pm (2.7 m), and low tide is 12:14pm (0.7 m), so Algies or Snells only as an evening swim around 6:25pm. The open coast turns a bit more easterly later and is still not a surf day. Northeast swell stays around half a metre.</p>
+        </article>
+
+        <p class="sources">MetService Hauraki Gulf recreational and Colville coastal, issued Monday morning 5 Oct 2026; Te Arai Point surf for swell and sea temperature; Mahurangi Harbour tide table (tides4fishing). Snells itself is a few minutes off that tide, not a different tide.</p>
+      </section>
+
+      <section class="guide" aria-labelledby="guide-heading">
+        <h2 id="guide-heading">The beaches</h2>
+        <p><strong>Snells Beach</strong> faces east across Kawau Bay. It is a flat swim, best about two hours either side of high. A fresh easterly blows it out.</p>
+        <p><strong>Algies Bay</strong> is the calm bay just south of Snells. The sand is good for about three hours either side of high, and it is not worth it at low.</p>
+        <p><strong>Scotts Landing</strong> is on the harbour side at the south end of the peninsula. It is the shelter when a northerly is up, and an easterly is blocked by the land too. A couple of hours either side of high.</p>
+        <p><strong>Martins Bay</strong> is the more open local bay, but it is all-tide, and it can pick up a little for a bodyboard.</p>
+        <p><strong>Scandretts Bay</strong> is a small beach on the northeast tip, with rock pools at low tide. It is not surf.</p>
+        <p><strong>Baddeleys and Campbells</strong> sit on the south side of Tāwharanui, so a northerly is offshore and a southerly is in their face. They are high-tide swims. The road goes through Matakana.</p>
+        <p><strong>Omaha and Anchor Bay</strong> at Tāwharanui face northeast. Pakiri and Te Arai are more open, cleanest in a west to southwest with swell from the northeast. Te Arai gets the most size, and Tāwharanui the least. All of them go through Matakana.</p>
+        <p><strong>Mathesons Bay</strong> at Leigh is a sheltered swim at any tide.</p>
+        <p><strong>Goat Island</strong> is the snorkel. Skip it in an east or northeast over about 20 knots, or swell over a metre from that direction.</p>
+        <p><strong>Sandspit</strong> is the ferry, not a swim.</p>
+        <p>On Saturday and Sunday the Matakana road is the queue for Omaha, Tāwharanui, Leigh, Pakiri, Te Arai, Baddeleys, and Campbells. Snells, Algies, Martins, and Scotts do not go through it.</p>
+      </section>
+    </main>
+
+    <footer>
+      <p>Updated each morning.</p>
+    </footer>
+  </div>
+</body>
+</html>
