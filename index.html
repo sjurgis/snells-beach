@@ -2,235 +2,75 @@
 <html lang="en-NZ">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Snells Beach</title>
-<style>
-  :root {
-    --sand: #f3eee4;
-    --ink: #143238;
-    --quiet: #3c5458;
-    --sea: #2f6d5e;
-    --rule: #d4cdc0;
-  }
-
-  * { box-sizing: border-box; }
-
-  html { -webkit-text-size-adjust: 100%; }
-
-  body {
-    margin: 0;
-    background: var(--sand);
-    color: var(--ink);
-    font-family: Georgia, "Iowan Old Style", "Palatino Linotype", Palatino, serif;
-    font-size: 1.125rem;
-    line-height: 1.55;
-  }
-
-  .page {
-    max-width: 40rem;
-    margin: 0 auto;
-    padding: 2.75rem 1.35rem 4.5rem;
-  }
-
-  header {
-    margin-bottom: 3.25rem;
-  }
-
-  .place {
-    margin: 0 0 0.7rem;
-    font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-    font-size: 0.78rem;
-    letter-spacing: 0.14em;
-    text-transform: uppercase;
-    color: var(--sea);
-  }
-
-  h1 {
-    margin: 0;
-    font-weight: normal;
-    font-size: clamp(2.7rem, 11vw, 4.4rem);
-    line-height: 0.92;
-    letter-spacing: -0.03em;
-  }
-
-  .updated {
-    margin: 1.35rem 0 0;
-    max-width: 34rem;
-    font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-    font-size: 0.92rem;
-    line-height: 1.45;
-    color: var(--quiet);
-  }
-
-  .today {
-    margin: 0 0 3.5rem;
-    padding-top: 0.15rem;
-  }
-
-  .when {
-    margin: 0 0 0.55rem;
-    font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-    font-size: 0.82rem;
-    letter-spacing: 0.08em;
-    text-transform: uppercase;
-    color: var(--sea);
-  }
-
-  .today h2 {
-    margin: 0 0 1.15rem;
-    font-weight: normal;
-    font-size: clamp(2rem, 7vw, 2.85rem);
-    line-height: 1.12;
-    letter-spacing: -0.02em;
-  }
-
-  .today p,
-  .days p,
-  .guide p {
-    margin: 0 0 1rem;
-  }
-
-  .today p:last-child,
-  .day p:last-child,
-  .guide p:last-child {
-    margin-bottom: 0;
-  }
-
-  .water {
-    margin-top: 1.35rem;
-    color: var(--quiet);
-  }
-
-  .days {
-    margin: 0 0 1.5rem;
-    padding-top: 0.25rem;
-    border-top: 1px solid var(--rule);
-  }
-
-  .days > h2,
-  .guide > h2 {
-    margin: 2rem 0 1.35rem;
-    font-weight: normal;
-    font-size: 1.35rem;
-    letter-spacing: -0.01em;
-  }
-
-  .day {
-    padding: 1.35rem 0 1.45rem;
-    border-bottom: 1px solid var(--rule);
-  }
-
-  .day h3 {
-    margin: 0 0 0.45rem;
-    font-weight: normal;
-    font-size: 1.28rem;
-    line-height: 1.25;
-  }
-
-  .day p {
-    margin: 0;
-    color: var(--ink);
-  }
-
-  .sources {
-    margin: 1.5rem 0 0;
-    font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-    font-size: 0.82rem;
-    line-height: 1.45;
-    color: var(--quiet);
-  }
-
-  .guide {
-    margin-top: 3.25rem;
-    padding-top: 0.25rem;
-    border-top: 1px solid var(--rule);
-    font-size: 0.98rem;
-    line-height: 1.6;
-    color: var(--quiet);
-  }
-
-  .guide p {
-    margin: 0 0 1.15rem;
-  }
-
-  .guide p strong {
-    font-weight: normal;
-    color: var(--ink);
-  }
-
-  footer {
-    margin-top: 3rem;
-    font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-    font-size: 0.82rem;
-    color: var(--quiet);
-  }
-
-  footer p { margin: 0; }
-
-  @media (min-width: 720px) {
-    .page { padding: 4.5rem 2rem 5.5rem; }
-    body { font-size: 1.2rem; }
-    .today { margin-bottom: 4.25rem; }
-  }
-</style>
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#0f4c5c">
+<title>Snells Beach · where to go today</title>
+<meta name="description" content="Daily beach pick around Snells Beach, Mahurangi: wind, swell, tide, dogs and drive time.">
+<link rel="stylesheet" href="style.css">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Ccircle cx='16' cy='12' r='7' fill='%23ff8a3d'/%3E%3Cpath d='M0 22c4-3 8-3 12 0s8 3 12 0 6-3 8-2v12H0z' fill='%231b7f79'/%3E%3C/svg%3E">
 </head>
 <body>
-  <div class="page">
-    <header>
-      <p class="place">Kawau Bay, Auckland</p>
-      <h1>Snells Beach</h1>
-      <p class="updated">Updated Friday 9 October 2026, 8:15am NZDT.</p>
-    </header>
-
-    <main>
-      <section class="today" aria-labelledby="today-heading">
-        <p class="when">Today, Friday 9 October</p>
-        <h2 id="today-heading">Algies Bay this morning</h2>
-        <p>The morning high was 6:59am (2.7 m), and the sand is still good until about 10am. The wind is light: east-southeast about 9 knots at 8am, easing into an easterly around 6–9 knots, then east-northeast by late morning. That is light enough for Algies. Low tide is 1:08pm (0.6 m), so the east shore is finished by midday.</p>
-        <p>The swell is not up: about 0.7 m from the northeast off Te Arai at around 7 seconds, which is not surf. Skip Omaha, Tāwharanui, Pakiri, and Te Arai. Backup: Scotts Landing in the evening, from about 5:15pm toward the 7:17pm high (2.8 m), out of the northeasterly that settles in after lunch. Sunset is 7:31pm.</p>
-        <p class="water">The water is about 16°C.</p>
-      </section>
-
-      <section class="days" aria-labelledby="days-heading">
-        <h2 id="days-heading">The next days</h2>
-
-        <article class="day">
-          <h3>Saturday 10 October</h3>
-          <p>Algies Bay in the morning, around the 7:51am high (2.8 m), from about 7am to 10:30am while the northeasterly is only about 3–7 knots. There may be light showers early. It builds north-northeast 10–14 knots in the afternoon, gusting about 21–23, and low tide is 1:57pm (0.6 m), so the east shore is done by lunchtime. Backup: Scotts Landing in the evening, about 6pm to sunset at 7:32pm, heading toward the 8:06pm high (2.8 m) and sheltered from the north-northeast. The swell is only about half a metre, so no surf trip, and neither pick goes through Matakana.</p>
-        </article>
-
-        <article class="day">
-          <h3>Sunday 11 October</h3>
-          <p>Algies Bay in the morning, around the 8:38am high (2.8 m), from about 8am to 11:30am. The wind is northwest about 10 knots, which is offshore on the east shore, then west about 12 knots from midday, gusting around 22. Showers are likely through the day, but it is warm, about 20°C in the afternoon. Low tide is 2:41pm (0.6 m) and the evening high is after dark. Backup: Snells from about 8am to 10:30am, same offshore breeze. The westerly would be offshore at Pakiri and Te Arai, but the swell is only about 0.4–0.5 m, so it is not worth the drive through Matakana.</p>
-        </article>
-
-        <article class="day">
-          <h3>Monday 12 October</h3>
-          <p>Algies Bay in the morning, around the 9:22am high (2.9 m), from about 8am to midday. The wind stays light: northwest about 5–8 knots early, then west to west-southwest under 10 knots, with a chance of showers. Low tide is 3:24pm (0.6 m) and the evening high is after dark at 9:35pm. Backup: Martins Bay through the middle of the day, when the tide is falling and the breeze is soft. The swell is still about half a metre, not surf.</p>
-        </article>
-
-        <p class="sources">Wind and weather from the Norwegian Meteorological Institute (met.no) forecast for Snells Beach, run at 6:18am Friday, checked against the Open-Meteo forecast for gusts and shower chances. Swell and sea temperature from the Open-Meteo marine model for Kawau Bay and off Te Arai. Tides from the Mahurangi Harbour table (tides4fishing); Snells itself is a few minutes off that.</p>
-      </section>
-
-      <section class="guide" aria-labelledby="guide-heading">
-        <h2 id="guide-heading">The beaches</h2>
-        <p><strong>Snells Beach</strong> faces east across Kawau Bay. It is a flat swim, best about two hours either side of high. A fresh easterly blows it out.</p>
-        <p><strong>Algies Bay</strong> is the calm bay just south of Snells. The sand is good for about three hours either side of high, and it is not worth it at low.</p>
-        <p><strong>Scotts Landing</strong> is on the harbour side at the south end of the peninsula. It is the shelter when a northerly is up, and an easterly is blocked by the land too. A couple of hours either side of high.</p>
-        <p><strong>Martins Bay</strong> is the more open local bay, but it is all-tide, and it can pick up a little for a bodyboard.</p>
-        <p><strong>Scandretts Bay</strong> is the most sheltered beach in a southeast. It is a small beach on the northeast tip, with rock pools at low tide, and it is not surf.</p>
-        <p><strong>Baddeleys and Campbells</strong> sit on the south side of Tāwharanui, so a northerly is offshore and a southerly is in their face. They are high-tide swims. The road goes through Matakana.</p>
-        <p><strong>Omaha and Anchor Bay</strong> at Tāwharanui face northeast. Pakiri and Te Arai are more open, cleanest in a west to southwest with swell from the northeast. Te Arai gets the most size, and Tāwharanui the least. All of them go through Matakana.</p>
-        <p><strong>Mathesons Bay</strong> at Leigh is a sheltered swim at any tide.</p>
-        <p><strong>Goat Island</strong> is the snorkel. Skip it in an east or northeast over about 20 knots, or swell over a metre from that direction.</p>
-        <p><strong>Sandspit</strong> is the ferry, not a swim.</p>
-        <p>On Saturday and Sunday the Matakana road is the queue for Omaha, Tāwharanui, Leigh, Pakiri, Te Arai, Baddeleys, and Campbells. Snells, Algies, Martins, Scotts, and Scandrett do not go through it.</p>
-      </section>
-    </main>
-
-    <footer>
-      <p>Updated each morning.</p>
-    </footer>
+<header class="top">
+  <div class="wrap">
+    <p class="eyebrow">Snells Beach · Mahurangi</p>
+    <h1 id="title">Where to go today</h1>
+    <p class="sub" id="subtitle">Loading the forecast…</p>
   </div>
+</header>
+
+<form class="prefs" id="prefs" aria-label="Your preferences" onsubmit="return false">
+  <div class="wrap prefs-inner">
+    <div class="seg" role="radiogroup" aria-label="Activity" id="activity">
+      <label><input type="radio" name="activity" value="swim"><span><svg class="ic"><use href="#i-swim"/></svg>Swim</span></label>
+      <label><input type="radio" name="activity" value="surf"><span><svg class="ic"><use href="#i-surf"/></svg>Surf</span></label>
+      <label><input type="radio" name="activity" value="snorkel"><span><svg class="ic"><use href="#i-snorkel"/></svg>Snorkel</span></label>
+      <label><input type="radio" name="activity" value="sup"><span><svg class="ic"><use href="#i-sup"/></svg>SUP / Kayak</span></label>
+    </div>
+    <div class="row2">
+      <div class="drive">
+        <label for="drive" class="mini"><svg class="ic"><use href="#i-car"/></svg><span id="driveLabel">Local</span></label>
+        <input type="range" id="drive" min="0" max="2" step="1" value="1" aria-describedby="driveHint">
+        <div class="ticks" id="driveHint"><span>Local</span><span>Nearby</span><span>Road trip</span></div>
+      </div>
+      <label class="switch">
+        <input type="checkbox" id="dog">
+        <span class="track" aria-hidden="true"><span class="knob"></span></span>
+        <span class="mini"><svg class="ic"><use href="#i-dog"/></svg>Dog</span>
+      </label>
+    </div>
+  </div>
+</form>
+
+<main class="wrap" id="app" aria-live="polite">
+  <div class="loading"><div class="spinner"></div>Checking wind, swell and tide…</div>
+</main>
+
+<footer class="wrap foot" id="foot"></footer>
+
+<!-- icon sprite -->
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <defs>
+    <symbol id="i-swim" viewBox="0 0 24 24"><circle cx="16.5" cy="6" r="2.2" fill="currentColor"/><path d="M4 12.5l5-3 3.5 2.5 3-2" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M2 17c2-1.5 4-1.5 6 0s4 1.5 6 0 4-1.5 6 0 2 1 2 1" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></symbol>
+    <symbol id="i-surf" viewBox="0 0 24 24"><path d="M2 18c3-1.6 5-1.6 8 0s5 1.6 8 0 3.4-1 4-1" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><path d="M3 14c1-6 6-10 12-9-3 1.5-4 4-2.5 6.5 1 1.6 3 2 4.5 1.5-1.5 2.5-5 3.6-8 2.6" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+    <symbol id="i-snorkel" viewBox="0 0 24 24"><rect x="2.5" y="8" width="13" height="7.5" rx="3.5" fill="none" stroke="currentColor" stroke-width="2"/><path d="M9 15.5v-2M19.5 3v11a4 4 0 0 1-4 4H12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></symbol>
+    <symbol id="i-sup" viewBox="0 0 24 24"><path d="M2 17.5h20" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"/><circle cx="11" cy="5" r="2" fill="currentColor"/><path d="M11 7.5v6M8 15l3-1.5 3 1.5M17 3l-4 13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+    <symbol id="i-car" viewBox="0 0 24 24"><path d="M4 16v-4l2-5h12l2 5v4z" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/><circle cx="7.5" cy="16.5" r="1.8" fill="currentColor"/><circle cx="16.5" cy="16.5" r="1.8" fill="currentColor"/><path d="M4 12h16" stroke="currentColor" stroke-width="1.6"/></symbol>
+    <symbol id="i-dog" viewBox="0 0 24 24"><path d="M5 20v-6l-2-3 2-5 3 2h6l3-2 2 5-2 3v6M9 20v-4h6v4" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/><circle cx="9.5" cy="11.5" r="1" fill="currentColor"/><circle cx="14.5" cy="11.5" r="1" fill="currentColor"/></symbol>
+    <symbol id="i-wave" viewBox="0 0 24 24"><path d="M2 9c2.5-2 5-2 7.5 0s5 2 7.5 0 3.5-1.5 5-1M2 15c2.5-2 5-2 7.5 0s5 2 7.5 0 3.5-1.5 5-1" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/></symbol>
+    <symbol id="i-tide" viewBox="0 0 24 24"><path d="M12 3v12M7.5 7.5L12 3l4.5 4.5" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/><path d="M2 19c2.5-1.8 5-1.8 7.5 0s5 1.8 7.5 0 3.5-1.4 5-.9" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/></symbol>
+    <symbol id="i-clock" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9" fill="none" stroke="currentColor" stroke-width="2"/><path d="M12 7v5l3 2" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></symbol>
+    <symbol id="i-traffic" viewBox="0 0 24 24"><rect x="7" y="2" width="10" height="20" rx="3" fill="none" stroke="currentColor" stroke-width="2"/><circle cx="12" cy="7" r="1.8" fill="currentColor"/><circle cx="12" cy="12" r="1.8" fill="currentColor"/><circle cx="12" cy="17" r="1.8" fill="currentColor"/></symbol>
+    <symbol id="i-arrow" viewBox="0 0 24 24"><path d="M12 21V4M5.5 10L12 3.5 18.5 10" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+    <symbol id="i-sun" viewBox="0 0 24 24"><circle cx="12" cy="12" r="4.5" fill="currentColor"/><path d="M12 1.5v3M12 19.5v3M1.5 12h3M19.5 12h3M4.6 4.6l2.1 2.1M17.3 17.3l2.1 2.1M4.6 19.4l2.1-2.1M17.3 6.7l2.1-2.1" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></symbol>
+    <symbol id="i-partly" viewBox="0 0 24 24"><circle cx="9" cy="9" r="4" fill="currentColor" opacity=".55"/><path d="M7 19h10a4 4 0 0 0 0-8 5 5 0 0 0-9.6 1.6A3.2 3.2 0 0 0 7 19z" fill="currentColor"/></symbol>
+    <symbol id="i-cloud" viewBox="0 0 24 24"><path d="M6 19h11a4.5 4.5 0 0 0 0-9 5.5 5.5 0 0 0-10.6 1.8A3.6 3.6 0 0 0 6 19z" fill="currentColor"/></symbol>
+    <symbol id="i-rain" viewBox="0 0 24 24"><path d="M6 14h11a4 4 0 0 0 0-8 5 5 0 0 0-9.6 1.6A3.2 3.2 0 0 0 6 14z" fill="currentColor"/><path d="M8 17l-1 3M12 17l-1 3M16 17l-1 3" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></symbol>
+    <symbol id="i-temp" viewBox="0 0 24 24"><path d="M10 4a2 2 0 0 1 4 0v9.5a4 4 0 1 1-4 0z" fill="none" stroke="currentColor" stroke-width="2"/><circle cx="12" cy="17" r="1.8" fill="currentColor"/></symbol>
+    <symbol id="i-check" viewBox="0 0 24 24"><path d="M5 12.5l4.5 4.5L19 7.5" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+    <symbol id="i-x" viewBox="0 0 24 24"><path d="M6.5 6.5l11 11M17.5 6.5l-11 11" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"/></symbol>
+    <symbol id="i-dot" viewBox="0 0 24 24"><circle cx="12" cy="12" r="4.5" fill="currentColor"/></symbol>
+  </defs>
+</svg>
+<script src="app.js" defer></script>
 </body>
 </html>

@@ -1,0 +1,173 @@
+#!/usr/bin/env python3
+"""Check data/forecast.json (and data/beaches.json) against data/SCHEMA.md. Stdlib only.
+
+Usage: python3 scripts/validate.py [path/to/forecast.json]
+Exit code 0 = OK, 1 = problems (printed one per line).
+"""
+import datetime as dt, json, re, sys
+from pathlib import Path
+
+ROOT = Path(__file__).resolve().parent.parent
+errors, warnings = [], []
+err = errors.append
+warn = warnings.append
+
+HHMM = re.compile(r"^([01]\d|2[0-3]):[0-5]\d$")
+SKY = {"sun", "partly", "cloud", "fog", "showers", "rain", "storm"}
+
+
+def num(v, lo, hi, where, required=True):
+    if v is None:
+        if required: err(f"{where}: missing")
+        return
+    if isinstance(v, bool) or not isinstance(v, (int, float)):
+        err(f"{where}: must be a number, got {v!r}"); return
+    if not lo <= v <= hi:
+        err(f"{where}: {v} outside {lo}..{hi}")
+
+
+def hhmm(v, where):
+    if not isinstance(v, str) or not HHMM.match(v):
+        err(f"{where}: must be 'HH:MM' 24h local time, got {v!r}"); return None
+    h, m = map(int, v.split(":")); return h * 60 + m
+
+
+def check_forecast(fc):
+    if not isinstance(fc, dict): err("forecast: top level must be an object"); return
+    if fc.get("schemaVersion") != 1: err("schemaVersion: must be 1")
+    if fc.get("timezone") != "Pacific/Auckland": err("timezone: must be 'Pacific/Auckland'")
+    up = fc.get("updated")
+    try:
+        u = dt.datetime.fromisoformat(up)
+        if u.tzinfo is None: err("updated: needs a UTC offset, e.g. 2026-10-09T07:19:00+13:00")
+    except Exception:
+        err(f"updated: not an ISO 8601 datetime: {up!r}"); u = None
+    src = fc.get("sources")
+    if not isinstance(src, list) or not src: err("sources: need a non-empty list")
+    else:
+        for i, s in enumerate(src):
+            for k in ("what", "name"):
+                if not isinstance(s.get(k), str) or not s.get(k): err(f"sources[{i}].{k}: required string")
+            if "url" in s and not str(s["url"]).startswith("http"): err(f"sources[{i}].url: must be http(s)")
+    days = fc.get("days")
+    if not isinstance(days, list) or not days: err("days: need a non-empty list"); return
+    if len(days) < 2: warn("days: only one day; the 'next days' strip will be empty")
+    prev = None
+    for di, d in enumerate(days):
+        w = f"days[{di}]"
+        try:
+            date = dt.date.fromisoformat(d.get("date", ""))
+        except Exception:
+            err(f"{w}.date: must be YYYY-MM-DD"); continue
+        w = f"days[{di}] {date}"
+        if prev and (date - prev).days != 1: err(f"{w}: dates must be consecutive (previous {prev})")
+        prev = date
+        sr, ss = hhmm(d.get("sunrise"), f"{w}.sunrise"), hhmm(d.get("sunset"), f"{w}.sunset")
+        if sr is not None and ss is not None and not sr < ss: err(f"{w}: sunrise must be before sunset")
+        num(d.get("airMaxC"), -5, 40, f"{w}.airMaxC", required=False)
+        num(d.get("waterTempC"), 5, 30, f"{w}.waterTempC", required=False)
+        tides = d.get("tides")
+        if not isinstance(tides, list) or len(tides) < 2:
+            err(f"{w}.tides: need at least 2 tide turns (high/low)")
+        else:
+            last_t, last_type = -1, None
+            for ti, t in enumerate(tides):
+                tw = f"{w}.tides[{ti}]"
+                m = hhmm(t.get("time"), f"{tw}.time")
+                if t.get("type") not in ("high", "low"): err(f"{tw}.type: 'high' or 'low'")
+                num(t.get("heightM"), -1, 5, f"{tw}.heightM")
+                if m is not None:
+                    if m <= last_t: err(f"{tw}: tides must be in time order")
+                    last_t = m
+                if t.get("type") == last_type: err(f"{tw}: two {last_type} tides in a row")
+                last_type = t.get("type")
+            if not any(t.get("type") == "high" for t in tides): err(f"{w}.tides: no high tide")
+        slots = d.get("slots")
+        if not isinstance(slots, list) or len(slots) < 2:
+            err(f"{w}.slots: need at least 2 time slots")
+        else:
+            last = -1
+            for si, s in enumerate(slots):
+                sw = f"{w}.slots[{si}]"
+                m = hhmm(s.get("time"), f"{sw}.time")
+                if m is not None:
+                    if m <= last: err(f"{sw}: slots must be in time order")
+                    last = m
+                num(s.get("windDirDeg"), 0, 360, f"{sw}.windDirDeg")
+                num(s.get("windKn"), 0, 80, f"{sw}.windKn")
+                num(s.get("gustKn"), 0, 100, f"{sw}.gustKn", required=False)
+                if s.get("gustKn") is not None and isinstance(s.get("windKn"), (int, float)) and s["gustKn"] + 0.5 < s["windKn"]:
+                    warn(f"{sw}: gustKn below windKn")
+                num(s.get("rainMm"), 0, 100, f"{sw}.rainMm", required=False)
+                num(s.get("airC"), -5, 40, f"{sw}.airC", required=False)
+                num(s.get("cloudPct"), 0, 100, f"{sw}.cloudPct", required=False)
+                if "sky" in s and s["sky"] not in SKY: err(f"{sw}.sky: one of {sorted(SKY)}")
+            if sr is not None and ss is not None and not any(sr - 60 <= hhmm(s.get("time"), "x") <= ss + 30 for s in slots if HHMM.match(str(s.get("time")))):
+                err(f"{w}.slots: no slot in daylight")
+        swell = d.get("swell")
+        if not isinstance(swell, list) or not swell:
+            err(f"{w}.swell: need at least 1 entry")
+        else:
+            for xi, x in enumerate(swell):
+                xw = f"{w}.swell[{xi}]"
+                hhmm(x.get("time"), f"{xw}.time")
+                o, i = x.get("open"), x.get("inner")
+                if not isinstance(o, dict): err(f"{xw}.open: required object"); o = {}
+                if not isinstance(i, dict): err(f"{xw}.inner: required object"); i = {}
+                num(o.get("swellM"), 0, 15, f"{xw}.open.swellM")
+                num(o.get("periodS"), 0, 25, f"{xw}.open.periodS")
+                num(o.get("dirDeg"), 0, 360, f"{xw}.open.dirDeg")
+                num(o.get("waveM"), 0, 15, f"{xw}.open.waveM", required=False)
+                num(i.get("waveM"), 0, 10, f"{xw}.inner.waveM")
+                num(i.get("periodS"), 0, 25, f"{xw}.inner.periodS", required=False)
+                num(i.get("dirDeg"), 0, 360, f"{xw}.inner.dirDeg", required=False)
+        tr = d.get("traffic")
+        if tr is not None:
+            if not isinstance(tr, dict) or tr.get("level") not in ("light", "moderate", "busy"):
+                err(f"{w}.traffic.level: 'light' | 'moderate' | 'busy'")
+            if not isinstance((tr or {}).get("note"), str): err(f"{w}.traffic.note: required string")
+    if u:
+        first = dt.date.fromisoformat(days[0]["date"]) if isinstance(days[0].get("date"), str) else None
+        if first and u.astimezone(dt.timezone(dt.timedelta(hours=13))).date() - first > dt.timedelta(days=1):
+            warn("days[0] is more than a day before 'updated': is the file stale?")
+
+
+def check_beaches(b):
+    ids = set()
+    for i, x in enumerate(b.get("beaches", [])):
+        w = f"beaches[{i}] {x.get('id')}"
+        if x.get("id") in ids: err(f"{w}: duplicate id")
+        ids.add(x.get("id"))
+        for k in ("name", "area"):
+            if not isinstance(x.get(k), str): err(f"{w}.{k}: required")
+        num(x.get("driveMin"), 0, 300, f"{w}.driveMin"); num(x.get("facingDeg"), 0, 360, f"{w}.facingDeg")
+        if not isinstance(x.get("viaMatakana"), bool): err(f"{w}.viaMatakana: bool")
+        if x.get("tide", {}).get("mode") not in ("high", "all"): err(f"{w}.tide.mode: 'high' | 'all'")
+        if x.get("exposure", {}).get("source") not in ("open", "inner"): err(f"{w}.exposure.source: 'open' | 'inner'")
+        for a in ("swim", "surf", "snorkel", "sup"): num(x.get("suits", {}).get(a), 0, 1, f"{w}.suits.{a}")
+        dog = x.get("dog") or {}
+        if not dog.get("rules"): err(f"{w}.dog.rules: required")
+        if not dog.get("verified"): warn(f"{w}: dog rule unverified (page will say 'check signs')")
+        for r in dog.get("rules", []):
+            if r.get("status") not in ("offlead", "leash", "limited", "banned"): err(f"{w}.dog.rules status {r.get('status')!r}")
+        if dog.get("rules") and "from" in dog["rules"][-1]: err(f"{w}.dog.rules: last rule must be the catch-all (no from/to)")
+    if not ids: err("beaches.json: no beaches")
+
+
+def main():
+    path = Path(sys.argv[1]) if len(sys.argv) > 1 else ROOT / "data" / "forecast.json"
+    for p, fn in ((path, check_forecast), (ROOT / "data" / "beaches.json", check_beaches)):
+        try:
+            data = json.loads(p.read_text(encoding="utf-8"))
+        except Exception as e:
+            err(f"{p}: cannot read/parse JSON: {e}"); continue
+        fn(data)
+    for w in warnings: print("warning:", w)
+    for e in errors: print("ERROR:", e)
+    if errors:
+        print(f"FAILED: {len(errors)} problem(s)"); sys.exit(1)
+    print(f"OK: {path.name} and beaches.json look valid" + (f" ({len(warnings)} warning(s))" if warnings else ""))
+
+
+if __name__ == "__main__":
+    main()

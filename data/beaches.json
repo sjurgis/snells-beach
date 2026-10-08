@@ -1,0 +1,666 @@
+{
+ "schemaVersion": 1,
+ "origin": {
+  "name": "Snells Beach township",
+  "lat": -36.42048,
+  "lon": 174.72398
+ },
+ "drive": {
+  "source": "OSRM public router (router.project-osrm.org), car profile, no traffic",
+  "measured": "2026-10-09",
+  "stops": [
+   {
+    "label": "Local",
+    "maxMin": 15,
+    "hint": "the peninsula"
+   },
+   {
+    "label": "Nearby",
+    "maxMin": 35,
+    "hint": "Ōmaha, Leigh, Tāwharanui"
+   },
+   {
+    "label": "Road trip",
+    "maxMin": 999,
+    "hint": "incl. Pākiri & Te Ārai"
+   }
+  ]
+ },
+ "dogNote": "Rules from Auckland Council park pages and DOC, checked 9 Oct 2026. Signs can lag the website; council says follow the website. Summer time-and-season rules run 1 Dec – 1 Mar.",
+ "matakana": "Weekend and holiday queues through Matakana village affect Ōmaha, Tāwharanui, Leigh, Pākiri, Te Ārai, Baddeleys and Campbells.",
+ "beaches": [
+  {
+   "id": "snells",
+   "name": "Snells Beach",
+   "area": "Mahurangi East",
+   "lat": -36.4164,
+   "lon": 174.72957,
+   "driveMin": 2,
+   "driveKm": 1.4,
+   "viaMatakana": false,
+   "facingDeg": 75,
+   "shelteredFrom": [],
+   "tide": {
+    "mode": "high",
+    "hours": 2
+   },
+   "exposure": {
+    "source": "inner",
+    "factor": 0.7
+   },
+   "suits": {
+    "surf": 0.1,
+    "swim": 1.0,
+    "snorkel": 0.15,
+    "sup": 0.75
+   },
+   "notes": [
+    "Faces east across Kawau Bay",
+    "Flat swim ~2 h either side of high",
+    "Fresh easterly = onshore chop"
+   ],
+   "dog": {
+    "verified": true,
+    "checked": "2026-10-09",
+    "source": "https://www.aucklandcouncil.govt.nz/en/parks-recreation/find-park-beach/park-detail/2558.html",
+    "sourceExtra": "https://ourauckland.aucklandcouncil.govt.nz/news/2025/06/paw-and-order-new-dog-walking-rules-from-1-august-2025/",
+    "rules": [
+     {
+      "from": "12-01",
+      "to": "03-01",
+      "status": "limited",
+      "chip": "South end · no dogs 10am–5pm",
+      "text": "South of Sunburst boat ramp: no dogs 10am–5pm, off-lead 5pm–10am. North of the ramp: no dogs (shorebird season 1 Sep – 31 Mar)"
+     },
+     {
+      "from": "03-02",
+      "to": "03-31",
+      "status": "offlead",
+      "chip": "Off-lead south of boat ramp",
+      "text": "South of Sunburst boat ramp: off-lead. North of the ramp: no dogs until 31 Mar (shorebirds)"
+     },
+     {
+      "from": "09-01",
+      "to": "11-30",
+      "status": "offlead",
+      "chip": "Off-lead south of boat ramp",
+      "text": "South of Sunburst boat ramp: off-lead. North of the ramp: no dogs 1 Sep – 31 Mar (shorebirds)"
+     },
+     {
+      "status": "offlead",
+      "chip": "Off-lead south · on-lead north",
+      "text": "South of Sunburst boat ramp: off-lead. North of the ramp: on-lead (Apr – Aug)"
+     }
+    ]
+   }
+  },
+  {
+   "id": "algies",
+   "name": "Algies Bay",
+   "area": "Mahurangi East",
+   "lat": -36.43268,
+   "lon": 174.73695,
+   "driveMin": 3,
+   "driveKm": 2.0,
+   "viaMatakana": false,
+   "facingDeg": 80,
+   "shelteredFrom": [],
+   "tide": {
+    "mode": "high",
+    "hours": 3
+   },
+   "exposure": {
+    "source": "inner",
+    "factor": 0.6
+   },
+   "suits": {
+    "surf": 0.05,
+    "swim": 1.0,
+    "snorkel": 0.2,
+    "sup": 0.85
+   },
+   "notes": [
+    "Calm bay just south of Snells",
+    "Good ~3 h either side of high",
+    "Not worth it at low tide"
+   ],
+   "dog": {
+    "verified": true,
+    "checked": "2026-10-09",
+    "source": "https://www.aucklandcouncil.govt.nz/en/parks-recreation/find-park-beach/park-detail/556.html",
+    "rules": [
+     {
+      "from": "12-01",
+      "to": "03-01",
+      "status": "limited",
+      "chip": "No dogs 10am–5pm",
+      "text": "Summer (1 Dec – 1 Mar): no dogs on the beach 10am–5pm, off-lead 5pm–10am"
+     },
+     {
+      "status": "offlead",
+      "chip": "Off-lead",
+      "text": "Off-season (2 Mar – 30 Nov): off-lead on the beach any time"
+     }
+    ]
+   }
+  },
+  {
+   "id": "scotts",
+   "name": "Scotts Landing",
+   "area": "Mahurangi Harbour",
+   "lat": -36.48611,
+   "lon": 174.72551,
+   "driveMin": 14,
+   "driveKm": 9.2,
+   "viaMatakana": false,
+   "facingDeg": 240,
+   "shelteredFrom": [
+    "N",
+    "NE",
+    "E"
+   ],
+   "tide": {
+    "mode": "high",
+    "hours": 2.5
+   },
+   "exposure": {
+    "source": "inner",
+    "factor": 0.2
+   },
+   "suits": {
+    "surf": 0.0,
+    "swim": 0.9,
+    "snorkel": 0.1,
+    "sup": 1.0
+   },
+   "notes": [
+    "Harbour side, south end of the peninsula",
+    "Shelter in a northerly or easterly",
+    "Swim 2–3 h either side of high"
+   ],
+   "dog": {
+    "verified": true,
+    "checked": "2026-10-09",
+    "source": "https://www.aucklandcouncil.govt.nz/en/parks-recreation/find-park-beach/park-detail/3531.html",
+    "sourceExtra": "https://www.aucklandcouncil.govt.nz/en/parks-recreation/find-park-beach/park-detail/218.html",
+    "rules": [
+     {
+      "status": "leash",
+      "chip": "On-lead",
+      "text": "On-lead at all times on Scott Point park, beach and foreshore. No dogs in the Scott Homestead grounds or on DOC's Mahurangi Scenic Reserve"
+     }
+    ]
+   }
+  },
+  {
+   "id": "scandretts",
+   "name": "Scandretts Bay",
+   "area": "Scandrett Regional Park",
+   "lat": -36.44172,
+   "lon": 174.77656,
+   "driveMin": 10,
+   "driveKm": 6.9,
+   "viaMatakana": false,
+   "facingDeg": 30,
+   "shelteredFrom": [
+    "SE"
+   ],
+   "tide": {
+    "mode": "all"
+   },
+   "exposure": {
+    "source": "inner",
+    "factor": 0.55
+   },
+   "suits": {
+    "surf": 0.05,
+    "swim": 0.85,
+    "snorkel": 0.45,
+    "sup": 0.9
+   },
+   "notes": [
+    "Most sheltered beach in a southeasterly",
+    "Rock pools at low tide",
+    "Small beach on the NE tip"
+   ],
+   "dog": {
+    "verified": true,
+    "checked": "2026-10-09",
+    "source": "https://www.aucklandcouncil.govt.nz/en/parks-recreation/find-park-beach/park-detail/225.html",
+    "rules": [
+     {
+      "status": "banned",
+      "chip": "No dogs",
+      "text": "Regional park: no dogs at any time, on the beach, in the park or in cars"
+     }
+    ]
+   }
+  },
+  {
+   "id": "martins",
+   "name": "Martins Bay",
+   "area": "Mahurangi East",
+   "lat": -36.45165,
+   "lon": 174.76217,
+   "driveMin": 7,
+   "driveKm": 6.1,
+   "viaMatakana": false,
+   "facingDeg": 60,
+   "shelteredFrom": [],
+   "tide": {
+    "mode": "all"
+   },
+   "exposure": {
+    "source": "inner",
+    "factor": 0.9
+   },
+   "suits": {
+    "surf": 0.3,
+    "swim": 0.95,
+    "snorkel": 0.3,
+    "sup": 0.95
+   },
+   "notes": [
+    "Any tide",
+    "More open, small bodyboard waves sometimes",
+    "Kayak hire at the campground"
+   ],
+   "dog": {
+    "verified": true,
+    "checked": "2026-10-09",
+    "source": "https://www.aucklandcouncil.govt.nz/en/parks-recreation/find-park-beach/park-detail/565.html",
+    "rules": [
+     {
+      "from": "12-01",
+      "to": "03-01",
+      "status": "limited",
+      "chip": "No dogs 10am–5pm",
+      "text": "Summer (1 Dec – 1 Mar): no dogs on the beach 10am–5pm, off-lead 5pm–10am"
+     },
+     {
+      "status": "offlead",
+      "chip": "Off-lead",
+      "text": "Off-season (2 Mar – 30 Nov): off-lead on the beach any time"
+     }
+    ]
+   }
+  },
+  {
+   "id": "baddeleys",
+   "name": "Baddeleys Beach",
+   "area": "South Tāwharanui",
+   "lat": -36.38193,
+   "lon": 174.75613,
+   "driveMin": 22,
+   "driveKm": 17.9,
+   "viaMatakana": true,
+   "facingDeg": 185,
+   "shelteredFrom": [],
+   "tide": {
+    "mode": "high",
+    "hours": 2.5
+   },
+   "exposure": {
+    "source": "inner",
+    "factor": 0.5
+   },
+   "suits": {
+    "surf": 0.05,
+    "swim": 0.9,
+    "snorkel": 0.25,
+    "sup": 0.8
+   },
+   "notes": [
+    "Faces south: a northerly is offshore",
+    "Southerly is straight in",
+    "High-tide swim"
+   ],
+   "dog": {
+    "verified": true,
+    "checked": "2026-10-09",
+    "source": "https://www.aucklandcouncil.govt.nz/en/parks-recreation/find-park-beach/park-detail/2622.html",
+    "rules": [
+     {
+      "from": "12-01",
+      "to": "03-01",
+      "status": "limited",
+      "chip": "No dogs 10am–5pm",
+      "text": "Summer (1 Dec – 1 Mar): no dogs on the beach 10am–5pm, off-lead 5pm–10am"
+     },
+     {
+      "status": "offlead",
+      "chip": "Off-lead",
+      "text": "Off-season (2 Mar – 30 Nov): off-lead on the beach any time"
+     }
+    ]
+   }
+  },
+  {
+   "id": "campbells",
+   "name": "Campbells Beach",
+   "area": "South Tāwharanui",
+   "lat": -36.38263,
+   "lon": 174.76546,
+   "driveMin": 23,
+   "driveKm": 18.3,
+   "viaMatakana": true,
+   "facingDeg": 175,
+   "shelteredFrom": [],
+   "tide": {
+    "mode": "high",
+    "hours": 2.5
+   },
+   "exposure": {
+    "source": "inner",
+    "factor": 0.5
+   },
+   "suits": {
+    "surf": 0.05,
+    "swim": 0.9,
+    "snorkel": 0.25,
+    "sup": 0.8
+   },
+   "notes": [
+    "Faces south: a northerly is offshore",
+    "Southerly is straight in",
+    "High-tide swim"
+   ],
+   "dog": {
+    "verified": true,
+    "checked": "2026-10-09",
+    "source": "https://www.aucklandcouncil.govt.nz/en/parks-recreation/find-park-beach/park-detail/2625.html",
+    "rules": [
+     {
+      "from": "12-01",
+      "to": "03-01",
+      "status": "limited",
+      "chip": "No dogs 10am–5pm",
+      "text": "Summer (1 Dec – 1 Mar): no dogs on the beach 10am–5pm, off-lead 5pm–10am"
+     },
+     {
+      "status": "offlead",
+      "chip": "Off-lead",
+      "text": "Off-season (2 Mar – 30 Nov): off-lead on the beach any time"
+     }
+    ]
+   }
+  },
+  {
+   "id": "omaha",
+   "name": "Ōmaha",
+   "area": "Ōmaha",
+   "lat": -36.33511,
+   "lon": 174.77983,
+   "driveMin": 20,
+   "driveKm": 16.7,
+   "viaMatakana": true,
+   "facingDeg": 80,
+   "shelteredFrom": [],
+   "tide": {
+    "mode": "all"
+   },
+   "exposure": {
+    "source": "open",
+    "factor": 0.8
+   },
+   "suits": {
+    "surf": 0.9,
+    "swim": 0.75,
+    "snorkel": 0.05,
+    "sup": 0.4
+   },
+   "notes": [
+    "Beach break, needs NE swell",
+    "Offshore in a westerly",
+    "Patrolled in summer"
+   ],
+   "dog": {
+    "verified": true,
+    "checked": "2026-10-09",
+    "source": "https://www.aucklandcouncil.govt.nz/en/parks-recreation/find-park-beach/park-detail/2437.html",
+    "rules": [
+     {
+      "from": "12-01",
+      "to": "03-01",
+      "status": "limited",
+      "chip": "No dogs 10am–5pm · north end never",
+      "text": "South of the Rita Way access track: no dogs 10am–5pm, off-lead 5pm–10am (1 Dec – 1 Mar). North of Rita Way: no dogs ever (wildlife)"
+     },
+     {
+      "status": "offlead",
+      "chip": "Off-lead · not north end",
+      "text": "South of the Rita Way access track: off-lead any time. North of Rita Way (Ida–Rita Way Reserve): no dogs ever"
+     }
+    ]
+   }
+  },
+  {
+   "id": "tawharanui",
+   "name": "Tāwharanui (Anchor Bay)",
+   "area": "Tāwharanui Regional Park",
+   "lat": -36.36528,
+   "lon": 174.83698,
+   "driveMin": 30,
+   "driveKm": 24.8,
+   "viaMatakana": true,
+   "facingDeg": 40,
+   "shelteredFrom": [],
+   "tide": {
+    "mode": "all"
+   },
+   "exposure": {
+    "source": "open",
+    "factor": 0.65
+   },
+   "suits": {
+    "surf": 0.8,
+    "swim": 0.85,
+    "snorkel": 0.5,
+    "sup": 0.5
+   },
+   "notes": [
+    "Faces NE, smaller than Te Ārai",
+    "Offshore in a southwesterly",
+    "Marine reserve: snorkel the rocks"
+   ],
+   "dog": {
+    "verified": true,
+    "checked": "2026-10-09",
+    "source": "https://www.aucklandcouncil.govt.nz/en/parks-recreation/find-park-beach/park-detail/228.html",
+    "rules": [
+     {
+      "status": "banned",
+      "chip": "No dogs",
+      "text": "Open sanctuary: no dogs anywhere in the park, including in cars on park roads"
+     }
+    ]
+   }
+  },
+  {
+   "id": "mathesons",
+   "name": "Mathesons Bay",
+   "area": "Leigh",
+   "lat": -36.30111,
+   "lon": 174.79712,
+   "driveMin": 25,
+   "driveKm": 21.2,
+   "viaMatakana": true,
+   "facingDeg": 100,
+   "shelteredFrom": [
+    "S",
+    "SW",
+    "W"
+   ],
+   "tide": {
+    "mode": "all"
+   },
+   "exposure": {
+    "source": "open",
+    "factor": 0.4
+   },
+   "suits": {
+    "surf": 0.05,
+    "swim": 0.95,
+    "snorkel": 0.7,
+    "sup": 0.75
+   },
+   "notes": [
+    "Sheltered swim at any tide",
+    "Reef and island",
+    "Good backup snorkel"
+   ],
+   "dog": {
+    "verified": true,
+    "checked": "2026-10-09",
+    "source": "https://www.aucklandcouncil.govt.nz/en/parks-recreation/find-park-beach/park-detail/2480.html",
+    "rules": [
+     {
+      "from": "12-01",
+      "to": "03-01",
+      "status": "limited",
+      "chip": "No dogs 10am–5pm",
+      "text": "Summer (1 Dec – 1 Mar): no dogs on the beach 10am–5pm, on-lead 5pm–10am"
+     },
+     {
+      "status": "offlead",
+      "chip": "Off-lead",
+      "text": "Off-season (2 Mar – 30 Nov): off-lead on the beach any time"
+     }
+    ]
+   }
+  },
+  {
+   "id": "goat",
+   "name": "Goat Island",
+   "area": "Leigh · marine reserve",
+   "lat": -36.27042,
+   "lon": 174.79333,
+   "driveMin": 31,
+   "driveKm": 25.4,
+   "viaMatakana": true,
+   "facingDeg": 30,
+   "shelteredFrom": [],
+   "tide": {
+    "mode": "all"
+   },
+   "exposure": {
+    "source": "open",
+    "factor": 0.5
+   },
+   "suits": {
+    "surf": 0.0,
+    "swim": 0.7,
+    "snorkel": 1.0,
+    "sup": 0.6
+   },
+   "notes": [
+    "The snorkel spot: marine reserve",
+    "DOC: skip in E/NE wind over ~20 kn",
+    "DOC: skip in E/NE swell over 1 m"
+   ],
+   "doc": {
+    "dirFromDeg": 22.5,
+    "dirToDeg": 112.5,
+    "maxWindKn": 20,
+    "maxSwellM": 1.0,
+    "source": "https://www.doc.govt.nz/parks-and-recreation/places-to-go/auckland/places/cape-rodney-okakari-point-marine-reserve-goat-island/"
+   },
+   "dog": {
+    "verified": true,
+    "checked": "2026-10-09",
+    "source": "https://www.doc.govt.nz/parks-and-recreation/places-to-go/auckland/places/cape-rodney-okakari-point-marine-reserve-goat-island/",
+    "rules": [
+     {
+      "status": "banned",
+      "chip": "No dogs",
+      "text": "DOC marine reserve: dogs are not allowed anywhere here"
+     }
+    ]
+   }
+  },
+  {
+   "id": "pakiri",
+   "name": "Pākiri",
+   "area": "Pākiri",
+   "lat": -36.2499,
+   "lon": 174.73589,
+   "driveMin": 46,
+   "driveKm": 31.8,
+   "viaMatakana": true,
+   "facingDeg": 67,
+   "shelteredFrom": [],
+   "tide": {
+    "mode": "all"
+   },
+   "exposure": {
+    "source": "open",
+    "factor": 0.95
+   },
+   "suits": {
+    "surf": 0.95,
+    "swim": 0.6,
+    "snorkel": 0.0,
+    "sup": 0.3
+   },
+   "notes": [
+    "Exposed beach break",
+    "Offshore WSW, best NE swell",
+    "Rips: swim with care"
+   ],
+   "dog": {
+    "verified": true,
+    "checked": "2026-10-09",
+    "source": "https://www.aucklandcouncil.govt.nz/en/parks-recreation/find-park-beach/park-detail/223.html",
+    "rules": [
+     {
+      "status": "banned",
+      "chip": "No dogs",
+      "text": "Pākiri Regional Park rules (from Aug 2025) ban dogs on Pākiri Beach, the foreshore and park land"
+     }
+    ]
+   }
+  },
+  {
+   "id": "tearai",
+   "name": "Te Ārai",
+   "area": "Te Ārai Regional Park",
+   "lat": -36.16353,
+   "lon": 174.65258,
+   "driveMin": 58,
+   "driveKm": 51.7,
+   "viaMatakana": true,
+   "facingDeg": 67,
+   "shelteredFrom": [],
+   "tide": {
+    "mode": "all"
+   },
+   "exposure": {
+    "source": "open",
+    "factor": 1.0
+   },
+   "suits": {
+    "surf": 1.0,
+    "swim": 0.55,
+    "snorkel": 0.0,
+    "sup": 0.25
+   },
+   "notes": [
+    "Most open: gets the most size",
+    "Offshore WSW, best NE swell",
+    "Longest drive"
+   ],
+   "dog": {
+    "verified": true,
+    "checked": "2026-10-09",
+    "source": "https://www.aucklandcouncil.govt.nz/en/parks-recreation/find-park-beach/park-detail/230.html",
+    "rules": [
+     {
+      "status": "banned",
+      "chip": "No dogs",
+      "text": "No dogs on Te Ārai Beach North or South, dunes, tracks, roads or car parks (even in cars); on-lead only in the inland dog area"
+     }
+    ]
+   }
+  }
+ ]
+}
