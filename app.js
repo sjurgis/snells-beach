@@ -4,13 +4,13 @@
 
 const TZ = "Pacific/Auckland";
 const PREF_KEY = "snells-beach-prefs-v1";
-const DEFAULT_PREFS = { activity: "swim", drive: 1, dog: false };
+const DEFAULT_PREFS = { activity: "hangout", drive: 1, dog: false };
 const ACT = {
+  hangout: { label: "Hangout / picnic", verb: "hang out" },
   swim: { label: "Swim / family", verb: "swim" },
   surf: { label: "Surf", verb: "surf" },
   snorkel: { label: "Snorkel", verb: "snorkel" },
   sup: { label: "SUP / kayak", verb: "paddle" },
-  hangout: { label: "Hangout / picnic", verb: "hang out" },
 };
 // how hard rain hits each activity (0 = ignore, 1 = rain ruins it)
 const RAIN_K = { hangout: 0.85, swim: 0.6, sup: 0.5, snorkel: 0.45, surf: 0.2 };
@@ -68,7 +68,15 @@ const isWeekend = (iso) => { const w = new Date(dayNum(iso) * 86400000).getUTCDa
 
 /* ---------- prefs ---------- */
 function loadPrefs() {
-  try { return { ...DEFAULT_PREFS, ...JSON.parse(localStorage.getItem(PREF_KEY) || "{}") }; }
+  try {
+    const p = { ...DEFAULT_PREFS, ...JSON.parse(localStorage.getItem(PREF_KEY) || "{}") };
+    // one-time switch to the new Hangout default for anyone saved before it existed
+    if (!localStorage.getItem("snells-beach-hangout-default")) {
+      p.activity = "hangout";
+      localStorage.setItem("snells-beach-hangout-default", "1");
+    }
+    return p;
+  }
   catch { return { ...DEFAULT_PREFS }; }
 }
 function savePrefs(p) { try { localStorage.setItem(PREF_KEY, JSON.stringify(p)); } catch { /* private mode */ } }
