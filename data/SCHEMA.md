@@ -30,7 +30,7 @@ Units are in the field names: `Kn` knots, `M` metres, `S` seconds, `Deg` degrees
 | `airMaxC` | number | no | daily max air temp °C |
 | `waterTempC` | number | no | sea surface temp °C (daytime mean, Kawau Bay) |
 | `tides` | array | yes | every high/low turn that day **in time order, alternating**: `{ "time": "06:59", "type": "high", "heightM": 2.7 }`. Mahurangi Harbour. At least 2. |
-| `slots` | array | yes | weather at fixed times, in time order. Use `07:00, 09:00, 11:00, 13:00, 15:00, 17:00, 19:00` (at least 2, at least one in daylight). |
+| `slots` | array | yes | weather **every hour** `06:00`–`20:00`, in time order (at least 2, at least one in daylight). The page scores each hour, so hourly data gives the best windows and the now-vs-later timeline. |
 | `swell` | array | yes | sea state at `06:00, 09:00, 12:00, 15:00, 18:00` (at least 1). The nearest entry to each slot is used. |
 | `traffic` | object | no | `{ "level": "light" \| "moderate" \| "busy", "note": "short text" }`. Put it on Saturdays, Sundays and public holidays (Labour Day = 4th Monday of October). Its presence turns on the Matakana chip and a small score penalty for beaches through Matakana; weekends get the chip even without it. It is a heuristic note, not live traffic. |
 
@@ -39,14 +39,22 @@ Units are in the field names: `Kn` knots, `M` metres, `S` seconds, `Deg` degrees
 | field | type | required | meaning |
 |---|---|---|---|
 | `time` | `"HH:MM"` | yes | local |
-| `windDirDeg` | number 0–360 | yes | direction the wind blows **from**, degrees true (90 = easterly) |
+| `windDirDeg` | number 0–360 | yes | direction the wind blows **from**, degrees true (90 = easterly). Use the blend below, not a single model hour. |
 | `windKn` | number | yes | mean wind speed, knots (met.no gives m/s: × 1.94384) |
 | `gustKn` | number | no | gust, knots (≥ `windKn`) |
-| `rainMm` | number | no | rain in the hour, mm |
+| `rainMm` | number | no | rain in the hour, mm (mean of met.no and Open-Meteo where both exist) |
+| `rainProbPct` | number 0–100 | no, strongly recommended | chance of rain that hour, % (Open-Meteo `precipitation_probability`). Drives rain scoring and the rain chip; without it the page falls back to `rainMm`/`sky` and validate.py warns. |
 | `airC` | number | no | air temp °C |
 | `cloudPct` | number 0–100 | no | cloud cover |
 | `sky` | string | no | one of `sun`, `partly`, `cloud`, `fog`, `showers`, `rain`, `storm` (drives the icon and a small rain penalty) |
-| `src` | string | no | where the slot came from, e.g. `"met.no"` or `"open-meteo"` (info only) |
+| `src` | string | no | which models went in, e.g. `"metno+openmeteo"` (info only) |
+| `models` | object | no | raw per-model wind for checking, `{ "metno": [dirDeg, kn], "openmeteo": [dirDeg, kn] }` (info only) |
+
+**Wind blend (how `update_forecast.py` makes `windDirDeg`/`windKn`).** One model hour in light air can point
+anywhere (on Sat 10 Oct 2026 met.no's 7am value was 345°/NNW while every other hour and model said N–NNE).
+So each slot is: met.no averaged as vectors over h-1, h, h+1 (while met.no is hourly; its 6-hourly steps later in
+the run are used only at their exact hour), then vector-averaged with Open-Meteo's hour h at equal weight.
+Speed is the plain mean of the two. The page shows winds under 5 kn as "light", with no direction.
 
 ### `swell[]`
 
@@ -88,8 +96,9 @@ swell_wave_direction, wave_height, wave_period, wave_direction, sea_surface_temp
         {"time": "20:06", "type": "high", "heightM": 2.8}
       ],
       "slots": [
-        {"time": "07:00", "windDirDeg": 345, "windKn": 6.8, "gustKn": 6.8, "rainMm": 0, "sky": "cloud"},
-        {"time": "13:00", "windDirDeg": 11,  "windKn": 12.2, "gustKn": 22.7, "rainMm": 0, "sky": "partly"}
+        {"time": "07:00", "windDirDeg": 6,  "windKn": 4.6, "gustKn": 4.6, "rainMm": 0.1, "rainProbPct": 0, "sky": "cloud",
+         "src": "metno+openmeteo", "models": {"metno": [356, 7.0], "openmeteo": [41, 2.2]}},
+        {"time": "13:00", "windDirDeg": 18, "windKn": 11.4, "gustKn": 21.8, "rainMm": 0.2, "rainProbPct": 75, "sky": "partly"}
       ],
       "swell": [
         {"time": "09:00", "open": {"swellM": 0.5, "periodS": 6.5, "dirDeg": 46, "waveM": 0.62},
@@ -112,9 +121,11 @@ swell_wave_direction, wave_height, wave_period, wave_direction, sea_surface_temp
 Per beach: `id`, `name`, `area`, `lat`/`lon`, `driveMin`/`driveKm` (OSRM from Snells Beach township),
 `viaMatakana`, `facingDeg` (direction the beach looks out to sea; wind from there is onshore, from the opposite side
 offshore), `shelteredFrom` (8-point wind directions that the local knowledge says are sheltered, e.g. `["SE"]`),
-`tide` (`{"mode":"high","hours":3}` = good within 3 h of high; `{"mode":"all"}`), `exposure`
+`tide` (`{"mode":"high",…}` = tide-limited: the page treats it as swimmable from mid-tide rising to mid-tide falling,
+i.e. halfway in time between each low and the high; `hours` is kept for reference only. `{"mode":"all"}` = any tide), `exposure`
 (`{"source":"inner"|"open","factor":0–1}` scales the Kawau Bay or Te Ārai wave height to this beach),
-`suits` (0–1 per activity), `notes` (short bullets), optional `doc` (Goat Island DOC limits), and `dog`:
+`highTideSand` (`plenty` | `some` | `little`: dry sand left at high tide, a local estimate used by hangout mode),
+`suits` (0–1 per activity: `swim`, `surf`, `snorkel`, `sup`, `hangout`), `notes` (short bullets), optional `doc` (Goat Island DOC limits), and `dog`:
 `{verified, checked, source, rules:[{from:"MM-DD", to:"MM-DD", status, chip, text}, …, {status, chip, text}]}`.
 Dog rules are matched in order by date (ranges may wrap the new year); the last rule has no dates and is the
 catch-all. `status` is `offlead` | `leash` | `limited` (time-restricted) | `banned`. A beach whose rule is not

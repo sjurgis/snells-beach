@@ -44,6 +44,7 @@
     "mode": "high",
     "hours": 2
    },
+   "highTideSand": "some",
    "exposure": {
     "source": "inner",
     "factor": 0.7
@@ -52,7 +53,8 @@
     "surf": 0.1,
     "swim": 1.0,
     "snorkel": 0.15,
-    "sup": 0.75
+    "sup": 0.75,
+    "hangout": 0.95
    },
    "notes": [
     "Faces east across Kawau Bay",
@@ -109,6 +111,7 @@
     "mode": "high",
     "hours": 3
    },
+   "highTideSand": "little",
    "exposure": {
     "source": "inner",
     "factor": 0.6
@@ -117,7 +120,8 @@
     "surf": 0.05,
     "swim": 1.0,
     "snorkel": 0.2,
-    "sup": 0.85
+    "sup": 0.85,
+    "hangout": 0.95
    },
    "notes": [
     "Calm bay just south of Snells",
@@ -163,6 +167,7 @@
     "mode": "high",
     "hours": 2.5
    },
+   "highTideSand": "little",
    "exposure": {
     "source": "inner",
     "factor": 0.2
@@ -171,7 +176,8 @@
     "surf": 0.0,
     "swim": 0.9,
     "snorkel": 0.1,
-    "sup": 1.0
+    "sup": 1.0,
+    "hangout": 0.95
    },
    "notes": [
     "Harbour side, south end of the peninsula",
@@ -208,6 +214,7 @@
    "tide": {
     "mode": "all"
    },
+   "highTideSand": "some",
    "exposure": {
     "source": "inner",
     "factor": 0.55
@@ -216,7 +223,8 @@
     "surf": 0.05,
     "swim": 0.85,
     "snorkel": 0.45,
-    "sup": 0.9
+    "sup": 0.9,
+    "hangout": 1.0
    },
    "notes": [
     "Most sheltered beach in a southeasterly",
@@ -250,6 +258,7 @@
    "tide": {
     "mode": "all"
    },
+   "highTideSand": "some",
    "exposure": {
     "source": "inner",
     "factor": 0.9
@@ -258,7 +267,8 @@
     "surf": 0.3,
     "swim": 0.95,
     "snorkel": 0.3,
-    "sup": 0.95
+    "sup": 0.95,
+    "hangout": 1.0
    },
    "notes": [
     "Any tide",
@@ -295,11 +305,14 @@
    "driveKm": 17.9,
    "viaMatakana": true,
    "facingDeg": 185,
-   "shelteredFrom": [],
+   "shelteredFrom": [
+    "N"
+   ],
    "tide": {
     "mode": "high",
     "hours": 2.5
    },
+   "highTideSand": "little",
    "exposure": {
     "source": "inner",
     "factor": 0.5
@@ -308,10 +321,11 @@
     "surf": 0.05,
     "swim": 0.9,
     "snorkel": 0.25,
-    "sup": 0.8
+    "sup": 0.8,
+    "hangout": 0.85
    },
    "notes": [
-    "Faces south: a northerly is offshore",
+    "Faces south: sheltered in a northerly",
     "Southerly is straight in",
     "High-tide swim"
    ],
@@ -345,11 +359,14 @@
    "driveKm": 18.3,
    "viaMatakana": true,
    "facingDeg": 175,
-   "shelteredFrom": [],
+   "shelteredFrom": [
+    "N"
+   ],
    "tide": {
     "mode": "high",
     "hours": 2.5
    },
+   "highTideSand": "little",
    "exposure": {
     "source": "inner",
     "factor": 0.5
@@ -358,10 +375,11 @@
     "surf": 0.05,
     "swim": 0.9,
     "snorkel": 0.25,
-    "sup": 0.8
+    "sup": 0.8,
+    "hangout": 0.85
    },
    "notes": [
-    "Faces south: a northerly is offshore",
+    "Faces south: sheltered in a northerly",
     "Southerly is straight in",
     "High-tide swim"
    ],
@@ -399,6 +417,7 @@
    "tide": {
     "mode": "all"
    },
+   "highTideSand": "plenty",
    "exposure": {
     "source": "open",
     "factor": 0.8
@@ -407,7 +426,8 @@
     "surf": 0.9,
     "swim": 0.75,
     "snorkel": 0.05,
-    "sup": 0.4
+    "sup": 0.4,
+    "hangout": 0.85
    },
    "notes": [
     "Beach break, needs NE swell",
@@ -448,6 +468,7 @@
    "tide": {
     "mode": "all"
    },
+   "highTideSand": "plenty",
    "exposure": {
     "source": "open",
     "factor": 0.65
@@ -456,7 +477,8 @@
     "surf": 0.8,
     "swim": 0.85,
     "snorkel": 0.5,
-    "sup": 0.5
+    "sup": 0.5,
+    "hangout": 0.95
    },
    "notes": [
     "Faces NE, smaller than Te Ārai",
@@ -494,6 +516,7 @@
    "tide": {
     "mode": "all"
    },
+   "highTideSand": "some",
    "exposure": {
     "source": "open",
     "factor": 0.4
@@ -502,7 +525,8 @@
     "surf": 0.05,
     "swim": 0.95,
     "snorkel": 0.7,
-    "sup": 0.75
+    "sup": 0.75,
+    "hangout": 0.95
    },
    "notes": [
     "Sheltered swim at any tide",
@@ -543,6 +567,7 @@
    "tide": {
     "mode": "all"
    },
+   "highTideSand": "some",
    "exposure": {
     "source": "open",
     "factor": 0.5
@@ -551,7 +576,8 @@
     "surf": 0.0,
     "swim": 0.7,
     "snorkel": 1.0,
-    "sup": 0.6
+    "sup": 0.6,
+    "hangout": 0.8
    },
    "notes": [
     "The snorkel spot: marine reserve",
@@ -592,6 +618,7 @@
    "tide": {
     "mode": "all"
    },
+   "highTideSand": "plenty",
    "exposure": {
     "source": "open",
     "factor": 0.95
@@ -600,7 +627,8 @@
     "surf": 0.95,
     "swim": 0.6,
     "snorkel": 0.0,
-    "sup": 0.3
+    "sup": 0.3,
+    "hangout": 0.7
    },
    "notes": [
     "Exposed beach break",
@@ -634,6 +662,7 @@
    "tide": {
     "mode": "all"
    },
+   "highTideSand": "plenty",
    "exposure": {
     "source": "open",
     "factor": 1.0
@@ -642,7 +671,8 @@
     "surf": 1.0,
     "swim": 0.55,
     "snorkel": 0.0,
-    "sup": 0.25
+    "sup": 0.25,
+    "hangout": 0.65
    },
    "notes": [
     "Most open: gets the most size",
@@ -662,5 +692,6 @@
     ]
    }
   }
- ]
+ ],
+ "highTideSandNote": "highTideSand is a rough estimate of dry sand left at high tide (plenty | some | little), not from an official source. Correct it from local knowledge."
 }

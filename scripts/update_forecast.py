@@ -2,8 +2,8 @@
 """Fetch fresh forecasts and rewrite data/forecast.json (stdlib only).
 
 Sources:
-  wind/weather  met.no locationforecast 2.0 (compact) for Snells Beach
-  gusts, gaps   Open-Meteo forecast (hourly, knots)   - fills slots met.no no longer covers
+  wind          hourly slots 06-20; vector blend of met.no (smoothed over +-1 h) and Open-Meteo, equal weight
+  weather       met.no locationforecast 2.0 (compact) sky/temp; Open-Meteo gusts + rain probability
   swell, sea    Open-Meteo marine: Kawau Bay (inner) and off Te Arai (open coast)
   sun           Open-Meteo daily sunrise/sunset
   tides         tides4fishing.com Mahurangi Harbour table
@@ -12,7 +12,7 @@ Usage:  python3 scripts/update_forecast.py [--days 4] [--start YYYY-MM-DD] [--ou
 Then:   python3 scripts/validate.py
 See data/SCHEMA.md for the file format.
 """
-import argparse, datetime as dt, html, json, re, sys, urllib.request
+import argparse, datetime as dt, html, json, math, re, sys, urllib.request
 from zoneinfo import ZoneInfo
 
 TZ = ZoneInfo("Pacific/Auckland")
@@ -20,7 +20,7 @@ UA = "snells-beach-site/1.0 github.com/sjurgis/snells-beach"
 LAT, LON = -36.42, 174.73                 # Snells Beach
 INNER = (-36.42, 174.80)                  # Kawau Bay (Open-Meteo snaps to -36.458, 174.875)
 OPEN = (-36.13, 174.85)                   # off Te Arai (snaps to -36.125, 174.875)
-SLOT_HOURS = [7, 9, 11, 13, 15, 17, 19]
+SLOT_HOURS = list(range(6, 21))          # hourly 06:00-20:00 local
 SWELL_HOURS = [6, 9, 12, 15, 18]
 MS_TO_KN = 1.943844
 TIDE_URL = "https://tides4fishing.com/nz/auckland/mahurangi-harbour"
@@ -110,12 +110,13 @@ def main():
             "cloudPct": round(inst.get("cloud_area_fraction", 0)),
             "rainMm": None if rain is None else round(rain / hours, 1),
             "sky": sky(nx.get("summary", {}).get("symbol_code")),
+            "step": hours,
         }
 
     om = get("https://api.open-meteo.com/v1/forecast?"
              f"latitude={LAT}&longitude={LON}&timezone=Pacific%2FAuckland&wind_speed_unit=kn"
              f"&start_date={start}&end_date={end}"
-             "&hourly=wind_speed_10m,wind_direction_10m,wind_gusts_10m,precipitation,temperature_2m,cloud_cover,weather_code"
+             "&hourly=wind_speed_10m,wind_direction_10m,wind_gusts_10m,precipitation,precipitation_probability,temperature_2m,cloud_cover,weather_code"
              "&daily=sunrise,sunset,temperature_2m_max")
     oh = om["hourly"]; ohi = {t: i for i, t in enumerate(oh["time"])}
 
@@ -152,20 +153,50 @@ def main():
         for h in SLOT_HOURS:
             t = dt.datetime(d.year, d.month, d.day, h, tzinfo=TZ)
             key = f"{d}T{h:02d}:00"
-            m = metno.get(t)
-            src = "met.no"
-            if m is None:   # met.no is 6-hourly after ~2.5 days: accept a met.no step within 1 h, else Open-Meteo
-                near = [metno[k] for k in (t - dt.timedelta(hours=1), t + dt.timedelta(hours=1)) if k in metno]
-                m = near[0] if near else None
-            if m is None:
-                if key not in ohi: continue
-                i = ohi[key]; src = "open-meteo"
-                m = {"windDirDeg": round(oh["wind_direction_10m"][i]), "windKn": round(oh["wind_speed_10m"][i], 1),
-                     "airC": round(oh["temperature_2m"][i], 1), "cloudPct": round(oh["cloud_cover"][i]),
-                     "rainMm": round(oh["precipitation"][i], 1), "sky": wmo_sky(oh["weather_code"][i])}
-            slot = {"time": f"{h:02d}:00", **{k: v for k, v in m.items() if v is not None}, "src": src}
-            if key in ohi and oh["wind_gusts_10m"][ohi[key]] is not None:
-                slot["gustKn"] = round(max(oh["wind_gusts_10m"][ohi[key]], slot["windKn"]), 1)
+            # met.no: smooth over h-1..h+1 while it is hourly; after ~2.5 days it is 6-hourly, use the exact step only
+            mn = [metno[k] for k in (t - dt.timedelta(hours=1), t, t + dt.timedelta(hours=1))
+                  if k in metno and metno[k]["step"] == 1]
+            if not mn and t in metno:
+                mn = [metno[t]]
+            om_i = ohi.get(key)
+            om_w = None
+            if om_i is not None and oh["wind_speed_10m"][om_i] is not None:
+                om_w = (oh["wind_direction_10m"][om_i], oh["wind_speed_10m"][om_i])
+            if not mn and om_w is None:
+                continue
+            # Blend direction as a vector mean (met.no smoothed vs Open-Meteo, equal weight); speed = plain mean.
+            models, u, v, spd = {}, 0.0, 0.0, []
+            if mn:
+                mu = sum(math.sin(math.radians(x["windDirDeg"])) * x["windKn"] for x in mn) / len(mn)
+                mv = sum(math.cos(math.radians(x["windDirDeg"])) * x["windKn"] for x in mn) / len(mn)
+                mk = sum(x["windKn"] for x in mn) / len(mn)
+                md = math.degrees(math.atan2(mu, mv)) % 360
+                models["metno"] = [round(md), round(mk, 1)]
+                u += math.sin(math.radians(md)) * mk; v += math.cos(math.radians(md)) * mk; spd.append(mk)
+            if om_w:
+                models["openmeteo"] = [round(om_w[0]), round(om_w[1], 1)]
+                u += math.sin(math.radians(om_w[0])) * om_w[1]; v += math.cos(math.radians(om_w[0])) * om_w[1]; spd.append(om_w[1])
+            kn = sum(spd) / len(spd)
+            wdir = round(math.degrees(math.atan2(u, v)) % 360) if (u or v) else (models.get("metno") or models["openmeteo"])[0]
+            exact = metno.get(t)
+            rain = []
+            if exact and exact["step"] == 1 and exact.get("rainMm") is not None: rain.append(exact["rainMm"])
+            if om_i is not None and oh["precipitation"][om_i] is not None: rain.append(oh["precipitation"][om_i])
+            slot = {"time": f"{h:02d}:00", "windDirDeg": wdir % 360, "windKn": round(kn, 1)}
+            if om_i is not None and oh["wind_gusts_10m"][om_i] is not None:
+                slot["gustKn"] = round(max(oh["wind_gusts_10m"][om_i], kn), 1)
+            if rain: slot["rainMm"] = round(sum(rain) / len(rain), 1)
+            if om_i is not None and oh["precipitation_probability"][om_i] is not None:
+                slot["rainProbPct"] = round(oh["precipitation_probability"][om_i])
+            if exact and exact["step"] == 1:
+                slot.update({"airC": exact["airC"], "cloudPct": exact["cloudPct"]})
+                if exact.get("sky"): slot["sky"] = exact["sky"]
+            elif om_i is not None:
+                slot.update({"airC": round(oh["temperature_2m"][om_i], 1), "cloudPct": round(oh["cloud_cover"][om_i])})
+                sk = wmo_sky(oh["weather_code"][om_i])
+                if sk: slot["sky"] = sk
+            slot["src"] = "+".join(k for k in ("metno", "openmeteo") if k in models)
+            slot["models"] = models
             slots.append(slot)
         swell = []
         for h in SWELL_HOURS:
@@ -199,10 +230,10 @@ def main():
         "timezone": "Pacific/Auckland",
         "location": {"name": "Snells Beach", "lat": LAT, "lon": LON},
         "sources": [
-            {"what": "Wind & weather", "name": "met.no Locationforecast (Snells Beach)",
+            {"what": "Wind & weather (blended)", "name": "met.no Locationforecast (Snells Beach)",
              "url": f"https://api.met.no/weatherapi/locationforecast/2.0/compact?lat={LAT}&lon={LON}",
              "issued": dt.datetime.fromisoformat(met["properties"]["meta"]["updated_at"].replace("Z", "+00:00")).astimezone(TZ).replace(microsecond=0).isoformat()},
-            {"what": "Gusts, sunrise/sunset, gaps", "name": "Open-Meteo forecast", "url": "https://open-meteo.com/"},
+            {"what": "Wind (blended), gusts, rain chance, sun", "name": "Open-Meteo forecast (best match)", "url": f"https://api.open-meteo.com/v1/forecast?latitude={LAT}&longitude={LON}"},
             {"what": "Swell & sea temp", "name": "Open-Meteo Marine (Kawau Bay; off Te Ārai)", "url": "https://open-meteo.com/en/docs/marine-weather-api"},
             {"what": "Tides", "name": "tides4fishing Mahurangi Harbour", "url": TIDE_URL},
         ],

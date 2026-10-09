@@ -101,7 +101,16 @@ def check_forecast(fc):
                 num(s.get("rainMm"), 0, 100, f"{sw}.rainMm", required=False)
                 num(s.get("airC"), -5, 40, f"{sw}.airC", required=False)
                 num(s.get("cloudPct"), 0, 100, f"{sw}.cloudPct", required=False)
+                num(s.get("rainProbPct"), 0, 100, f"{sw}.rainProbPct", required=False)
+                if "models" in s:
+                    if not isinstance(s["models"], dict): err(f"{sw}.models: must be an object")
+                    else:
+                        for mk, mv in s["models"].items():
+                            if not (isinstance(mv, list) and len(mv) == 2 and all(isinstance(z, (int, float)) for z in mv)):
+                                err(f"{sw}.models.{mk}: must be [dirDeg, kn]")
                 if "sky" in s and s["sky"] not in SKY: err(f"{sw}.sky: one of {sorted(SKY)}")
+            if not any("rainProbPct" in s for s in slots):
+                warn(f"{w}.slots: no rainProbPct anywhere; rain scoring falls back to rainMm/sky only")
             if sr is not None and ss is not None and not any(sr - 60 <= hhmm(s.get("time"), "x") <= ss + 30 for s in slots if HHMM.match(str(s.get("time")))):
                 err(f"{w}.slots: no slot in daylight")
         swell = d.get("swell")
@@ -144,7 +153,8 @@ def check_beaches(b):
         if not isinstance(x.get("viaMatakana"), bool): err(f"{w}.viaMatakana: bool")
         if x.get("tide", {}).get("mode") not in ("high", "all"): err(f"{w}.tide.mode: 'high' | 'all'")
         if x.get("exposure", {}).get("source") not in ("open", "inner"): err(f"{w}.exposure.source: 'open' | 'inner'")
-        for a in ("swim", "surf", "snorkel", "sup"): num(x.get("suits", {}).get(a), 0, 1, f"{w}.suits.{a}")
+        if x.get("highTideSand", "some") not in ("plenty", "some", "little"): err(f"{w}.highTideSand: 'plenty' | 'some' | 'little'")
+        for a in ("swim", "surf", "snorkel", "sup", "hangout"): num(x.get("suits", {}).get(a), 0, 1, f"{w}.suits.{a}")
         dog = x.get("dog") or {}
         if not dog.get("rules"): err(f"{w}.dog.rules: required")
         if not dog.get("verified"): warn(f"{w}: dog rule unverified (page will say 'check signs')")
