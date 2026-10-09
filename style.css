@@ -218,6 +218,8 @@ main { padding-top: 14px; padding-bottom: 8px; }
 
 /* now vs later */
 .nlgrid { display: grid; grid-template-columns: minmax(0,1fr) minmax(0,1fr); gap: 10px; margin-bottom: 10px; }
+@media (max-width: 600px) { .nlgrid { grid-template-columns: minmax(0,1fr); } .nl .rhead { flex-wrap: wrap; gap: 6px; } .nl .chip { white-space: nowrap; } }
+.nl .rhead { display: flex; justify-content: space-between; align-items: flex-start; gap: 8px; }
 .nl { padding: 12px; border-top: 4px solid var(--line); }
 .nl.r-great { border-top-color: var(--great); } .nl.r-good { border-top-color: var(--good); }
 .nl.r-meh { border-top-color: var(--meh); } .nl.r-nope { border-top-color: var(--nope); }
