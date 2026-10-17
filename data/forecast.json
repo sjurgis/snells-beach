@@ -1,6 +1,6 @@
 {
  "schemaVersion": 1,
- "updated": "2026-10-18T07:21:04+13:00",
+ "updated": "2026-10-18T07:25:38+13:00",
  "timezone": "Pacific/Auckland",
  "location": {
   "name": "Snells Beach",
@@ -30,9 +30,9 @@
    "url": "https://tides4fishing.com/nz/auckland/mahurangi-harbour"
   },
   {
-   "what": "Live wind (airport, shown only)",
-   "name": "aviationweather.gov METAR",
-   "url": "https://aviationweather.gov/"
+   "what": "Live wind & rain (home stations)",
+   "name": "Weather Underground station pages: Algies Bay (IWARKW15), Snells Beach (ISNELL2)",
+   "url": "https://www.wunderground.com/dashboard/pws/IWARKW15"
   }
  ],
  "days": [
@@ -1722,26 +1722,64 @@
   }
  ],
  "observations": {
-  "fetched": "2026-10-18T07:21:04+13:00",
-  "kind": "airport",
-  "blend": false,
+  "fetched": "2026-10-18T07:25:38+13:00",
+  "kind": "home",
+  "blend": true,
   "stations": [
    {
-    "id": "NZAA",
-    "name": "Auckland Intl",
-    "kind": "airport",
-    "lat": -37.008,
-    "lon": 174.792,
-    "time": "2026-10-18T07:00:00+13:00",
-    "windKn": 5.0,
-    "gustKn": null,
-    "windDirDeg": 150,
-    "airC": 10,
-    "pressureHpa": 1028,
-    "rainRateMmH": null,
-    "rainTodayMm": null,
-    "raining": false,
-    "url": "https://aviationweather.gov/data/metar/?id=NZAA"
+    "id": "IWARKW15",
+    "name": "Algies Bay",
+    "kind": "home",
+    "lat": -36.435,
+    "lon": 174.74,
+    "time": "2026-10-18T07:19:48+13:00",
+    "windKn": 0.5,
+    "gustKn": 2.2,
+    "windDirDeg": 172,
+    "airC": 10.0,
+    "pressureHpa": 1030.1,
+    "rainRateMmH": 0.0,
+    "rainTodayMm": 0.0,
+    "url": "https://www.wunderground.com/dashboard/pws/IWARKW15",
+    "via": "page"
+   },
+   {
+    "id": "ISNELL2",
+    "name": "Snells Beach",
+    "kind": "home",
+    "lat": -36.415,
+    "lon": 174.726,
+    "time": "2026-10-18T07:19:12+13:00",
+    "windKn": 0.1,
+    "gustKn": 0.6,
+    "windDirDeg": 320,
+    "airC": 10.1,
+    "pressureHpa": 1025.4,
+    "rainRateMmH": 0.0,
+    "rainTodayMm": 0.0,
+    "url": "https://www.wunderground.com/dashboard/pws/ISNELL2",
+    "via": "page"
+   }
+  ],
+  "fetchLog": [
+   {
+    "id": "IWARKW15",
+    "ok": true,
+    "attempts": 4,
+    "tries": [
+     "200:WuNext-Preview-Phased",
+     "200:WuNext-Preview-Phased",
+     "200:WuNext-Preview-Phased",
+     "200:wu-next-prod"
+    ]
+   },
+   {
+    "id": "ISNELL2",
+    "ok": true,
+    "attempts": 1,
+    "tries": [
+     "200:wu-next-prod"
+    ]
    }
   ]
  }
