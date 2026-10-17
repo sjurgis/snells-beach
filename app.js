@@ -3,6 +3,7 @@
 "use strict";
 
 const TZ = "Pacific/Auckland";
+const APP_VERSION = "2026-10-17b";   // bump with data/version.txt when app.js/style.css/index.html change
 const PREF_KEY = "snells-beach-prefs-v1";
 const DEFAULT_PREFS = { activities: ["hangout"], favs: [], drive: 1, dog: false };
 const ACT = {
@@ -98,8 +99,7 @@ function savePrefs(p) { try { localStorage.setItem(PREF_KEY, JSON.stringify(p));
 
 /* ---------- data ---------- */
 async function getJSON(path) {
-  const v = new Date().toISOString().slice(0, 13).replace(/\D/g, "");   // changes hourly: busts caches
-  const r = await fetch(`${path}?v=${v}`, { cache: "no-cache" });
+  const r = await fetch(`${path}?t=${Date.now()}`, { cache: "no-store" });
   if (!r.ok) throw new Error(`${path} returned HTTP ${r.status}`);
   return r.json();
 }
@@ -651,7 +651,8 @@ function render() {
   const today = results[0];
   const dLabel = (d, ctx) => ctx.isToday ? "Today" : (dayNum(d.date) - dayNum(now.date) === 1 ? "Tomorrow" : fmtDate(d.date, { weekday: "long" }));
   $("#title").textContent = today.ctx.isToday ? `Where to ${acts.length === 1 ? ACT[act].verb : "go"} today` : `Where to ${acts.length === 1 ? ACT[act].verb : "go"} · ${fmtDate(today.day.date, { weekday: "long" })}`;
-  $("#subtitle").innerHTML = `${esc(fmtDate(today.day.date, { weekday: "short", day: "numeric", month: "short" }))}${today.day.airMaxC != null ? ` · ${icon("temp")}${Math.round(today.day.airMaxC)}° air` : ""}${today.day.waterTempC != null ? ` · ${icon("wave")}${Math.round(today.day.waterTempC)}° water` : ""} · ${icon("sun")}${fmtTime(hm(today.day.sunrise))}–${fmtTime(hm(today.day.sunset))}`;
+  const updHM = new Intl.DateTimeFormat("en-NZ", { timeZone: TZ, hour: "numeric", minute: "2-digit" }).format(updated).replace(" ", "");
+  $("#subtitle").innerHTML = `<span class="updlbl">${icon("clock")}Updated ${esc(updHM)}</span> · ${esc(fmtDate(today.day.date, { weekday: "short", day: "numeric", month: "short" }))}${today.day.airMaxC != null ? ` · ${icon("temp")}${Math.round(today.day.airMaxC)}° air` : ""}${today.day.waterTempC != null ? ` · ${icon("wave")}${Math.round(today.day.waterTempC)}° water` : ""} · ${icon("sun")}${fmtTime(hm(today.day.sunrise))}–${fmtTime(hm(today.day.sunset))}`;
 
   let html = "";
   if (stale || ageH > 30) {
@@ -746,6 +747,21 @@ function render() {
     <p class="muted">Wind is a blend of met.no and Open-Meteo; arrows point where the wind blows to. Times are rounded to the half hour. Scores are a rough guide: check <a href="https://safeswim.org.nz/" rel="noopener">Safeswim</a> and the signs at the beach.</p>`;
 }
 
+/* Auto-refresh: new forecast -> re-render in place; new site code -> full reload. */
+let refreshing = false, lastCheck = 0;
+async function refresh() {
+  if (refreshing || Date.now() - lastCheck < 20000) return;
+  refreshing = true; lastCheck = Date.now();
+  try {
+    const vr = await fetch(`data/version.txt?t=${Date.now()}`, { cache: "no-store" }).catch(() => null);
+    if (vr?.ok) { const v = (await vr.text()).trim(); if (v && v !== APP_VERSION) { location.reload(); return; } }
+    const fc = await getJSON("data/forecast.json");
+    if (fc?.days?.length && fc.updated !== STATE.fc?.updated) { blendObservations(fc, nzNow()); STATE.fc = fc; }
+    if (STATE.fc) render();
+  } catch (e) { console.warn("refresh failed", e); }
+  finally { refreshing = false; }
+}
+
 function showError(err) {
   $("#app").innerHTML = `<section class="card errorcard"><h2>Can't load today's forecast</h2><p>${esc(err?.message || err)}</p><p class="muted">It's usually a blip with the connection. Try again in a moment.</p><button type="button" id="retry">Try again</button></section>`;
   $("#subtitle").textContent = "Forecast unavailable";
@@ -798,7 +814,9 @@ async function main() {
     Object.assign(STATE, { beaches, fc });
     wireFavs();
     render();
-    setInterval(render, 10 * 60 * 1000);   // keep "now" fresh if the page is left open
+    setInterval(refresh, 5 * 60 * 1000);   // pick up new hourly data and keep "now" fresh
+    document.addEventListener("visibilitychange", () => { if (document.visibilityState === "visible") refresh(); });
+    window.addEventListener("focus", refresh);
   } catch (err) {
     console.error(err);
     showError(err);
