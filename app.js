@@ -3,7 +3,7 @@
 "use strict";
 
 const TZ = "Pacific/Auckland";
-const APP_VERSION = "2026-10-18d";   // bump with data/version.txt when app.js/style.css/index.html change
+const APP_VERSION = "2026-10-18e";   // bump with data/version.txt when app.js/style.css/index.html change
 const PREF_KEY = "snells-beach-prefs-v1";
 const DEFAULT_PREFS = { activities: ["hangout"], favs: [], drive: 1, dog: false };
 const ACT = {
@@ -352,15 +352,10 @@ function reasons(r, act) {
   const w = windSummary(r.inWin), rel = windRel(r.b, w.dir);
   const W = `${dir16(w.dir)} ${knText(w)} kn`;
   if (e.docOff) out.push({ k: "bad", t: `DOC: skip Goat Island (${e.docOff})` });
-  if (w.light) out.push({ k: "good", t: `Light wind, under 5 kn` });
-  else if (rel === "sheltered") out.push({ k: "good", t: `Sheltered from the ${dir16(w.dir)} ${knText(w)} kn` });
-  else if (rel === "offshore") out.push({ k: act === "surf" || w.hi <= 15 ? "good" : "mid", t: `Offshore ${W}${act === "surf" ? ": clean" : ""}` });
-  else if (rel === "onshore") out.push({ k: w.hi >= 10 || act === "surf" ? "bad" : "mid", t: `Onshore ${W}${w.hi >= 10 ? (act === "hangout" ? ": breezy on the sand" : ": choppy") : ""}` });
-  else out.push({ k: w.hi >= 14 ? "bad" : "mid", t: `Cross-shore ${W}` });
+  // wind is shown in the Actual/Forecast boxes and the wind chip, so no wind bullet here
 
   const rs = rainSummary(r.inWin);
   if (rs.show) out.push({ k: rs.prob >= 60 || rs.mm >= 0.5 ? "bad" : "mid", t: `Rain ${rs.prob}% chance${rs.mm >= 0.1 ? `, ~${rs.mm.toFixed(1)} mm/h` : ""}` });
-  else if (act === "hangout" || act === "swim") out.push({ k: "good", t: "Dry" });
 
   if (act === "surf") {
     const h = e.surfH;
@@ -432,7 +427,7 @@ function chips(r, act, prefs, { compact = false } = {}) {
   if (r.traffic) c.push(`<span class="chip c-mid" title="${esc(r.day.traffic?.note || "Weekend traffic through Matakana")}">${icon("traffic")}Matakana</span>`);
   return `<div class="chips">${c.join("")}</div>`;
 }
-const bullets = (list) => `<ul class="reasons">${list.map((x) => `<li class="r-${x.k}">${icon(x.k === "good" ? "check" : x.k === "bad" ? "x" : "dot")}<span>${esc(x.t)}</span></li>`).join("")}</ul>`;
+const bullets = (list) => !list.length ? "" : `<ul class="reasons">${list.map((x) => `<li class="r-${x.k}">${icon(x.k === "good" ? "check" : x.k === "bad" ? "x" : "dot")}<span>${esc(x.t)}</span></li>`).join("")}</ul>`;
 const pill = (r) => `<span class="pill p-${r.rating.key}">${r.rating.label}</span>`;
 function ring(score, key) {
   const C = 2 * Math.PI * 26, f = clamp(score, 0, 100) / 100;
