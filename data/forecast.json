@@ -1,6 +1,6 @@
 {
  "schemaVersion": 1,
- "updated": "2026-10-17T22:26:51+13:00",
+ "updated": "2026-10-17T22:27:23+13:00",
  "timezone": "Pacific/Auckland",
  "location": {
   "name": "Snells Beach",
@@ -31,8 +31,8 @@
   },
   {
    "what": "Live wind & rain (home stations)",
-   "name": "Weather Underground station pages: Algies Bay (IWARKW15)",
-   "url": "https://www.wunderground.com/dashboard/pws/IWARKW15"
+   "name": "Weather Underground station pages: Snells Beach (ISNELL2)",
+   "url": "https://www.wunderground.com/dashboard/pws/ISNELL2"
   }
  ],
  "days": [
@@ -1694,25 +1694,25 @@
   }
  ],
  "observations": {
-  "fetched": "2026-10-17T22:26:51+13:00",
+  "fetched": "2026-10-17T22:27:23+13:00",
   "kind": "home",
   "blend": true,
   "stations": [
    {
-    "id": "IWARKW15",
-    "name": "Algies Bay",
+    "id": "ISNELL2",
+    "name": "Snells Beach",
     "kind": "home",
-    "lat": -36.435,
-    "lon": 174.74,
-    "time": "2026-10-17T22:24:52+13:00",
-    "windKn": 2.7,
-    "gustKn": 6.4,
-    "windDirDeg": 233,
-    "airC": 11.0,
-    "pressureHpa": 1029.8,
+    "lat": -36.415,
+    "lon": 174.726,
+    "time": "2026-10-17T22:24:15+13:00",
+    "windKn": 1.3,
+    "gustKn": 2.5,
+    "windDirDeg": 302,
+    "airC": 10.6,
+    "pressureHpa": 1025.4,
     "rainRateMmH": 0.0,
     "rainTodayMm": 0.0,
-    "url": "https://www.wunderground.com/dashboard/pws/IWARKW15",
+    "url": "https://www.wunderground.com/dashboard/pws/ISNELL2",
     "via": "page"
    }
   ]
