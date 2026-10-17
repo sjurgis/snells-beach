@@ -1,6 +1,6 @@
 {
  "schemaVersion": 1,
- "updated": "2026-10-18T10:39:54+13:00",
+ "updated": "2026-10-18T10:45:34+13:00",
  "timezone": "Pacific/Auckland",
  "location": {
   "name": "Snells Beach",
@@ -31,8 +31,8 @@
   },
   {
    "what": "Live wind & rain (home stations)",
-   "name": "Weather Underground station pages: Snells Beach (ISNELL2), Snells Beach (ISNELL1), Sandspit (IWARKW128), Mahurangi East (IWARKW125), Mahurangi East (IWARKW107), Point Wells (Omaha) (IWARKWOR11), Omaha Flats (IWARKW99)",
-   "url": "https://www.wunderground.com/dashboard/pws/ISNELL2"
+   "name": "Weather Underground station pages: Algies Bay (IWARKW15), Snells Beach (ISNELL2), Snells Beach (ISNELL1), Sandspit (IWARKW128), Mahurangi East (IWARKW125), Mahurangi East (IWARKW107), Point Wells (Omaha) (IWARKWOR11), Omaha Flats (IWARKW99)",
+   "url": "https://www.wunderground.com/dashboard/pws/IWARKW15"
   }
  ],
  "days": [
@@ -1714,20 +1714,37 @@
   }
  ],
  "observations": {
-  "fetched": "2026-10-18T10:39:54+13:00",
+  "fetched": "2026-10-18T10:45:34+13:00",
   "kind": "home",
   "blend": true,
   "stations": [
+   {
+    "id": "IWARKW15",
+    "name": "Algies Bay",
+    "kind": "home",
+    "lat": -36.435,
+    "lon": 174.74,
+    "time": "2026-10-18T10:44:51+13:00",
+    "windKn": 5.9,
+    "gustKn": 19.5,
+    "windDirDeg": 120,
+    "airC": 15.5,
+    "pressureHpa": 1030.5,
+    "rainRateMmH": 0.0,
+    "rainTodayMm": 0.0,
+    "url": "https://www.wunderground.com/dashboard/pws/IWARKW15",
+    "via": "page"
+   },
    {
     "id": "ISNELL2",
     "name": "Snells Beach",
     "kind": "home",
     "lat": -36.415,
     "lon": 174.726,
-    "time": "2026-10-18T10:39:12+13:00",
-    "windKn": 2.8,
-    "gustKn": 5.0,
-    "windDirDeg": 186,
+    "time": "2026-10-18T10:44:11+13:00",
+    "windKn": 4.1,
+    "gustKn": 6.4,
+    "windDirDeg": 163,
     "airC": 17.7,
     "pressureHpa": 1026.1,
     "rainRateMmH": 0.0,
@@ -1775,11 +1792,11 @@
     "kind": "home",
     "lat": -36.473,
     "lon": 174.734,
-    "time": "2026-10-18T10:34:51+13:00",
-    "windKn": 1.7,
-    "gustKn": 6.0,
-    "windDirDeg": 121,
-    "airC": 15.9,
+    "time": "2026-10-18T10:39:49+13:00",
+    "windKn": 2.1,
+    "gustKn": 8.0,
+    "windDirDeg": 166,
+    "airC": 16.2,
     "pressureHpa": 1026.8,
     "rainRateMmH": 0.0,
     "rainTodayMm": 0.0,
@@ -1826,11 +1843,11 @@
     "kind": "home",
     "lat": -36.34,
     "lon": 174.742,
-    "time": "2026-10-18T10:34:47+13:00",
-    "windKn": 0.9,
+    "time": "2026-10-18T10:39:51+13:00",
+    "windKn": 0.4,
     "gustKn": 4.3,
-    "windDirDeg": 73,
-    "airC": 17.8,
+    "windDirDeg": 67,
+    "airC": 17.9,
     "pressureHpa": 1024.0,
     "rainRateMmH": 0.0,
     "rainTodayMm": 0.0,
@@ -1841,19 +1858,18 @@
   "fetchLog": [
    {
     "id": "IWARKW15",
-    "ok": false,
-    "attempts": 4,
+    "ok": true,
+    "method": "page",
+    "attempts": 2,
     "tries": [
      "200:WuNext-Preview-Phased",
-     "200:WuNext-Preview-Phased",
-     "200:WuNext-Preview-Phased",
-     "200:WuNext-Preview-Phased"
-    ],
-    "error": "no readings in served page (client-rendered variant)"
+     "200:wu-next-prod"
+    ]
    },
    {
     "id": "ISNELL2",
     "ok": true,
+    "method": "page",
     "attempts": 4,
     "tries": [
      "200:WuNext-Preview-Phased",
@@ -1865,14 +1881,17 @@
    {
     "id": "ISNELL1",
     "ok": true,
-    "attempts": 1,
+    "method": "page",
+    "attempts": 2,
     "tries": [
+     "200:WuNext-Preview-Phased",
      "200:wu-next-prod"
     ]
    },
    {
     "id": "IWARKW128",
     "ok": true,
+    "method": "page",
     "attempts": 1,
     "tries": [
      "200:wu-next-prod"
@@ -1881,6 +1900,7 @@
    {
     "id": "IWARKW125",
     "ok": true,
+    "method": "page",
     "attempts": 1,
     "tries": [
      "200:wu-next-prod"
@@ -1889,8 +1909,11 @@
    {
     "id": "IWARKW107",
     "ok": true,
-    "attempts": 2,
+    "method": "page",
+    "attempts": 4,
     "tries": [
+     "200:WuNext-Preview-Phased",
+     "200:WuNext-Preview-Phased",
      "200:WuNext-Preview-Phased",
      "200:wu-next-prod"
     ]
@@ -1898,14 +1921,18 @@
    {
     "id": "IWARKWOR11",
     "ok": true,
-    "attempts": 1,
+    "method": "page",
+    "attempts": 3,
     "tries": [
+     "200:WuNext-Preview-Phased",
+     "200:WuNext-Preview-Phased",
      "200:wu-next-prod"
     ]
    },
    {
     "id": "IWARKW99",
     "ok": true,
+    "method": "page",
     "attempts": 1,
     "tries": [
      "200:wu-next-prod"
