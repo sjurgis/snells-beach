@@ -136,9 +136,16 @@ def page_station(sid, name, now, log, lat=None, lon=None):
             tries.append(f"err:{type(e).__name__}")
         if o: break
         if i < 3: time.sleep(2 * (i + 1))
-    entry = {"id": sid, "ok": False, "attempts": len(tries), "tries": tries}
+    entry = {"id": sid, "ok": False, "method": "page", "attempts": len(tries), "tries": tries}
     log.append(entry)
-    if not o: entry["error"] = "no readings in served page (client-rendered variant)"; raise ValueError(entry["error"])
+    if not o: entry["error"] = NO_STATE; raise ValueError(entry["error"])
+    return _reading_from_state(o, sid, name, now, entry, lat, lon)
+
+
+NO_STATE = "no readings in served page (client-rendered variant)"
+
+
+def _reading_from_state(o, sid, name, now, entry, lat=None, lon=None):
     t = dt.datetime.fromtimestamp(o["epoch"], dt.timezone.utc).astimezone(TZ)
     if not _fresh(t, now): entry["error"] = f"latest reading old ({t:%H:%M})"; raise ValueError(entry["error"])
     if "metric" in o and isinstance(o["metric"], dict):
@@ -160,12 +167,77 @@ def page_station(sid, name, now, log, lat=None, lon=None):
         "windKn": r1(wind, k), "gustKn": r1(gust, k), "windDirDeg": o.get("winddirAvg"),
         "airC": None if temp is None else round(tc(temp), 1), "pressureHpa": r1(pres, pk),
         "rainRateMmH": r1(rate, rk), "rainTodayMm": r1(tot, rk),
-        "url": f"https://www.wunderground.com/dashboard/pws/{sid}", "via": "page",
+        "url": f"https://www.wunderground.com/dashboard/pws/{sid}", "via": entry.get("method", "page"),
     }
 
 
+# --- Fallback: render the public dashboard in headless Chrome and read what it DISPLAYS.
+# Chrome runs the page like a normal visitor's browser; we only read the rendered DOM text
+# (or the page's own server-rendered state if that variant comes back). We never touch the
+# page's API key and never call api.weather.com ourselves. One render per station per run.
+CHROME = "/usr/bin/google-chrome"
+RENDER_TIMEOUT_S = 22
+RENDER_PARALLEL = 3
+
+
+def _parse_display(text, now):
+    import re
+    t = " ".join(text.split())
+    if "connected" not in t: raise ValueError("station not shown as connected")
+    m = re.search(r"connected\s+(\d{1,2}):(\d{2})\s*(AM|PM)\s+NZ[DS]T\s+on\s+([A-Z][a-z]+ \d{1,2}, \d{4})", t)
+    if not m: raise ValueError("no observation time on rendered page")
+    h = int(m.group(1)) % 12 + (12 if m.group(3) == "PM" else 0)
+    d = dt.datetime.strptime(m.group(4), "%B %d, %Y")
+    when = dt.datetime(d.year, d.month, d.day, h, int(m.group(2)), tzinfo=TZ)
+    num = lambda rx: (lambda mm: float(mm.group(1)) if mm else None)(re.search(rx, t))
+    w = re.search(r"\bWind\s+([\d.]+)\s+gusts\s+([\d.]+)\s+(\d{1,3})°", t)
+    if not w: raise ValueError("no wind on rendered page")
+    temp, pres = num(r"\bTemperature\s+(-?[\d.]+)"), num(r"\bPressure\s+([\d.]+)")
+    pr = re.search(r"\bPrecipitation\s+([\d.]+)\s+([\d.]+)", t)
+    imperial = pres is None or pres < 40          # inHg -> the page is in US units (°F, mph, in)
+    k, pk, rk = (MPH_TO_KN, INHG_TO_HPA, IN_TO_MM) if imperial else (KMH_TO_KN, 1, 1)
+    r1 = lambda v, f: None if v is None else round(v * f, 1)
+    return when, {
+        "windKn": r1(float(w.group(1)), k), "gustKn": r1(float(w.group(2)), k), "windDirDeg": int(w.group(3)) % 360,
+        "airC": None if temp is None else round((temp - 32) * 5 / 9 if imperial else temp, 1),
+        "pressureHpa": r1(pres, pk),
+        "rainRateMmH": r1(float(pr.group(1)), rk) if pr else None, "rainTodayMm": r1(float(pr.group(2)), rk) if pr else None,
+    }
+
+
+def render_station(sid, name, now, entry, lat=None, lon=None):
+    import subprocess, tempfile, time
+    from bs4 import BeautifulSoup
+    entry["method"] = "render"
+    t0 = time.time()
+    with tempfile.TemporaryDirectory(prefix="wu-chrome-") as prof:
+        try:
+            html = subprocess.run([CHROME, "--headless=new", "--no-sandbox", "--disable-gpu", "--no-first-run",
+                                   f"--user-data-dir={prof}", f"--user-agent={BROWSER_UA}", "--virtual-time-budget=15000",
+                                   "--dump-dom", f"https://www.wunderground.com/dashboard/pws/{sid}"],
+                                  capture_output=True, text=True, timeout=RENDER_TIMEOUT_S).stdout
+        except subprocess.TimeoutExpired:
+            entry["renderS"] = RENDER_TIMEOUT_S; entry["error"] = "render timed out"; raise ValueError(entry["error"])
+    entry["renderS"] = round(time.time() - t0, 1)
+    o = _parse_state(html, sid)                    # if the old variant came back, its own data is exact
+    entry["parse"] = "state" if o else "display"
+    if o: return _reading_from_state(o, sid, name, now, entry, lat, lon)
+    soup = BeautifulSoup(html, "html.parser")
+    for tag in soup(["script", "style", "svg"]): tag.decompose()
+    try:
+        when, v = _parse_display(soup.get_text(" "), now)
+    except ValueError as e:
+        entry["error"] = f"render: {e}"; raise
+    if not _fresh(when, now): entry["error"] = f"render: latest reading old ({when:%H:%M})"; raise ValueError(entry["error"])
+    entry["ok"] = True
+    entry.pop("error", None)
+    return {"id": sid, "name": name, "kind": "home", "lat": lat, "lon": lon, "time": when.isoformat(), **v,
+            "url": f"https://www.wunderground.com/dashboard/pws/{sid}", "via": "render"}
+
+
 def pages(now, log):
-    """All stations in parallel (one thread each), so a run takes about as long as the slowest station."""
+    """Plain page fetches for all stations in parallel; any that only got the client-rendered
+    variant are then rendered in headless Chrome, at most RENDER_PARALLEL at once."""
     from concurrent.futures import ThreadPoolExecutor
     def one(st):
         sid, name, lat, lon = st
@@ -175,8 +247,19 @@ def pages(now, log):
             print(f"warning: WU page {sid}: {e}", file=sys.stderr); return None, sub
     with ThreadPoolExecutor(max_workers=len(PAGE_STATIONS)) as ex:
         res = list(ex.map(one, PAGE_STATIONS))
+    todo = [(st, sub[0]) for st, (r, sub) in zip(PAGE_STATIONS, res) if r is None and sub and sub[0].get("error") == NO_STATE]
+    def rend(item):
+        (sid, name, lat, lon), entry = item
+        entry["pageError"] = entry.pop("error", None)
+        try: return sid, render_station(sid, name, now, entry, lat, lon)
+        except Exception as e:
+            entry.setdefault("error", f"render: {e}"); print(f"warning: WU render {sid}: {e}", file=sys.stderr); return sid, None
+    rendered = {}
+    if todo and os.path.exists(CHROME):
+        with ThreadPoolExecutor(max_workers=RENDER_PARALLEL) as ex:
+            rendered = dict(ex.map(rend, todo))
     for _, sub in res: log.extend(sub)
-    return [r for r, _ in res if r]
+    return [r or rendered.get(st[0]) for st, (r, _) in zip(PAGE_STATIONS, res) if (r or rendered.get(st[0]))]
 
 
 def collect(now=None):
