@@ -290,3 +290,21 @@ main { padding-top: 14px; padding-bottom: 8px; }
 .wval small { font-size: .72em; opacity: .8; margin-left: 1px; }
 .wgust { font-size: .72rem; color: var(--muted); }
 .wcell.none .wval { color: var(--muted); }
+.wpair.one { grid-template-columns: minmax(0,1fr); max-width: 60%; }
+.wgust { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+@media (max-width: 600px) {
+  .wpair.one { max-width: none; }
+  /* live card: one line per station */
+  .card.live ul { grid-template-columns: minmax(0,1fr); gap: 4px; }
+  .card.live li { display: flex; align-items: center; gap: 6px; min-width: 0; white-space: nowrap; }
+  .card.live li > a { flex: 0 1 auto; min-width: 0; overflow: hidden; text-overflow: ellipsis; font-size: .85rem; }
+  .card.live li > small { flex: none; font-size: .7rem; }
+  .card.live li .chips { margin: 0 0 0 auto; flex-wrap: nowrap; gap: 3px; flex: none; }
+  .card.live li .chip { font-size: .72rem; padding: 2px 5px; gap: 3px; }
+  .card.live li .chip.c-pres { display: none; }
+}
+@media (max-width: 600px) {
+  .card.live li > a { flex: 1 1 auto; min-width: 72px; }
+}
+@media (max-width: 420px) { .card.live li .chip.c-temp { display: none; } }
+@media (max-width: 480px) { .runners { grid-template-columns: minmax(0,1fr); } }

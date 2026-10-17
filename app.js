@@ -3,7 +3,7 @@
 "use strict";
 
 const TZ = "Pacific/Auckland";
-const APP_VERSION = "2026-10-18c";   // bump with data/version.txt when app.js/style.css/index.html change
+const APP_VERSION = "2026-10-18d";   // bump with data/version.txt when app.js/style.css/index.html change
 const PREF_KEY = "snells-beach-prefs-v1";
 const DEFAULT_PREFS = { activities: ["hangout"], favs: [], drive: 1, dog: false };
 const ACT = {
@@ -470,7 +470,7 @@ function nowLater(today, tomorrow, now, prefs) {
       nowCard = `<article class="card nl r-${rt.key}"><span class="nl-tag">${icon("clock")}Right now</span>
         <div class="rhead"><h4>${bname(c.R.b)}</h4>${pill(fake)}</div>
         <p class="when sm"><b>${sc < 30 ? "Not great anywhere" : `Good till ~${fmtTime(c.until)}`}</b></p>
-        ${windPair(STATE.fc, d, c.R.b, hr, now)}
+        ${windPair(STATE.fc, d, c.R.b, now)}
         <div class="chips">${rainChip([c.e])}${tide}</div>${liveBasis(STATE.fc, now, c.R.b.id)}</article>`;
     }
   }
@@ -481,10 +481,11 @@ function nowLater(today, tomorrow, now, prefs) {
     if (later) laterCard = `<article class="card nl r-${later.rating.key}"><span class="nl-tag">${icon("clock")}Best later today</span>
       <div class="rhead"><h4>${bname(later.b)}</h4>${pill(later)}</div>
       <p class="when sm"><b>${esc(later.window)}</b></p>
+      ${windPair(STATE.fc, d, later.b, now, { at: later.start })}
       ${chips(later, later.act, prefs, { compact: true })}</article>`;
   } else {
     const t = tomorrow?.picks[0];
-    if (t && now.min <= ss) laterCard = `<article class="card nl r-${t.rating.key}"><span class="nl-tag">${icon("clock")}Tomorrow</span><div class="rhead"><h4>${bname(t.b)}</h4>${pill(t)}</div><p class="when sm"><b>${esc(t.window)}</b></p>${chips(t, t.act, prefs, { compact: true })}</article>`;
+    if (t && now.min <= ss) laterCard = `<article class="card nl r-${t.rating.key}"><span class="nl-tag">${icon("clock")}Tomorrow</span><div class="rhead"><h4>${bname(t.b)}</h4>${pill(t)}</div><p class="when sm"><b>${esc(t.window)}</b></p>${windPair(STATE.fc, t.day, t.b, now, { at: t.best.t })}${chips(t, t.act, prefs, { compact: true })}</article>`;
   }
   return `<div class="nlgrid">${nowCard}${laterCard}</div>`;
 }
@@ -631,18 +632,35 @@ function blendObservations(fc, now, beaches = STATE?.beaches) {
   }
   fc.observations.applied = true;
 }
-/* Actual (live station) vs Forecast wind for one beach, side by side: label, arrow (blowing to), compass, kn. */
-function windCell(label, kn, dir, gust, cls) {
-  if (kn == null) return `<div class="wcell ${cls} none"><span class="wlbl">${label}</span><span class="wval">n/a</span></div>`;
+/* Actual (live station) vs Forecast wind for one beach, side by side: label, arrow (blowing to), compass, kn, gust. */
+function windCell(label, kn, dir, gust, cls, foot = "") {
+  if (kn == null) return `<div class="wcell ${cls} none"><span class="wlbl">${label}</span><span class="wval">n/a</span>${foot ? `<span class="wgust">${foot}</span>` : ""}</div>`;
   const calm = kn < 1 || dir == null;
-  return `<div class="wcell ${cls}"><span class="wlbl">${label}</span><span class="wval">${calm ? icon("wind") : arrow(dir)}<b>${calm ? "Calm" : dir16(dir)}</b> ${calm ? "" : Math.round(kn) + "<small>kn</small>"}</span>${gust != null && gust >= 1 ? `<span class="wgust">gust ${Math.round(gust)}</span>` : ""}</div>`;
+  const g = gust != null && gust >= 1 ? `gust ${Math.round(gust)}` : "";
+  return `<div class="wcell ${cls}"><span class="wlbl">${label}</span><span class="wval">${calm ? icon("wind") : arrow(dir)}<b>${calm ? "Calm" : dir16(dir)}</b> ${calm ? "" : Math.round(kn) + "<small>kn</small>"}</span><span class="wgust">${[g, foot].filter(Boolean).join(" · ")}</span></div>`;
 }
-function windPair(fc, day, b, hr, now) {
-  const L = fc.liveByBeach?.[b.id];
+const nearestSlot = (slots, t) => slots.reduce((a, s) => (!a || Math.abs(hm(s.time) - t) < Math.abs(hm(a.time) - t) ? s : a), null);
+/* today: Actual (this beach's live stations) + Forecast (model, current hour, or the card's window if it starts later);
+   other days: Forecast only, at the card's best hour. */
+function windPair(fc, day, b, now, { at = null } = {}) {
   const src = day.fcSlots || day.slots || [];
-  const f = src.reduce((a, s) => (!a || Math.abs(hm(s.time) - hr) < Math.abs(hm(a.time) - hr) ? s : a), null);
-  const actual = L?.mode === "live" ? windCell("Actual", L.kn, L.dir, L.gust, "act") : windCell("Actual", null, null, null, "act");
-  const fcst = f ? windCell("Forecast", f.windKn, f.windDirDeg, f.gustKn, "fc") : windCell("Forecast", null, null, null, "fc");
+  const isToday = day.date === now.date;
+  const hrNow = Math.round(now.min / 60) * 60;
+  let ft = isToday ? hrNow : (at ?? 12 * 60), flabel = "Forecast";
+  if (at != null && (!isToday || at > now.min + 45)) { ft = at; flabel = `Forecast ${fmtTime(at)}`; }
+  else if (isToday) flabel = "Forecast now";
+  const f = src.length ? nearestSlot(src, ft) : null;
+  const fcst = f ? windCell(flabel, f.windKn, f.windDirDeg, f.gustKn, "fc") : windCell(flabel, null, null, null, "fc");
+  if (!isToday) return `<div class="wpair one" aria-label="Wind forecast">${fcst}</div>`;
+  const L = fc.liveByBeach?.[b.id] || fc.liveNow;
+  let actual;
+  if (L?.mode === "live") {
+    const ids = L.stations.map((x) => x.id).join(", ");
+    actual = windCell(`Actual ${fmtTime(L.t0)}`, L.kn, L.dir, L.gust, "act", L.why === "local" ? `Algies/Snells (${ids})` : ids);
+  } else {
+    const why = L?.mode === "airport" ? "airport only" : L?.mode === "stale" ? "readings old" : "no live data";
+    actual = windCell("Actual", null, null, null, "act", why);
+  }
   return `<div class="wpair" aria-label="Wind: actual vs forecast">${actual}${fcst}</div>`;
 }
 function liveBasis(fc, now, beachId = null) {
@@ -661,12 +679,12 @@ function liveCard(fc, now) {
     const old = t == null || now.min - t > 120;
     const wind = s.windKn < 1 ? `${icon("wind")}Calm` : `${s.windDirDeg != null ? arrow(s.windDirDeg) : icon("wind")}${s.windDirDeg != null ? dir16(s.windDirDeg) + " " : ""}${Math.round(s.windKn)}<small>kn</small>${s.gustKn ? ` <small>gust ${Math.round(s.gustKn)}</small>` : ""}`;
     const c = [`<span class="chip c-plain">${wind}</span>`];
-    if (s.airC != null) c.push(`<span class="chip c-plain">${icon("temp")}${Math.round(s.airC)}°</span>`);
-    if (s.pressureHpa != null) c.push(`<span class="chip c-plain">${Math.round(s.pressureHpa)}<small>hPa</small></span>`);
+    if (s.airC != null) c.push(`<span class="chip c-plain c-temp">${icon("temp")}${Math.round(s.airC)}°</span>`);
+    if (s.pressureHpa != null) c.push(`<span class="chip c-plain c-pres">${Math.round(s.pressureHpa)}<small>hPa</small></span>`);
     if (s.rainRateMmH) c.push(`<span class="chip c-bad">${icon("rain")}${s.rainRateMmH}<small>mm/h</small></span>`);
     else if (s.raining) c.push(`<span class="chip c-bad">${icon("rain")}Raining</span>`);
     else if (s.rainRateMmH === 0 || s.raining === false) c.push(`<span class="chip c-good">${icon("sun")}Dry</span>`);
-    return `<li><a href="${esc(s.url)}" rel="noopener"><b>${esc(s.name)}</b></a> <small class="muted">${t != null ? "at " + fmtTime(t) : "earlier"}${old ? " · old" : ""}</small><div class="chips">${c.join("")}</div></li>`;
+    return `<li><a href="${esc(s.url)}" rel="noopener"><b>${esc(s.name)}</b></a> <small class="muted">${t != null ? fmtTime(t) : "earlier"}${old ? " · old" : ""}</small><div class="chips">${c.join("")}</div></li>`;
   }).join("");
   const head = home ? `Live from ${o.stations.length} home station${o.stations.length > 1 ? "s" : ""}` : "Live reading · airport";
   const note = home ? (o.applied ? "Used as the wind and rain for right now, fading back to the forecast over ~3 h." : "Shown only; too old to change the scores.") : "This airport is a long way from Snells, so it's shown but not used in the scores.";
@@ -744,6 +762,7 @@ function render() {
       <div class="hero-head"><div><span class="badge">${today.ctx.isToday ? "Today's pick" : esc(dLabel(today.day, today.ctx)) + "'s pick"}</span>${pill(top)}</div>${ring(top.score, top.rating.key)}</div>
       <h2>${bname(top.b)}</h2>
       <p class="when">${icon("clock")}<span>${top.done ? "" : "Best "}<b>${esc(top.window)}</b></span></p>
+      ${windPair(fc, today.day, top.b, now, { at: top.done ? null : top.start })}
       ${chips(top, top.act, prefs)}
       ${bullets(reasons(top, top.act))}
       ${lowNote}
@@ -755,6 +774,7 @@ function render() {
         <article class="card runner r-${r.rating.key}">
           <div class="rhead"><h4>${bname(r.b)}</h4>${pill(r)}</div>
           <p class="when sm">${icon("clock")}<b>${esc(r.window)}</b></p>
+          ${windPair(fc, today.day, r.b, now, { at: r.done ? null : r.start })}
           ${chips(r, r.act, prefs, { compact: true })}
           ${bullets(reasons(r, r.act).slice(0, 2))}
         </article>`).join("")}</div>`;
@@ -778,6 +798,7 @@ function render() {
         <div class="dhead"><div><h4>${esc(dLabel(day, ctx))}</h4><span class="muted">${esc(fmtDate(day.date, { day: "numeric", month: "short" }))}</span></div>${wk}<span class="wx">${mid ? skyIcon(mid.sky) : ""}${day.airMaxC != null ? Math.round(day.airMaxC) + "°" : ""}</span></div>
         <div class="dpick"><span class="dname">${bname(top.b)}</span>${pill(top)}</div>
         <p class="when sm">${icon("clock")}<b>${esc(top.window)}</b></p>
+        ${windPair(fc, day, top.b, now, { at: top.best.t })}
         ${chips(top, top.act, prefs, { compact: true })}
         ${bullets(reasons(top, top.act).slice(0, 2))}
       </article>`;
@@ -793,6 +814,7 @@ function render() {
       </summary>
       <div class="rbody">
         <p class="when sm">${icon("clock")}<b>${esc(r.window)}</b></p>
+        ${windPair(fc, today.day, r.b, now, { at: r.done ? null : r.start })}
         ${chips(r, r.act, { ...prefs, dog: true })}
         ${bullets(reasons(r, r.act))}
         <ul class="notes">${(r.b.notes || []).map((n) => `<li>${esc(n)}</li>`).join("")}</ul>
