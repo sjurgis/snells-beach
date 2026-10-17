@@ -1,6 +1,6 @@
 {
  "schemaVersion": 1,
- "updated": "2026-10-18T08:27:11+13:00",
+ "updated": "2026-10-18T09:21:03+13:00",
  "timezone": "Pacific/Auckland",
  "location": {
   "name": "Snells Beach",
@@ -12,7 +12,7 @@
    "what": "Wind & weather (blended)",
    "name": "met.no Locationforecast (Snells Beach)",
    "url": "https://api.met.no/weatherapi/locationforecast/2.0/compact?lat=-36.42&lon=174.73",
-   "issued": "2026-10-18T08:18:12+13:00"
+   "issued": "2026-10-18T08:18:13+13:00"
   },
   {
    "what": "Wind (blended), gusts, rain chance, sun",
@@ -85,20 +85,16 @@
     },
     {
      "time": "07:00",
-     "windDirDeg": 193,
-     "windKn": 9.1,
+     "windDirDeg": 201,
+     "windKn": 6.0,
      "gustKn": 10.7,
      "rainMm": 0.0,
      "rainProbPct": 0,
      "airC": 8.8,
      "cloudPct": 0,
      "sky": "sun",
-     "src": "metno+openmeteo",
+     "src": "openmeteo",
      "models": {
-      "metno": [
-       189,
-       12.1
-      ],
       "openmeteo": [
        201,
        6.0
@@ -107,19 +103,19 @@
     },
     {
      "time": "08:00",
-     "windDirDeg": 189,
-     "windKn": 9.6,
+     "windDirDeg": 186,
+     "windKn": 9.7,
      "gustKn": 12.6,
      "rainMm": 0.0,
      "rainProbPct": 0,
-     "airC": 11.0,
-     "cloudPct": 3,
+     "airC": 11.2,
+     "cloudPct": 0,
      "sky": "sun",
      "src": "metno+openmeteo",
      "models": {
       "metno": [
-       185,
-       12.2
+       182,
+       12.4
       ],
       "openmeteo": [
        194,
@@ -129,8 +125,8 @@
     },
     {
      "time": "09:00",
-     "windDirDeg": 186,
-     "windKn": 9.6,
+     "windDirDeg": 184,
+     "windKn": 9.5,
      "gustKn": 15.4,
      "rainMm": 0.0,
      "rainProbPct": 0,
@@ -140,8 +136,8 @@
      "src": "metno+openmeteo",
      "models": {
       "metno": [
-       185,
-       11.7
+       182,
+       11.6
       ],
       "openmeteo": [
        187,
@@ -1722,7 +1718,7 @@
   }
  ],
  "observations": {
-  "fetched": "2026-10-18T08:27:11+13:00",
+  "fetched": "2026-10-18T09:21:03+13:00",
   "kind": "home",
   "blend": true,
   "stations": [
@@ -1732,11 +1728,11 @@
     "kind": "home",
     "lat": -36.435,
     "lon": 174.74,
-    "time": "2026-10-18T08:24:51+13:00",
-    "windKn": 1.8,
-    "gustKn": 8.5,
-    "windDirDeg": 216,
-    "airC": 12.1,
+    "time": "2026-10-18T09:19:47+13:00",
+    "windKn": 8.1,
+    "gustKn": 17.3,
+    "windDirDeg": 155,
+    "airC": 14.1,
     "pressureHpa": 1030.5,
     "rainRateMmH": 0.0,
     "rainTodayMm": 0.0,
@@ -1749,11 +1745,11 @@
     "kind": "home",
     "lat": -36.415,
     "lon": 174.726,
-    "time": "2026-10-18T08:24:12+13:00",
-    "windKn": 0.5,
-    "gustKn": 1.9,
-    "windDirDeg": 192,
-    "airC": 14.4,
+    "time": "2026-10-18T09:19:12+13:00",
+    "windKn": 4.5,
+    "gustKn": 8.3,
+    "windDirDeg": 206,
+    "airC": 16.2,
     "pressureHpa": 1026.1,
     "rainRateMmH": 0.0,
     "rainTodayMm": 0.0,
@@ -1765,17 +1761,17 @@
    {
     "id": "IWARKW15",
     "ok": true,
-    "attempts": 2,
+    "attempts": 1,
     "tries": [
-     "200:WuNext-Preview-Phased",
      "200:wu-next-prod"
     ]
    },
    {
     "id": "ISNELL2",
     "ok": true,
-    "attempts": 1,
+    "attempts": 2,
     "tries": [
+     "200:WuNext-Preview-Phased",
      "200:wu-next-prod"
     ]
    }
