@@ -278,3 +278,5 @@ main { padding-top: 14px; padding-bottom: 8px; }
 .card.live .sm { font-size: .78rem; margin: 6px 0 0; }
 .chip.c-act { background: var(--sea); color: #fff; }
 .favs { grid-column: 1 / -1; }
+.basis { margin: 8px 0 0; font-size: .76rem; color: var(--muted); display: flex; align-items: center; gap: 5px; }
+.basis.live { color: var(--sea); font-weight: 600; }

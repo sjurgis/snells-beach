@@ -3,7 +3,7 @@
 "use strict";
 
 const TZ = "Pacific/Auckland";
-const APP_VERSION = "2026-10-17b";   // bump with data/version.txt when app.js/style.css/index.html change
+const APP_VERSION = "2026-10-17c";   // bump with data/version.txt when app.js/style.css/index.html change
 const PREF_KEY = "snells-beach-prefs-v1";
 const DEFAULT_PREFS = { activities: ["hangout"], favs: [], drive: 1, dog: false };
 const ACT = {
@@ -447,9 +447,9 @@ function nowLater(today, tomorrow, now, prefs) {
   let nowCard;
   if (now.min > ss) {
     const t = tomorrow?.picks[0];
-    nowCard = `<article class="card nl dark"><span class="nl-tag">${icon("clock")}Right now</span><h4>It's dark</h4><p class="muted">Sunset was ~${fmtTime(ss)}.</p>${t ? `<p class="nl-next">Tomorrow: <b>${bname(t.b)}</b> ${pill(t)}<br><span>${icon("clock")}${esc(t.window)}</span></p>` : ""}</article>`;
+    nowCard = `<article class="card nl dark"><span class="nl-tag">${icon("clock")}Right now</span><h4>It's dark</h4><p class="muted">Sunset was ~${fmtTime(ss)}.</p>${liveBasis(STATE.fc, now)}${t ? `<p class="nl-next">Tomorrow: <b>${bname(t.b)}</b> ${pill(t)}<br><span>${icon("clock")}${esc(t.window)}</span></p>` : ""}</article>`;
   } else if (now.min < sr - 30) {
-    nowCard = `<article class="card nl dark"><span class="nl-tag">${icon("clock")}Right now</span><h4>Still dark</h4><p class="muted">Sunrise ~${fmtTime(sr)}.</p></article>`;
+    nowCard = `<article class="card nl dark"><span class="nl-tag">${icon("clock")}Right now</span><h4>Still dark</h4><p class="muted">Sunrise ~${fmtTime(sr)}.</p>${liveBasis(STATE.fc, now)}</article>`;
   } else {
     const hr = Math.min(Math.max(Math.round(now.min / 60) * 60, Math.ceil((sr - 30) / 60) * 60), ss);
     const cands = elig.map((R) => {
@@ -470,7 +470,7 @@ function nowLater(today, tomorrow, now, prefs) {
       nowCard = `<article class="card nl r-${rt.key}"><span class="nl-tag">${icon("clock")}Right now</span>
         <div class="rhead"><h4>${bname(c.R.b)}</h4>${pill(fake)}</div>
         <p class="when sm"><b>${sc < 30 ? "Not great anywhere" : `Good till ~${fmtTime(c.until)}`}</b></p>
-        <div class="chips">${windChip(fake, c.R.act, [c.e])}${rainChip([c.e])}${tide}</div></article>`;
+        <div class="chips">${windChip(fake, c.R.act, [c.e])}${rainChip([c.e])}${tide}</div>${liveBasis(STATE.fc, now)}</article>`;
     }
   }
   // best later today: windows starting at least an hour from now
@@ -543,7 +543,6 @@ function todayStrip(day, tides, ctx) {
 }
 
 /* ---------- live station readings ---------- */
-const OBS_SPAN = 180;   // minutes either side of the reading that it nudges the model
 function obsMean(stations) {
   let x = 0, y = 0, kn = 0, g = [], rain = 0, n = 0;
   for (const s of stations) {
@@ -557,34 +556,59 @@ function obsMinutes(iso, dayIso) {   // "2026-10-17T13:05:00+13:00" -> local min
   const m = /^(\d{4}-\d{2}-\d{2})T(\d{2}):(\d{2})/.exec(iso || "");
   return m && m[1] === dayIso ? +m[2] * 60 + +m[3] : null;
 }
-/* Modest near-term correction: only home stations (not the far-off airport), weight ≤ 50% at the
-   reading's time, fading to nothing 3 h either side. Rain seen now lifts the current hour's wetness. */
-function blendObservations(fc, now) {
+/* Live-first "now": a fresh (≤ 90 min) home-station reading REPLACES the current hour's wind, gust,
+   direction and rain, then fades back to the forecast over ~3 h. Tide and swell stay from the models.
+   Local stations (Algies IWARKW15, Snells ISNELL2) are preferred; several are combined by median.
+   An airport reading is too far away to use, so then everything stays forecast-based. */
+const LOCAL_IDS = ["IWARKW15", "ISNELL2"];
+const median = (xs) => { const v = xs.filter((x) => x != null).sort((p, q) => p - q); if (!v.length) return null; const m = v.length >> 1; return v.length % 2 ? v[m] : (v[m - 1] + v[m]) / 2; };
+function liveNow(fc, now) {
   const o = fc.observations;
-  if (!o?.blend || !o.stations?.length) return;
+  if (!o?.stations?.length) return { mode: "none" };
+  if (o.kind !== "home") return { mode: "airport", label: o.stations[0].name };
+  const fresh = o.stations.map((s) => ({ s, t: obsMinutes(s.time, now.date) })).filter((x) => x.t != null && now.min - x.t <= 90 && now.min - x.t >= -15);
+  if (!fresh.length) return { mode: "stale" };
+  const local = fresh.filter((x) => LOCAL_IDS.includes(x.s.id));
+  const use = (local.length ? local : fresh).map((x) => x.s);
+  const t0 = Math.max(...(local.length ? local : fresh).map((x) => x.t));
+  const kn = median(use.map((s) => s.windKn)), gust = median(use.map((s) => s.gustKn));
+  let x = 0, y = 0;
+  for (const s of use) if (s.windDirDeg != null && s.windKn >= 1) { x += Math.sin(s.windDirDeg * Math.PI / 180) * s.windKn; y += Math.cos(s.windDirDeg * Math.PI / 180) * s.windKn; }
+  const dir = x || y ? norm(Math.atan2(x, y) * 180 / Math.PI) : null;
+  const rain = median(use.map((s) => s.rainRateMmH));
+  return { mode: "live", kn, gust, dir, rain, t0, stations: use, label: use.map((s) => `${s.name} ${s.id}`).join(", ") };
+}
+function blendObservations(fc, now) {
+  const L = liveNow(fc, now);
+  fc.liveNow = L;
+  if (L.mode !== "live") return;
   const day = fc.days.find((d) => d.date === now.date); if (!day) return;
-  const times = o.stations.map((s) => obsMinutes(s.time, now.date)).filter((t) => t != null);
-  if (!times.length) return;
-  const t0 = times.reduce((a, b) => a + b) / times.length;
-  if (now.min - t0 > OBS_SPAN) return;   // readings too old to matter
-  const m = obsMean(o.stations);
   for (const sl of day.slots || []) {
-    const dt = Math.abs(hm(sl.time) - t0); if (dt >= OBS_SPAN) continue;
-    const w = 0.5 * (1 - dt / OBS_SPAN);
+    const dt = hm(sl.time) - now.min;             // minutes ahead of now
+    if (dt < -30 || dt >= 180) continue;           // only the current hour and the next ~3 h
+    const w = dt <= 30 ? 1 : lerp([[30, 1], [90, 0.8], [150, 0.4], [180, 0]], dt);
     const k0 = sl.windKn;
-    sl.windKn = +(k0 * (1 - w) + m.kn * w).toFixed(1);
-    if (m.gust != null) sl.gustKn = +(((sl.gustKn ?? k0) * (1 - w)) + m.gust * w).toFixed(1);
-    if (m.dir != null && sl.windDirDeg != null) {
-      const a = sl.windDirDeg * Math.PI / 180, b = m.dir * Math.PI / 180;
+    if (L.kn != null) sl.windKn = +(k0 * (1 - w) + L.kn * w).toFixed(1);
+    if (L.gust != null) sl.gustKn = +(((sl.gustKn ?? k0) * (1 - w)) + Math.max(L.gust, L.kn ?? 0) * w).toFixed(1);
+    if (L.dir != null && sl.windDirDeg != null) {
+      const a = sl.windDirDeg * Math.PI / 180, b = L.dir * Math.PI / 180;
       sl.windDirDeg = Math.round(norm(Math.atan2(Math.sin(a) * (1 - w) + Math.sin(b) * w, Math.cos(a) * (1 - w) + Math.cos(b) * w) * 180 / Math.PI));
     }
-    if (dt <= 60) {
-      if (m.rain >= 0.2) { sl.rainMm = Math.max(sl.rainMm ?? 0, +m.rain.toFixed(1)); sl.rainProbPct = Math.max(sl.rainProbPct ?? 0, 85); }
-      else if (dt <= 30 && (sl.rainProbPct ?? 0) > 40) sl.rainProbPct = Math.round(sl.rainProbPct * 0.6);   // dry right now
+    if (L.rain != null) {
+      const p = L.rain >= 0.2 ? 95 : L.rain > 0 ? 60 : 0;
+      sl.rainMm = +(((sl.rainMm ?? 0) * (1 - w)) + L.rain * w).toFixed(1);
+      sl.rainProbPct = Math.round((sl.rainProbPct ?? 0) * (1 - w) + p * w);
     }
-    sl.obsAdj = true;
+    sl.obsAdj = w;
   }
-  o.applied = true;
+  fc.observations.applied = true;
+}
+function liveBasis(fc, now) {
+  const L = fc.liveNow || {};
+  if (L.mode === "live") return `<p class="basis live">${icon("wind")}Based on live readings (${esc(L.label)}, ${fmtTime(L.t0)})</p>`;
+  if (L.mode === "airport") return `<p class="basis">${icon("dot")}Forecast-based: only a distant airport reading is live</p>`;
+  if (L.mode === "stale") return `<p class="basis">${icon("dot")}Forecast-based: home-station readings are over 90 min old</p>`;
+  return `<p class="basis">${icon("dot")}Forecast-based: no live readings right now</p>`;
 }
 function liveCard(fc, now) {
   const o = fc.observations;
@@ -603,7 +627,7 @@ function liveCard(fc, now) {
     return `<li><a href="${esc(s.url)}" rel="noopener"><b>${esc(s.name)}</b></a> <small class="muted">${t != null ? "at " + fmtTime(t) : "earlier"}${old ? " · old" : ""}</small><div class="chips">${c.join("")}</div></li>`;
   }).join("");
   const head = home ? `Live from ${o.stations.length} home station${o.stations.length > 1 ? "s" : ""}` : "Live reading · airport";
-  const note = home ? (o.applied ? "Blended into the next few hours' scores." : "Shown only; too old to change the scores.") : "This airport is a long way from Snells, so it's shown but not used in the scores.";
+  const note = home ? (o.applied ? "Used as the wind and rain for right now, fading back to the forecast over ~3 h." : "Shown only; too old to change the scores.") : "This airport is a long way from Snells, so it's shown but not used in the scores.";
   return `<section class="card live${home ? "" : " far"}" aria-label="Live station readings"><h3>${icon("wind")}${head}</h3><ul>${rows}</ul><p class="muted sm">${note}</p></section>`;
 }
 
@@ -756,7 +780,7 @@ async function refresh() {
     const vr = await fetch(`data/version.txt?t=${Date.now()}`, { cache: "no-store" }).catch(() => null);
     if (vr?.ok) { const v = (await vr.text()).trim(); if (v && v !== APP_VERSION) { location.reload(); return; } }
     const fc = await getJSON("data/forecast.json");
-    if (fc?.days?.length && fc.updated !== STATE.fc?.updated) { blendObservations(fc, nzNow()); STATE.fc = fc; }
+    if (fc?.days?.length && (fc.updated !== STATE.fc?.updated || fc.observations?.fetched !== STATE.fc?.observations?.fetched)) { blendObservations(fc, nzNow()); STATE.fc = fc; }
     if (STATE.fc) render();
   } catch (e) { console.warn("refresh failed", e); }
   finally { refreshing = false; }

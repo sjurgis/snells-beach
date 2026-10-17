@@ -92,10 +92,14 @@ MPH_TO_KN, INHG_TO_HPA, IN_TO_MM = 0.868976, 33.8639, 25.4
 def page_station(sid, name, now):
     import requests
     from bs4 import BeautifulSoup
-    r = requests.get(f"https://www.wunderground.com/dashboard/pws/{sid}", headers={"User-Agent": BROWSER_UA}, timeout=15)
-    r.raise_for_status()
-    tag = BeautifulSoup(r.text, "html.parser").find("script", id="app-root-state")
-    if not tag or not tag.string: raise ValueError("no app-root-state in page")
+    import time
+    for attempt in (1, 2):   # the page is sometimes served without the state block; retry once
+        r = requests.get(f"https://www.wunderground.com/dashboard/pws/{sid}", headers={"User-Agent": BROWSER_UA}, timeout=15)
+        r.raise_for_status()
+        tag = BeautifulSoup(r.text, "html.parser").find("script", id="app-root-state")
+        if tag and tag.string: break
+        if attempt == 1: time.sleep(4)
+    if not tag or not tag.string: raise ValueError("no app-root-state in page (after one retry)")
     raw = tag.string
     for a, b in (("&q;", '"'), ("&s;", "'"), ("&l;", "<"), ("&g;", ">"), ("&a;", "&")): raw = raw.replace(a, b)
     state = json.loads(raw)
