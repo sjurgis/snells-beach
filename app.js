@@ -4,16 +4,21 @@
 
 const TZ = "Pacific/Auckland";
 const PREF_KEY = "snells-beach-prefs-v1";
-const DEFAULT_PREFS = { activity: "hangout", drive: 1, dog: false };
+const DEFAULT_PREFS = { activities: ["hangout"], favs: [], drive: 1, dog: false };
 const ACT = {
   hangout: { label: "Hangout / picnic", verb: "hang out" },
   swim: { label: "Swim / family", verb: "swim" },
   surf: { label: "Surf", verb: "surf" },
   snorkel: { label: "Snorkel", verb: "snorkel" },
   sup: { label: "SUP / kayak", verb: "paddle" },
+  sailing: { label: "Sailing", verb: "sail", heuristic: true },
+  fishing: { label: "Fishing", verb: "fish", heuristic: true },
+  walking: { label: "Beach walk", verb: "walk", heuristic: true },
 };
+const ACT_ICON = { hangout: "hangout", swim: "swim", surf: "surf", snorkel: "snorkel", sup: "sup", sailing: "sail", fishing: "fish", walking: "walk" };
+const TIDE_ACTS = new Set(["swim", "snorkel", "sup"]);   // these care about the mid-tide window
 // how hard rain hits each activity (0 = ignore, 1 = rain ruins it)
-const RAIN_K = { hangout: 0.85, swim: 0.6, sup: 0.5, snorkel: 0.45, surf: 0.2 };
+const RAIN_K = { hangout: 0.85, swim: 0.6, sup: 0.5, snorkel: 0.45, surf: 0.2, sailing: 0.5, fishing: 0.35, walking: 0.6 };
 const DIR16 = ["N","NNE","NE","ENE","E","ESE","SE","SSE","S","SSW","SW","WSW","W","WNW","NW","NNW"];
 const DIR8 = ["N","NE","E","SE","S","SW","W","NW"];
 
@@ -69,15 +74,25 @@ const isWeekend = (iso) => { const w = new Date(dayNum(iso) * 86400000).getUTCDa
 /* ---------- prefs ---------- */
 function loadPrefs() {
   try {
-    const p = { ...DEFAULT_PREFS, ...JSON.parse(localStorage.getItem(PREF_KEY) || "{}") };
+    const saved = JSON.parse(localStorage.getItem(PREF_KEY) || "{}");
+    const p = { ...DEFAULT_PREFS, ...saved };
+    // migrate the old single-activity pref to the multi-select list
+    if (!Array.isArray(saved.activities)) p.activities = saved.activity && ACT[saved.activity] ? [saved.activity] : ["hangout"];
+    delete p.activity;
     // one-time switch to the new Hangout default for anyone saved before it existed
     if (!localStorage.getItem("snells-beach-hangout-default")) {
-      p.activity = "hangout";
+      p.activities = ["hangout"];
       localStorage.setItem("snells-beach-hangout-default", "1");
     }
-    return p;
+    return fixPrefs(p);
   }
   catch { return { ...DEFAULT_PREFS }; }
+}
+function fixPrefs(p) {
+  p.activities = (Array.isArray(p.activities) ? p.activities : []).filter((a) => ACT[a]);
+  if (!p.activities.length) p.activities = ["hangout"];
+  p.favs = Array.isArray(p.favs) ? p.favs.filter((x) => typeof x === "string") : [];
+  return p;
 }
 function savePrefs(p) { try { localStorage.setItem(PREF_KEY, JSON.stringify(p)); } catch { /* private mode */ } }
 
@@ -209,6 +224,32 @@ function evalSlot(b, day, slot, act, tides) {
     waterQ = lerp([[0, 1], [1, 1], [2, 0.85]], water);
     if (pen >= 0.3 && f > 0.75) extra.push({ k: "mid", t: "Little dry sand near high tide" });
     score = 100 * suit * (0.65 * windQ + 0.25 * sandQ + 0.1 * waterQ);
+  } else if (act === "sailing") {
+    // HEURISTIC: steady 8-18 kn, gusts close to the mean, moderate sea; open launch spots in Kawau Bay
+    windQ = lerp([[0, 0], [4, 0.15], [8, 0.85], [10, 1], [16, 1], [18, 0.85], [22, 0.4], [28, 0.1]], kn);
+    const gustQ = lerp([[0, 1], [5, 0.95], [8, 0.75], [12, 0.45], [16, 0.2]], Math.max(0, gust - kn));
+    const sea = inner.waveM ?? open.waveM ?? 0;
+    waterQ = lerp([[0, 1], [0.8, 0.9], [1.3, 0.5], [2, 0.15]], sea);
+    score = 100 * suit * windQ * gustQ * (0.6 + 0.4 * waterQ);
+    if (gust - kn >= 10) extra.push({ k: "bad", t: `Gusty: ${Math.round(kn)} kn gusting ${Math.round(gust)}` });
+  } else if (act === "fishing") {
+    // HEURISTIC: light-moderate wind, not too rough, around a tide turn, bonus at dawn/dusk
+    windQ = lerp([[0, 1], [8, 1], [14, 0.6], [20, 0.25], [28, 0]], effWind);
+    waterQ = lerp([[0, 1], [0.6, 0.9], [1.2, 0.5], [2, 0.2]], water);
+    let turn = Infinity;
+    for (const x of tides.list) turn = Math.min(turn, Math.abs(x.t - tAbs));
+    const turnQ = lerp([[0, 1], [90, 0.9], [180, 0.65], [372, 0.5]], turn);
+    const sr = hm(day.sunrise || "06:30"), ss = hm(day.sunset || "19:30");
+    const lightB = Math.min(Math.abs(t - sr), Math.abs(t - ss)) <= 90 ? 1.1 : 1;
+    score = 100 * suit * (0.45 * windQ + 0.3 * waterQ + 0.25 * turnQ) * lightB;
+  } else if (act === "walking") {
+    // HEURISTIC: not too windy on the sand, wider beach nearer low tide
+    const eff = (kn * 0.6 + gust * 0.4) * EFF_HANG[rel];
+    windQ = lerp([[0, 1], [10, 0.9], [18, 0.6], [28, 0.25]], eff);
+    const h = tideHeight(tides, tAbs) ?? tides.hmin;
+    const f = clamp((h - tides.hmin) / (tides.hmax - tides.hmin), 0, 1);
+    waterQ = 1 - 0.35 * f;
+    score = 100 * suit * (0.55 * windQ + 0.45 * waterQ);
   } else { // swim / family
     windQ = lerp([[0, 1], [6, 1], [10, 0.8], [15, 0.5], [20, 0.25], [28, 0.05]], effWind);
     waterQ = lerp([[0, 1], [0.3, 1], [0.5, 0.8], [0.8, 0.45], [1.2, 0.2], [2, 0.05]], water);
@@ -243,6 +284,7 @@ function evalBeachDay(b, day, act, tides, ctx) {
   const evals = slots.map((s) => {
     const e = evalSlot(b, day, s, act, tides);
     if (traffic) e.score *= 0.93;
+    if (ctx.favs?.has(b.id)) e.score = Math.min(100, e.score * 1.1);   // favourites get a nudge
     return e;
   });
   const dog = dogRule(b, day.date);
@@ -268,7 +310,7 @@ function pickWindow(R, fromMin = -Infinity, { nowMin = null } = {}) {
   while (hi < cand.length - 1 && ok(cand[hi + 1])) hi++;
   let start = Math.max(cand[lo].t - 30, R.sr), end = Math.min(cand[hi].t + 30, R.ss);
   let tideWin = null;
-  if (best.tideMode === "high" && R.act !== "surf" && R.act !== "hangout" && best.win) {
+  if (best.tideMode === "high" && TIDE_ACTS.has(R.act) && best.win) {
     tideWin = { rise: localMin(R.tides, R.day.date, best.win.rise), fall: localMin(R.tides, R.day.date, best.win.fall), high: localMin(R.tides, R.day.date, best.win.high) };
     // The mid-tide window drives the time; only trim hours at its edges that are clearly poor (rain, wind).
     let s2 = Math.max(tideWin.rise, R.sr, fromMin === -Infinity ? R.sr : fromMin), e2 = Math.min(tideWin.fall, R.ss);
@@ -325,12 +367,19 @@ function reasons(r, act) {
     out.push(h < 0.6 ? { k: "bad", t: `Swell ${h.toFixed(1)} m · ${Math.round(e.period)} s: too small` }
       : h < 0.8 ? { k: "mid", t: `Swell ${h.toFixed(1)} m · ${Math.round(e.period)} s: small` }
       : { k: "good", t: `Swell ${h.toFixed(1)} m · ${Math.round(e.period)} s` });
+  } else if (act === "sailing") {
+    const w = windSummary(r.inWin);
+    out.push(w.hi < 7 ? { k: "bad", t: "Too light to sail" } : w.lo > 20 ? { k: "bad", t: "Too windy" } : { k: "good", t: `Sailable ${knText(w)} kn (heuristic)` });
+  } else if (act === "fishing") {
+    out.push({ k: "mid", t: "Fishing score: tide turn, dawn/dusk, calm (heuristic)" });
+  } else if (act === "walking") {
+    out.push({ k: "mid", t: "Walk score: wind + beach width (heuristic)" });
   } else if (act !== "hangout") {
     const h = e.water, flatT = act === "swim" ? 0.3 : 0.2;
     out.push(h < flatT ? { k: "good", t: "Flat water" } : h < 0.5 ? { k: act === "swim" ? "good" : "mid", t: `Small waves ~${h.toFixed(1)} m` } : { k: "bad", t: `Waves ~${h.toFixed(1)} m: lumpy` });
   }
 
-  if (act !== "surf" && act !== "hangout") {
+  if (TIDE_ACTS.has(act)) {
     if (r.tideWin) {
       const inside = e.tideQ >= 0.9;
       out.push({ k: inside ? "good" : "bad", t: inside ? `Deep enough ~${fmtRange(r.tideWin.rise, r.tideWin.fall)} (mid-tide to mid-tide)` : `Too shallow: swimmable ~${fmtRange(r.tideWin.rise, r.tideWin.fall)}` });
@@ -342,6 +391,7 @@ function reasons(r, act) {
   return out.slice(0, 4);
 }
 function relClass(rel, kn, act) {
+  if (act === "sailing") return kn >= 8 && kn <= 18 ? "good" : kn >= 5 && kn <= 22 ? "mid" : "bad";
   if (rel === "sheltered" || kn < 6) return "good";
   if (rel === "offshore") return act === "surf" || kn <= 15 ? "good" : "mid";
   if (rel === "onshore") return kn >= 10 || act === "surf" ? "bad" : "mid";
@@ -349,7 +399,7 @@ function relClass(rel, kn, act) {
 }
 function windChip(r, act, es = r.inWin) {
   const w = windSummary(es), rel = windRel(r.b, w.dir);
-  if (w.light) return `<span class="chip c-good" title="Light and variable">${icon("wind")}Light <small>&lt;5 kn</small></span>`;
+  if (w.light && act !== "sailing") return `<span class="chip c-good" title="Light and variable">${icon("wind")}Light <small>&lt;5 kn</small></span>`;
   return `<span class="chip c-${relClass(rel, w.hi, act)}" title="Wind from the ${dir16(w.dir)} (${rel}); arrow shows where it blows to">${arrow(w.dir)}${dir16(w.dir)} ${knText(w)}<small>kn</small></span>`;
 }
 function rainChip(es) {
@@ -359,11 +409,12 @@ function rainChip(es) {
 }
 function chips(r, act, prefs, { compact = false } = {}) {
   const e = r.best, c = [];
+  if ((prefs.activities || []).length > 1) c.push(`<span class="chip c-act">${icon(ACT_ICON[act] || "dot")}${esc(ACT[act].label)}</span>`);
   c.push(windChip(r, act));
   const rc = rainChip(r.inWin); if (rc) c.push(rc);
   if (act === "surf") c.push(`<span class="chip c-${e.surfH >= 0.8 ? "good" : e.surfH >= 0.6 ? "mid" : "bad"}">${icon("wave")}${e.surfH.toFixed(1)}<small>m</small> · ${Math.round(e.period)}<small>s</small></span>`);
-  else if (act !== "hangout") c.push(`<span class="chip c-${e.water < 0.3 ? "good" : e.water < 0.5 ? "mid" : "bad"}">${icon("wave")}${e.water < 0.2 ? "Flat" : e.water.toFixed(1) + "<small>m</small>"}</span>`);
-  if (act !== "surf" && act !== "hangout") {
+  else if (TIDE_ACTS.has(act)) c.push(`<span class="chip c-${e.water < 0.3 ? "good" : e.water < 0.5 ? "mid" : "bad"}">${icon("wave")}${e.water < 0.2 ? "Flat" : e.water.toFixed(1) + "<small>m</small>"}</span>`);
+  if (TIDE_ACTS.has(act)) {
     if (r.tideWin) {
       const txt = r.tideWin.rise < r.start - 15 ? `Swimmable till ~${fmtTime(r.tideWin.fall)}` : `Swimmable from ~${fmtTime(r.tideWin.rise)}`;
       c.push(`<span class="chip c-${e.tideQ >= 0.9 ? "good" : "bad"}" title="Mid-tide ${fmtTime(r.tideWin.rise)}, high ${fmtTime(r.tideWin.high)}, mid-tide ${fmtTime(r.tideWin.fall)}">${icon("tide")}${txt}</span>`);
@@ -396,7 +447,7 @@ function nowLater(today, tomorrow, now, prefs) {
   let nowCard;
   if (now.min > ss) {
     const t = tomorrow?.picks[0];
-    nowCard = `<article class="card nl dark"><span class="nl-tag">${icon("clock")}Right now</span><h4>It's dark</h4><p class="muted">Sunset was ~${fmtTime(ss)}.</p>${t ? `<p class="nl-next">Tomorrow: <b>${esc(t.b.name)}</b> ${pill(t)}<br><span>${icon("clock")}${esc(t.window)}</span></p>` : ""}</article>`;
+    nowCard = `<article class="card nl dark"><span class="nl-tag">${icon("clock")}Right now</span><h4>It's dark</h4><p class="muted">Sunset was ~${fmtTime(ss)}.</p>${t ? `<p class="nl-next">Tomorrow: <b>${bname(t.b)}</b> ${pill(t)}<br><span>${icon("clock")}${esc(t.window)}</span></p>` : ""}</article>`;
   } else if (now.min < sr - 30) {
     nowCard = `<article class="card nl dark"><span class="nl-tag">${icon("clock")}Right now</span><h4>Still dark</h4><p class="muted">Sunrise ~${fmtTime(sr)}.</p></article>`;
   } else {
@@ -414,10 +465,10 @@ function nowLater(today, tomorrow, now, prefs) {
     else {
       const sc = Math.round(c.e.score), rt = rating(sc);
       const fake = { ...c.R, best: c.e, inWin: [c.e], rating: rt };
-      const tide = c.e.win && c.R.act !== "surf" && c.R.act !== "hangout"
+      const tide = c.e.win && TIDE_ACTS.has(c.R.act)
         ? `<span class="chip c-${c.e.tideQ >= 0.9 ? "good" : "bad"}">${icon("tide")}${c.e.tideQ >= 0.9 ? "Deep enough" : `Swimmable from ~${fmtTime(localMin(c.R.tides, d.date, c.e.win.rise))}`}</span>` : "";
       nowCard = `<article class="card nl r-${rt.key}"><span class="nl-tag">${icon("clock")}Right now</span>
-        <div class="rhead"><h4>${esc(c.R.b.name)}</h4>${pill(fake)}</div>
+        <div class="rhead"><h4>${bname(c.R.b)}</h4>${pill(fake)}</div>
         <p class="when sm"><b>${sc < 30 ? "Not great anywhere" : `Good till ~${fmtTime(c.until)}`}</b></p>
         <div class="chips">${windChip(fake, c.R.act, [c.e])}${rainChip([c.e])}${tide}</div></article>`;
     }
@@ -427,12 +478,12 @@ function nowLater(today, tomorrow, now, prefs) {
   if (now.min < ss - 60) {
     const later = elig.map((R) => pickWindow(R, Math.max(now.min + 60, sr))).filter((x) => x && !x.done).sort((a, b) => b.score - a.score)[0];
     if (later) laterCard = `<article class="card nl r-${later.rating.key}"><span class="nl-tag">${icon("clock")}Best later today</span>
-      <div class="rhead"><h4>${esc(later.b.name)}</h4>${pill(later)}</div>
+      <div class="rhead"><h4>${bname(later.b)}</h4>${pill(later)}</div>
       <p class="when sm"><b>${esc(later.window)}</b></p>
-      ${chips(later, prefs.activity, prefs, { compact: true })}</article>`;
+      ${chips(later, later.act, prefs, { compact: true })}</article>`;
   } else {
     const t = tomorrow?.picks[0];
-    if (t && now.min <= ss) laterCard = `<article class="card nl r-${t.rating.key}"><span class="nl-tag">${icon("clock")}Tomorrow</span><div class="rhead"><h4>${esc(t.b.name)}</h4>${pill(t)}</div><p class="when sm"><b>${esc(t.window)}</b></p>${chips(t, prefs.activity, prefs, { compact: true })}</article>`;
+    if (t && now.min <= ss) laterCard = `<article class="card nl r-${t.rating.key}"><span class="nl-tag">${icon("clock")}Tomorrow</span><div class="rhead"><h4>${bname(t.b)}</h4>${pill(t)}</div><p class="when sm"><b>${esc(t.window)}</b></p>${chips(t, t.act, prefs, { compact: true })}</article>`;
   }
   return `<div class="nlgrid">${nowCard}${laterCard}</div>`;
 }
@@ -450,7 +501,7 @@ function timeline(today, now) {
   const axis = [6, 9, 12, 15, 18, 21].map((h) => `<span style="left:${P(h * 60)}%">${h === 12 ? "12pm" : h > 12 ? h - 12 + (h === 18 || h === 21 ? "pm" : "") : h + "am"}</span>`).join("");
   return `<section class="card tl" aria-label="Hour by hour, best beaches">
     <div class="tl-axis">${axis}</div>
-    ${rows.map(({ R }) => `<div class="tl-row"><span class="tl-name">${esc(R.b.name)}</span><div class="tl-bar">${night}${R.evals.map((e) => {
+    ${rows.map(({ R }) => `<div class="tl-row"><span class="tl-name">${bname(R.b)}</span><div class="tl-bar">${night}${R.evals.map((e) => {
       const k = rating(e.score).key, past = isToday && e.t + 30 < now.min;
       return `<i class="tl-b k-${k}${past ? " past" : ""}${e.wet >= 0.4 ? " wet" : ""}" style="left:${P(e.t - 30)}%;width:${(60 / span * 100).toFixed(2)}%" title="${fmtTime(e.t)}: ${rating(e.score).label}"></i>`;
     }).join("")}${nowM}</div></div>`).join("")}
@@ -491,14 +542,81 @@ function todayStrip(day, tides, ctx) {
   return `<section class="card strip" aria-label="Today hour by hour"><div class="hours">${cols}</div><div class="tidewrap">${svg}</div><p class="legend"><span>${icon("tide")}Tide · Mahurangi Harbour</span><span>rain % · wind kn (arrow = blowing to)</span></p></section>`;
 }
 
+/* ---------- live station readings ---------- */
+const OBS_SPAN = 180;   // minutes either side of the reading that it nudges the model
+function obsMean(stations) {
+  let x = 0, y = 0, kn = 0, g = [], rain = 0, n = 0;
+  for (const s of stations) {
+    n++; kn += s.windKn; if (s.gustKn != null) g.push(s.gustKn);
+    if (s.windDirDeg != null) { x += Math.sin(s.windDirDeg * Math.PI / 180) * Math.max(s.windKn, 0.5); y += Math.cos(s.windDirDeg * Math.PI / 180) * Math.max(s.windKn, 0.5); }
+    rain = Math.max(rain, s.rainRateMmH ?? 0);
+  }
+  return n ? { kn: kn / n, gust: g.length ? g.reduce((a, b) => a + b) / g.length : null, dir: x || y ? norm(Math.atan2(x, y) * 180 / Math.PI) : null, rain } : null;
+}
+function obsMinutes(iso, dayIso) {   // "2026-10-17T13:05:00+13:00" -> local minutes on dayIso, or null
+  const m = /^(\d{4}-\d{2}-\d{2})T(\d{2}):(\d{2})/.exec(iso || "");
+  return m && m[1] === dayIso ? +m[2] * 60 + +m[3] : null;
+}
+/* Modest near-term correction: only home stations (not the far-off airport), weight ≤ 50% at the
+   reading's time, fading to nothing 3 h either side. Rain seen now lifts the current hour's wetness. */
+function blendObservations(fc, now) {
+  const o = fc.observations;
+  if (!o?.blend || !o.stations?.length) return;
+  const day = fc.days.find((d) => d.date === now.date); if (!day) return;
+  const times = o.stations.map((s) => obsMinutes(s.time, now.date)).filter((t) => t != null);
+  if (!times.length) return;
+  const t0 = times.reduce((a, b) => a + b) / times.length;
+  if (now.min - t0 > OBS_SPAN) return;   // readings too old to matter
+  const m = obsMean(o.stations);
+  for (const sl of day.slots || []) {
+    const dt = Math.abs(hm(sl.time) - t0); if (dt >= OBS_SPAN) continue;
+    const w = 0.5 * (1 - dt / OBS_SPAN);
+    const k0 = sl.windKn;
+    sl.windKn = +(k0 * (1 - w) + m.kn * w).toFixed(1);
+    if (m.gust != null) sl.gustKn = +(((sl.gustKn ?? k0) * (1 - w)) + m.gust * w).toFixed(1);
+    if (m.dir != null && sl.windDirDeg != null) {
+      const a = sl.windDirDeg * Math.PI / 180, b = m.dir * Math.PI / 180;
+      sl.windDirDeg = Math.round(norm(Math.atan2(Math.sin(a) * (1 - w) + Math.sin(b) * w, Math.cos(a) * (1 - w) + Math.cos(b) * w) * 180 / Math.PI));
+    }
+    if (dt <= 60) {
+      if (m.rain >= 0.2) { sl.rainMm = Math.max(sl.rainMm ?? 0, +m.rain.toFixed(1)); sl.rainProbPct = Math.max(sl.rainProbPct ?? 0, 85); }
+      else if (dt <= 30 && (sl.rainProbPct ?? 0) > 40) sl.rainProbPct = Math.round(sl.rainProbPct * 0.6);   // dry right now
+    }
+    sl.obsAdj = true;
+  }
+  o.applied = true;
+}
+function liveCard(fc, now) {
+  const o = fc.observations;
+  if (!o?.stations?.length) return "";
+  const home = o.kind === "home";
+  const rows = o.stations.slice(0, 4).map((s) => {
+    const t = obsMinutes(s.time, now.date);
+    const old = t == null || now.min - t > 120;
+    const wind = s.windKn < 1 ? `${icon("wind")}Calm` : `${s.windDirDeg != null ? arrow(s.windDirDeg) : icon("wind")}${s.windDirDeg != null ? dir16(s.windDirDeg) + " " : ""}${Math.round(s.windKn)}<small>kn</small>${s.gustKn ? ` <small>gust ${Math.round(s.gustKn)}</small>` : ""}`;
+    const c = [`<span class="chip c-plain">${wind}</span>`];
+    if (s.airC != null) c.push(`<span class="chip c-plain">${icon("temp")}${Math.round(s.airC)}°</span>`);
+    if (s.pressureHpa != null) c.push(`<span class="chip c-plain">${Math.round(s.pressureHpa)}<small>hPa</small></span>`);
+    if (s.rainRateMmH) c.push(`<span class="chip c-bad">${icon("rain")}${s.rainRateMmH}<small>mm/h</small></span>`);
+    else if (s.raining) c.push(`<span class="chip c-bad">${icon("rain")}Raining</span>`);
+    else if (s.rainRateMmH === 0 || s.raining === false) c.push(`<span class="chip c-good">${icon("sun")}Dry</span>`);
+    return `<li><a href="${esc(s.url)}" rel="noopener"><b>${esc(s.name)}</b></a> <small class="muted">${t != null ? "at " + fmtTime(t) : "earlier"}${old ? " · old" : ""}</small><div class="chips">${c.join("")}</div></li>`;
+  }).join("");
+  const head = home ? `Live from ${o.stations.length} home station${o.stations.length > 1 ? "s" : ""}` : "Live reading · airport";
+  const note = home ? (o.applied ? "Blended into the next few hours' scores." : "Shown only; too old to change the scores.") : "This airport is a long way from Snells, so it's shown but not used in the scores.";
+  return `<section class="card live${home ? "" : " far"}" aria-label="Live station readings"><h3>${icon("wind")}${head}</h3><ul>${rows}</ul><p class="muted sm">${note}</p></section>`;
+}
+
 /* ---------- render ---------- */
 let STATE = null;
+const bname = (b) => (STATE?.prefs?.favs || []).includes(b.id) ? `★ ${esc(b.name)}` : esc(b.name);
 
 function render() {
   const { beaches, fc, prefs } = STATE;
   const now = nzNow();
   const app = $("#app");
-  const act = prefs.activity;
+  const acts = prefs.activities, act = acts[0];
+  const actLabel = acts.map((a) => ACT[a].label.toLowerCase()).join(", ");
   const stops = beaches.drive?.stops || [{ label: "Local", maxMin: 15 }, { label: "Nearby", maxMin: 35 }, { label: "Road trip", maxMin: 999 }];
   const stop = stops[clamp(prefs.drive, 0, stops.length - 1)];
   $("#driveLabel").textContent = stop.maxMin >= 999 ? `${stop.label} · any distance` : `${stop.label} · ≤${stop.maxMin} min`;
@@ -511,10 +629,20 @@ function render() {
   const ageH = (Date.now() - updated.getTime()) / 3.6e6;
 
   const results = days.slice(0, 4).map((day) => {
-    const ctx = { isToday: day.date === now.date, nowMin: now.min, weekend: isWeekend(day.date), maxDrive: stop.maxMin, dog: prefs.dog };
-    const all = beaches.beaches.map((b) => evalBeachDay(b, day, act, tides, ctx)).filter((R) => R.evals.length);
+    const ctx = { isToday: day.date === now.date, nowMin: now.min, weekend: isWeekend(day.date), maxDrive: stop.maxMin, dog: prefs.dog, favs: new Set(prefs.favs) };
     const from = ctx.isToday ? now.min - 30 : -Infinity;
-    const picks = all.map((R) => pickWindow(R, from, { nowMin: ctx.isToday ? now.min : null })).filter(Boolean);
+    // every selected activity is scored; each beach shows the activity it suits best right then
+    const all = [], picks = [];
+    for (const b of beaches.beaches) {
+      let bestR = null, bestP = null;
+      for (const a of acts) {
+        const Ra = evalBeachDay(b, day, a, tides, ctx);
+        if (!Ra.evals.length) continue;
+        const Pa = pickWindow(Ra, from, { nowMin: ctx.isToday ? now.min : null });
+        if (Pa && (!bestP || (bestP.done && !Pa.done) || (Pa.done === bestP.done && Pa.score > bestP.score))) { bestR = Ra; bestP = Pa; }
+      }
+      if (bestR) { all.push(bestR); picks.push(bestP); }
+    }
     picks.sort((a, b) => (b.eligible - a.eligible) || (a.done - b.done) || (b.score - a.score) || ((b.end - b.start) - (a.end - a.start)) || (a.b.driveMin - b.b.driveMin));
     const sr = hm(day.sunrise || "06:30"), ss = hm(day.sunset || "19:30");
     return { day, ctx, all, picks, sr, ss };
@@ -522,7 +650,7 @@ function render() {
 
   const today = results[0];
   const dLabel = (d, ctx) => ctx.isToday ? "Today" : (dayNum(d.date) - dayNum(now.date) === 1 ? "Tomorrow" : fmtDate(d.date, { weekday: "long" }));
-  $("#title").textContent = today.ctx.isToday ? `Where to ${ACT[act].verb} today` : `Where to ${ACT[act].verb} · ${fmtDate(today.day.date, { weekday: "long" })}`;
+  $("#title").textContent = today.ctx.isToday ? `Where to ${acts.length === 1 ? ACT[act].verb : "go"} today` : `Where to ${acts.length === 1 ? ACT[act].verb : "go"} · ${fmtDate(today.day.date, { weekday: "long" })}`;
   $("#subtitle").innerHTML = `${esc(fmtDate(today.day.date, { weekday: "short", day: "numeric", month: "short" }))}${today.day.airMaxC != null ? ` · ${icon("temp")}${Math.round(today.day.airMaxC)}° air` : ""}${today.day.waterTempC != null ? ` · ${icon("wave")}${Math.round(today.day.waterTempC)}° water` : ""} · ${icon("sun")}${fmtTime(hm(today.day.sunrise))}–${fmtTime(hm(today.day.sunset))}`;
 
   let html = "";
@@ -530,8 +658,11 @@ function render() {
     html += `<div class="notice warn">${icon("clock")}<span>This forecast is from <b>${esc(updated.toLocaleString("en-NZ", { timeZone: TZ, weekday: "short", day: "numeric", month: "short", hour: "numeric", minute: "2-digit" }))}</b>. The morning update hasn't run yet, so treat it as a rough guide.</span></div>`;
   }
 
+  if (today.ctx.isToday) html += liveCard(fc, now);
+  const heur = acts.filter((a) => ACT[a].heuristic);
+  if (heur.length) html += `<div class="notice">${icon("dot")}<span>${esc(heur.map((a) => ACT[a].label).join(", "))}: rough heuristic scores, not proper forecasts for ${heur.length > 1 ? "these" : "this"}.</span></div>`;
   const elig = today.picks.filter((r) => r.eligible);
-  if (act === "snorkel") {
+  if (acts.includes("snorkel")) {
     const goat = today.picks.find((r) => r.b.doc);
     if (goat?.best.docOff) html += `<div class="notice bad">${icon("x")}<span><b>Goat Island is off today</b>: ${esc(goat.best.docOff)}. DOC says skip it in E/NE wind over ~20 kn or E/NE swell over 1 m.</span></div>`;
     else if (goat && !goat.eligible) html += `<div class="notice">${icon("dot")}<span>Goat Island is the snorkel spot, but it's hidden: ${esc(goat.filters.join(", ").toLowerCase())}.</span></div>`;
@@ -541,13 +672,13 @@ function render() {
     html += `<section class="hero r-nope"><h2>Nothing fits</h2><p class="when">Every beach is filtered out by your settings. Try a longer drive${prefs.dog ? " or leave the dog home" : ""}.</p></section>`;
   } else {
     const top = elig[0];
-    const lowNote = top.score < 30 ? `<p class="lownote">Nothing's really on for ${esc(ACT[act].label.toLowerCase())}. This is the least-bad option.</p>` : "";
+    const lowNote = top.score < 30 ? `<p class="lownote">Nothing's really on for ${esc(actLabel)}. This is the least-bad option.</p>` : "";
     html += `<div class="topgrid"><section class="hero r-${top.rating.key}" aria-label="Top pick">
       <div class="hero-head"><div><span class="badge">${today.ctx.isToday ? "Today's pick" : esc(dLabel(today.day, today.ctx)) + "'s pick"}</span>${pill(top)}</div>${ring(top.score, top.rating.key)}</div>
-      <h2>${esc(top.b.name)}</h2>
+      <h2>${bname(top.b)}</h2>
       <p class="when">${icon("clock")}<span>${top.done ? "" : "Best "}<b>${esc(top.window)}</b></span></p>
-      ${chips(top, act, prefs)}
-      ${bullets(reasons(top, act))}
+      ${chips(top, top.act, prefs)}
+      ${bullets(reasons(top, top.act))}
       ${lowNote}
     </section>`;
     const ru = elig.slice(1, 3);
@@ -555,10 +686,10 @@ function render() {
     if (ru.length) {
       html += `<h3 class="sec">${ru.every((r) => r.score >= 50) ? (today.ctx.isToday ? "Also good today" : "Also good") : "Next best"}</h3><div class="runners">${ru.map((r) => `
         <article class="card runner r-${r.rating.key}">
-          <div class="rhead"><h4>${esc(r.b.name)}</h4>${pill(r)}</div>
+          <div class="rhead"><h4>${bname(r.b)}</h4>${pill(r)}</div>
           <p class="when sm">${icon("clock")}<b>${esc(r.window)}</b></p>
-          ${chips(r, act, prefs, { compact: true })}
-          ${bullets(reasons(r, act).slice(0, 2))}
+          ${chips(r, r.act, prefs, { compact: true })}
+          ${bullets(reasons(r, r.act).slice(0, 2))}
         </article>`).join("")}</div>`;
     }
     html += `</div></div>`;
@@ -578,10 +709,10 @@ function render() {
       if (!top) return `<article class="card day"><div class="dhead"><h4>${esc(dLabel(day, ctx))}</h4>${wk}</div><p class="muted">Nothing fits your filters.</p></article>`;
       return `<article class="card day r-${top.rating.key}">
         <div class="dhead"><div><h4>${esc(dLabel(day, ctx))}</h4><span class="muted">${esc(fmtDate(day.date, { day: "numeric", month: "short" }))}</span></div>${wk}<span class="wx">${mid ? skyIcon(mid.sky) : ""}${day.airMaxC != null ? Math.round(day.airMaxC) + "°" : ""}</span></div>
-        <div class="dpick"><span class="dname">${esc(top.b.name)}</span>${pill(top)}</div>
+        <div class="dpick"><span class="dname">${bname(top.b)}</span>${pill(top)}</div>
         <p class="when sm">${icon("clock")}<b>${esc(top.window)}</b></p>
-        ${chips(top, act, prefs, { compact: true })}
-        ${bullets(reasons(top, act).slice(0, 2))}
+        ${chips(top, top.act, prefs, { compact: true })}
+        ${bullets(reasons(top, top.act).slice(0, 2))}
       </article>`;
     }).join("")}</div>`;
   }
@@ -590,13 +721,13 @@ function render() {
     const dogLine = r.dog ? `<p class="dogrule">${icon("dog")}<span>${esc(r.dog.text)}${r.b.dog?.source ? ` · <a href="${esc(r.b.dog.source)}" rel="noopener">source</a>` : ""}${r.b.dog?.verified === false ? " · <b>unverified, check signs</b>" : ""}</span></p>` : "";
     return `<details class="row ${r.eligible ? "r-" + r.rating.key : "off"}">
       <summary>
-        <span class="rname"><b>${esc(r.b.name)}</b><small>${esc(r.b.area)} · ${r.b.driveMin} min</small></span>
+        <span class="rname"><b>${bname(r.b)}</b><small>${esc(r.b.area)} · ${r.b.driveMin} min</small></span>
         ${r.eligible ? `<span class="bar"><i style="width:${r.score}%"></i></span><span class="rs">${r.score}</span>${pill(r)}` : `<span class="why">${esc(r.filters.join(" · "))}</span>`}
       </summary>
       <div class="rbody">
         <p class="when sm">${icon("clock")}<b>${esc(r.window)}</b></p>
-        ${chips(r, act, { ...prefs, dog: true })}
-        ${bullets(reasons(r, act))}
+        ${chips(r, r.act, { ...prefs, dog: true })}
+        ${bullets(reasons(r, r.act))}
         <ul class="notes">${(r.b.notes || []).map((n) => `<li>${esc(n)}</li>`).join("")}</ul>
         ${dogLine}
       </div>
@@ -621,11 +752,26 @@ function showError(err) {
   $("#retry")?.addEventListener("click", () => location.reload());
 }
 
+function wireFavs() {
+  const box = $("#favlist"); if (!box) return;
+  const prefs = STATE.prefs;
+  box.innerHTML = STATE.beaches.beaches.map((b) => `<label class="fav"><input type="checkbox" value="${esc(b.id)}"${prefs.favs.includes(b.id) ? " checked" : ""}><span>${esc(b.name)}</span></label>`).join("");
+  const cnt = () => { $("#favcount").textContent = prefs.favs.length ? `${prefs.favs.length} picked` : "none"; };
+  cnt();
+  for (const el of box.querySelectorAll("input")) el.addEventListener("change", () => {
+    prefs.favs = [...box.querySelectorAll("input:checked")].map((x) => x.value); cnt(); savePrefs(prefs); render();
+  });
+}
+
 function wirePrefs() {
   const prefs = STATE.prefs;
   for (const el of document.querySelectorAll('input[name="activity"]')) {
-    el.checked = el.value === prefs.activity;
-    el.addEventListener("change", () => { prefs.activity = el.value; savePrefs(prefs); render(); });
+    el.checked = prefs.activities.includes(el.value);
+    el.addEventListener("change", () => {
+      const on = [...document.querySelectorAll('input[name="activity"]:checked')].map((x) => x.value);
+      if (!on.length) { el.checked = true; return; }   // keep at least one
+      prefs.activities = on; savePrefs(prefs); if (STATE.fc) render();
+    });
   }
   const drive = $("#drive"); drive.value = prefs.drive;
   drive.addEventListener("input", () => { prefs.drive = +drive.value; savePrefs(prefs); render(); });
@@ -637,10 +783,10 @@ async function main() {
   const prefs = loadPrefs();
   // URL overrides, handy for sharing: ?activity=hangout&drive=2&dog=1
   const q = new URLSearchParams(location.search);
-  if (q.has("activity")) prefs.activity = q.get("activity");
+  if (q.has("activity")) prefs.activities = q.get("activity").split(",");
   if (q.has("drive")) prefs.drive = clamp(parseInt(q.get("drive"), 10) || 0, 0, 2);
   if (q.has("dog")) prefs.dog = q.get("dog") === "1" || q.get("dog") === "true";
-  if (!ACT[prefs.activity]) prefs.activity = DEFAULT_PREFS.activity;
+  fixPrefs(prefs);
   if (q.has("activity") || q.has("drive") || q.has("dog")) savePrefs(prefs);
   if (/^\d{1,2}:\d{2}$/.test(q.get("at") || "")) NOW_OVERRIDE = hm(q.get("at"));
   STATE = { prefs };
@@ -648,7 +794,9 @@ async function main() {
   try {
     const [beaches, fc] = await Promise.all([getJSON("data/beaches.json"), getJSON("data/forecast.json")]);
     if (!fc?.days?.length) throw new Error("forecast.json has no days in it");
+    blendObservations(fc, nzNow());
     Object.assign(STATE, { beaches, fc });
+    wireFavs();
     render();
     setInterval(render, 10 * 60 * 1000);   // keep "now" fresh if the page is left open
   } catch (err) {

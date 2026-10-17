@@ -130,3 +130,16 @@ i.e. halfway in time between each low and the high; `hours` is kept for referenc
 Dog rules are matched in order by date (ranges may wrap the new year); the last rule has no dates and is the
 catch-all. `status` is `offlead` | `leash` | `limited` (time-restricted) | `banned`. A beach whose rule is not
 verified should have `"verified": false` and the page shows "unverified, check signs".
+
+## `observations` (optional) — live station readings
+
+Written by `scripts/observations.py` each run; omitted when nothing fresh (≤ 90 min) is available. Never invented.
+
+| field | type | meaning |
+|---|---|---|
+| `fetched` | ISO time with offset | when the readings were pulled |
+| `kind` | `"home"` \| `"airport"` | `home` = Weather Underground personal stations (needs env `WU_API_KEY`); `airport` = keyless METAR fallback (NZWP/NZAA) |
+| `blend` | bool | `true` only for home stations: the page nudges today's wind/gust/direction (≤ 50 % weight, fading to 0 over ±3 h) and current-hour rain toward the readings |
+| `stations[]` | array | `{ id, name, kind, time, windKn, gustKn?, windDirDeg?, airC?, pressureHpa?, rainRateMmH?, rainTodayMm?, raining?, lat?, lon?, url }` |
+
+`data/live.txt` gets one plain-text line summarising the same readings, for the hourly message to quote.

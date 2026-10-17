@@ -20,12 +20,15 @@
 
 <form class="prefs" id="prefs" aria-label="Your preferences" onsubmit="return false">
   <div class="wrap prefs-inner">
-    <div class="seg" role="radiogroup" aria-label="Activity" id="activity">
-      <label><input type="radio" name="activity" value="hangout"><span aria-label="Hangout, picnic, kids"><svg class="ic"><use href="#i-hangout"/></svg>Hangout</span></label>
-      <label><input type="radio" name="activity" value="swim"><span><svg class="ic"><use href="#i-swim"/></svg>Swim</span></label>
-      <label><input type="radio" name="activity" value="surf"><span><svg class="ic"><use href="#i-surf"/></svg>Surf</span></label>
-      <label><input type="radio" name="activity" value="snorkel"><span><svg class="ic"><use href="#i-snorkel"/></svg>Snorkel</span></label>
-      <label><input type="radio" name="activity" value="sup"><span aria-label="SUP / Kayak"><svg class="ic"><use href="#i-sup"/></svg>SUP/Kayak</span></label>
+    <div class="seg" role="group" aria-label="Activities (pick any)" id="activity">
+      <label><input type="checkbox" name="activity" value="hangout"><span aria-label="Hangout, picnic, kids"><svg class="ic"><use href="#i-hangout"/></svg>Hangout</span></label>
+      <label><input type="checkbox" name="activity" value="swim"><span><svg class="ic"><use href="#i-swim"/></svg>Swim</span></label>
+      <label><input type="checkbox" name="activity" value="surf"><span><svg class="ic"><use href="#i-surf"/></svg>Surf</span></label>
+      <label><input type="checkbox" name="activity" value="snorkel"><span><svg class="ic"><use href="#i-snorkel"/></svg>Snorkel</span></label>
+      <label><input type="checkbox" name="activity" value="sup"><span aria-label="SUP / Kayak"><svg class="ic"><use href="#i-sup"/></svg>SUP/Kayak</span></label>
+      <label><input type="checkbox" name="activity" value="sailing"><span><svg class="ic"><use href="#i-sail"/></svg>Sail</span></label>
+      <label><input type="checkbox" name="activity" value="fishing"><span><svg class="ic"><use href="#i-fish"/></svg>Fish</span></label>
+      <label><input type="checkbox" name="activity" value="walking"><span aria-label="Beach walk"><svg class="ic"><use href="#i-walk"/></svg>Walk</span></label>
     </div>
     <div class="row2">
       <div class="drive">
@@ -39,6 +42,7 @@
         <span class="mini"><svg class="ic"><use href="#i-dog"/></svg>Dog</span>
       </label>
     </div>
+    <details class="favs"><summary><span>★ Favourite beaches</span> <small id="favcount">none</small></summary><div id="favlist" class="favlist"></div></details>
   </div>
 </form>
 
@@ -72,6 +76,9 @@
     <symbol id="i-check" viewBox="0 0 24 24"><path d="M5 12.5l4.5 4.5L19 7.5" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></symbol>
     <symbol id="i-x" viewBox="0 0 24 24"><path d="M6.5 6.5l11 11M17.5 6.5l-11 11" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"/></symbol>
     <symbol id="i-dot" viewBox="0 0 24 24"><circle cx="12" cy="12" r="4.5" fill="currentColor"/></symbol>
+    <symbol id="i-sail" viewBox="0 0 24 24"><path d="M12 3v14M12 4l7 12h-7M11 6L5 16h6" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/><path d="M3 19.5c3 1.5 15 1.5 18 0" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></symbol>
+    <symbol id="i-fish" viewBox="0 0 24 24"><path d="M3 12c3-5 10-6 14-1l4-3v8l-4-3c-4 5-11 4-14-1z" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/><circle cx="8" cy="11" r="1.2" fill="currentColor"/></symbol>
+    <symbol id="i-walk" viewBox="0 0 24 24"><circle cx="13" cy="4" r="2" fill="currentColor"/><path d="M12 7l-3 5 3 2-1 7M12 7l3 4 3 1M9 12l-2 3M12 14l3 3 1 4" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></symbol>
   </defs>
 </svg>
 <script src="app.js" defer></script>

@@ -1,6 +1,6 @@
 {
  "schemaVersion": 1,
- "updated": "2026-10-17T13:28:54+13:00",
+ "updated": "2026-10-17T13:32:24+13:00",
  "timezone": "Pacific/Auckland",
  "location": {
   "name": "Snells Beach",
@@ -1706,7 +1706,7 @@
   }
  ],
  "observations": {
-  "fetched": "2026-10-17T13:28:54+13:00",
+  "fetched": "2026-10-17T13:32:24+13:00",
   "kind": "airport",
   "blend": false,
   "stations": [

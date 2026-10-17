@@ -42,6 +42,24 @@ def check_forecast(fc):
         if u.tzinfo is None: err("updated: needs a UTC offset, e.g. 2026-10-09T07:19:00+13:00")
     except Exception:
         err(f"updated: not an ISO 8601 datetime: {up!r}"); u = None
+    obs = fc.get("observations")
+    if obs is not None:
+        if not isinstance(obs, dict) or obs.get("kind") not in ("home", "airport") or not isinstance(obs.get("stations"), list) or not obs["stations"]:
+            err("observations: need kind home|airport and a non-empty stations list")
+        else:
+            for i, s in enumerate(obs["stations"]):
+                w = f"observations.stations[{i}]"
+                for k in ("id", "name", "time"):
+                    if not isinstance(s.get(k), str) or not s.get(k): err(f"{w}.{k}: required string")
+                try:
+                    if dt.datetime.fromisoformat(s.get("time", "")).tzinfo is None: err(f"{w}.time: needs offset")
+                except Exception: err(f"{w}.time: not ISO 8601")
+                num(s.get("windKn"), 0, 120, f"{w}.windKn")
+                num(s.get("gustKn"), 0, 150, f"{w}.gustKn", required=False)
+                num(s.get("windDirDeg"), 0, 360, f"{w}.windDirDeg", required=False)
+                num(s.get("airC"), -10, 45, f"{w}.airC", required=False)
+                num(s.get("pressureHpa"), 900, 1100, f"{w}.pressureHpa", required=False)
+                num(s.get("rainRateMmH"), 0, 300, f"{w}.rainRateMmH", required=False)
     src = fc.get("sources")
     if not isinstance(src, list) or not src: err("sources: need a non-empty list")
     else:

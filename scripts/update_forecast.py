@@ -12,7 +12,7 @@ Usage:  python3 scripts/update_forecast.py [--days 4] [--start YYYY-MM-DD] [--ou
 Then:   python3 scripts/validate.py
 See data/SCHEMA.md for the file format.
 """
-import argparse, datetime as dt, html, json, math, re, sys, urllib.request
+import argparse, os, datetime as dt, html, json, math, re, sys, urllib.request
 from zoneinfo import ZoneInfo
 
 TZ = ZoneInfo("Pacific/Auckland")
@@ -239,6 +239,17 @@ def main():
         ],
         "days": days,
     }
+    try:
+        sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+        from observations import collect, live_line
+        obs, osrc = collect(now)
+    except Exception as e:  # live obs must never break the forecast
+        print("warning: observations:", e, file=sys.stderr)
+        obs, osrc, live_line = None, None, (lambda o: "Live: no station readings right now.")
+    if obs:
+        out["observations"] = obs; out["sources"].append(osrc)
+    with open(os.path.join(os.path.dirname(a.out) or ".", "live.txt"), "w", encoding="utf-8") as f:
+        f.write(live_line(obs) + "\n")
     with open(a.out, "w", encoding="utf-8") as f:
         json.dump(out, f, ensure_ascii=False, indent=1)
         f.write("\n")

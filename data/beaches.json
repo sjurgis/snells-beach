@@ -55,7 +55,7 @@
     "snorkel": 0.15,
     "sup": 0.75,
     "hangout": 0.95
-   },
+   , "sailing": 0.85, "fishing": 0.6, "walking": 0.8},
    "notes": [
     "Faces east across Kawau Bay",
     "Flat swim ~2 h either side of high",
@@ -122,7 +122,7 @@
     "snorkel": 0.2,
     "sup": 0.85,
     "hangout": 0.95
-   },
+   , "sailing": 0.8, "fishing": 0.6, "walking": 0.7},
    "notes": [
     "Calm bay just south of Snells",
     "Good ~3 h either side of high",
@@ -178,7 +178,7 @@
     "snorkel": 0.1,
     "sup": 1.0,
     "hangout": 0.95
-   },
+   , "sailing": 0.75, "fishing": 0.8, "walking": 0.6},
    "notes": [
     "Harbour side, south end of the peninsula",
     "Shelter in a northerly or easterly",
@@ -225,7 +225,7 @@
     "snorkel": 0.45,
     "sup": 0.9,
     "hangout": 1.0
-   },
+   , "sailing": 0.6, "fishing": 0.6, "walking": 0.6},
    "notes": [
     "Most sheltered beach in a southeasterly",
     "Rock pools at low tide",
@@ -269,7 +269,7 @@
     "snorkel": 0.3,
     "sup": 0.95,
     "hangout": 1.0
-   },
+   , "sailing": 0.85, "fishing": 0.6, "walking": 0.8},
    "notes": [
     "Any tide",
     "More open, small bodyboard waves sometimes",
@@ -323,7 +323,7 @@
     "snorkel": 0.25,
     "sup": 0.8,
     "hangout": 0.85
-   },
+   , "sailing": 0.5, "fishing": 0.5, "walking": 0.6},
    "notes": [
     "Faces south: sheltered in a northerly",
     "Southerly is straight in",
@@ -377,7 +377,7 @@
     "snorkel": 0.25,
     "sup": 0.8,
     "hangout": 0.85
-   },
+   , "sailing": 0.5, "fishing": 0.5, "walking": 0.6},
    "notes": [
     "Faces south: sheltered in a northerly",
     "Southerly is straight in",
@@ -428,7 +428,7 @@
     "snorkel": 0.05,
     "sup": 0.4,
     "hangout": 0.85
-   },
+   , "sailing": 0.4, "fishing": 0.8, "walking": 0.95},
    "notes": [
     "Beach break, needs NE swell",
     "Offshore in a westerly",
@@ -479,7 +479,7 @@
     "snorkel": 0.5,
     "sup": 0.5,
     "hangout": 0.95
-   },
+   , "sailing": 0.3, "fishing": 0.1, "walking": 1},
    "notes": [
     "Faces NE, smaller than Te Ārai",
     "Offshore in a southwesterly",
@@ -527,7 +527,7 @@
     "snorkel": 0.7,
     "sup": 0.75,
     "hangout": 0.95
-   },
+   , "sailing": 0.2, "fishing": 0.5, "walking": 0.6},
    "notes": [
     "Sheltered swim at any tide",
     "Reef and island",
@@ -578,7 +578,7 @@
     "snorkel": 1.0,
     "sup": 0.6,
     "hangout": 0.8
-   },
+   , "sailing": 0.1, "fishing": 0, "walking": 0.7},
    "notes": [
     "The snorkel spot: marine reserve",
     "DOC: skip in E/NE wind over ~20 kn",
@@ -629,7 +629,7 @@
     "snorkel": 0.0,
     "sup": 0.3,
     "hangout": 0.7
-   },
+   , "sailing": 0.1, "fishing": 0.9, "walking": 0.95},
    "notes": [
     "Exposed beach break",
     "Offshore WSW, best NE swell",
@@ -673,7 +673,7 @@
     "snorkel": 0.0,
     "sup": 0.25,
     "hangout": 0.65
-   },
+   , "sailing": 0.1, "fishing": 0.85, "walking": 0.95},
    "notes": [
     "Most open: gets the most size",
     "Offshore WSW, best NE swell",
