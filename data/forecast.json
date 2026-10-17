@@ -1,6 +1,6 @@
 {
  "schemaVersion": 1,
- "updated": "2026-10-17T18:24:01+13:00",
+ "updated": "2026-10-17T19:28:45+13:00",
  "timezone": "Pacific/Auckland",
  "location": {
   "name": "Snells Beach",
@@ -265,20 +265,16 @@
     },
     {
      "time": "17:00",
-     "windDirDeg": 192,
-     "windKn": 11.3,
+     "windDirDeg": 183,
+     "windKn": 9.6,
      "gustKn": 19.0,
      "rainMm": 0.0,
      "rainProbPct": 0,
      "airC": 14.3,
      "cloudPct": 34,
      "sky": "partly",
-     "src": "metno+openmeteo",
+     "src": "openmeteo",
      "models": {
-      "metno": [
-       198,
-       13.0
-      ],
       "openmeteo": [
        183,
        9.6
@@ -287,19 +283,19 @@
     },
     {
      "time": "18:00",
-     "windDirDeg": 205,
-     "windKn": 11.0,
+     "windDirDeg": 210,
+     "windKn": 10.6,
      "gustKn": 19.8,
      "rainMm": 0.0,
      "rainProbPct": 0,
-     "airC": 13.3,
-     "cloudPct": 2,
+     "airC": 13.4,
+     "cloudPct": 3,
      "sky": "sun",
      "src": "metno+openmeteo",
      "models": {
       "metno": [
-       207,
-       12.3
+       216,
+       11.7
       ],
       "openmeteo": [
        202,
@@ -309,8 +305,8 @@
     },
     {
      "time": "19:00",
-     "windDirDeg": 212,
-     "windKn": 9.1,
+     "windDirDeg": 217,
+     "windKn": 9.0,
      "gustKn": 18.5,
      "rainMm": 0.0,
      "rainProbPct": 0,
@@ -320,8 +316,8 @@
      "src": "metno+openmeteo",
      "models": {
       "metno": [
-       211,
-       12.3
+       219,
+       11.9
       ],
       "openmeteo": [
        214,
@@ -1690,7 +1686,7 @@
   }
  ],
  "observations": {
-  "fetched": "2026-10-17T18:24:01+13:00",
+  "fetched": "2026-10-17T19:28:45+13:00",
   "kind": "airport",
   "blend": false,
   "stations": [
@@ -1700,11 +1696,11 @@
     "kind": "airport",
     "lat": -37.008,
     "lon": 174.792,
-    "time": "2026-10-17T18:00:00+13:00",
-    "windKn": 13.0,
+    "time": "2026-10-17T19:00:00+13:00",
+    "windKn": 14.0,
     "gustKn": null,
-    "windDirDeg": 220,
-    "airC": 15,
+    "windDirDeg": 200,
+    "airC": 14,
     "pressureHpa": 1026,
     "rainRateMmH": null,
     "rainTodayMm": null,
