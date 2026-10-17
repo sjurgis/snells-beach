@@ -280,3 +280,13 @@ main { padding-top: 14px; padding-bottom: 8px; }
 .favs { grid-column: 1 / -1; }
 .basis { margin: 8px 0 0; font-size: .76rem; color: var(--muted); display: flex; align-items: center; gap: 5px; }
 .basis.live { color: var(--sea); font-weight: 600; }
+/* actual vs forecast wind */
+.wpair { display: grid; grid-template-columns: minmax(0,1fr) minmax(0,1fr); gap: 6px; margin: 2px 0 8px; }
+.wcell { min-width: 0; background: var(--sand-2); border-radius: 12px; padding: 6px 8px; display: flex; flex-direction: column; gap: 1px; }
+.wcell.act { background: #e3f1ef; box-shadow: inset 3px 0 0 var(--sea); }
+.wlbl { font-size: .66rem; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; color: var(--muted); }
+.wval { display: flex; align-items: center; gap: 4px; font-size: .95rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.wval .ic { width: 1.1em; height: 1.1em; flex: none; }
+.wval small { font-size: .72em; opacity: .8; margin-left: 1px; }
+.wgust { font-size: .72rem; color: var(--muted); }
+.wcell.none .wval { color: var(--muted); }

@@ -3,7 +3,7 @@
 "use strict";
 
 const TZ = "Pacific/Auckland";
-const APP_VERSION = "2026-10-18b";   // bump with data/version.txt when app.js/style.css/index.html change
+const APP_VERSION = "2026-10-18c";   // bump with data/version.txt when app.js/style.css/index.html change
 const PREF_KEY = "snells-beach-prefs-v1";
 const DEFAULT_PREFS = { activities: ["hangout"], favs: [], drive: 1, dog: false };
 const ACT = {
@@ -470,7 +470,8 @@ function nowLater(today, tomorrow, now, prefs) {
       nowCard = `<article class="card nl r-${rt.key}"><span class="nl-tag">${icon("clock")}Right now</span>
         <div class="rhead"><h4>${bname(c.R.b)}</h4>${pill(fake)}</div>
         <p class="when sm"><b>${sc < 30 ? "Not great anywhere" : `Good till ~${fmtTime(c.until)}`}</b></p>
-        <div class="chips">${windChip(fake, c.R.act, [c.e])}${rainChip([c.e])}${tide}</div>${liveBasis(STATE.fc, now, c.R.b.id)}</article>`;
+        ${windPair(STATE.fc, d, c.R.b, hr, now)}
+        <div class="chips">${rainChip([c.e])}${tide}</div>${liveBasis(STATE.fc, now, c.R.b.id)}</article>`;
     }
   }
   // best later today: windows starting at least an hour from now
@@ -629,6 +630,20 @@ function blendObservations(fc, now, beaches = STATE?.beaches) {
     day.slotsByBeach[b.id] = applyLive(day.fcSlots, Lb, now);
   }
   fc.observations.applied = true;
+}
+/* Actual (live station) vs Forecast wind for one beach, side by side: label, arrow (blowing to), compass, kn. */
+function windCell(label, kn, dir, gust, cls) {
+  if (kn == null) return `<div class="wcell ${cls} none"><span class="wlbl">${label}</span><span class="wval">n/a</span></div>`;
+  const calm = kn < 1 || dir == null;
+  return `<div class="wcell ${cls}"><span class="wlbl">${label}</span><span class="wval">${calm ? icon("wind") : arrow(dir)}<b>${calm ? "Calm" : dir16(dir)}</b> ${calm ? "" : Math.round(kn) + "<small>kn</small>"}</span>${gust != null && gust >= 1 ? `<span class="wgust">gust ${Math.round(gust)}</span>` : ""}</div>`;
+}
+function windPair(fc, day, b, hr, now) {
+  const L = fc.liveByBeach?.[b.id];
+  const src = day.fcSlots || day.slots || [];
+  const f = src.reduce((a, s) => (!a || Math.abs(hm(s.time) - hr) < Math.abs(hm(a.time) - hr) ? s : a), null);
+  const actual = L?.mode === "live" ? windCell("Actual", L.kn, L.dir, L.gust, "act") : windCell("Actual", null, null, null, "act");
+  const fcst = f ? windCell("Forecast", f.windKn, f.windDirDeg, f.gustKn, "fc") : windCell("Forecast", null, null, null, "fc");
+  return `<div class="wpair" aria-label="Wind: actual vs forecast">${actual}${fcst}</div>`;
 }
 function liveBasis(fc, now, beachId = null) {
   const L = (beachId && fc.liveByBeach?.[beachId]) || fc.liveNow || {};
