@@ -3,7 +3,7 @@
 "use strict";
 
 const TZ = "Pacific/Auckland";
-const APP_VERSION = "2026-10-17c";   // bump with data/version.txt when app.js/style.css/index.html change
+const APP_VERSION = "2026-10-18a";   // bump with data/version.txt when app.js/style.css/index.html change
 const PREF_KEY = "snells-beach-prefs-v1";
 const DEFAULT_PREFS = { activities: ["hangout"], favs: [], drive: 1, dog: false };
 const ACT = {
@@ -279,7 +279,7 @@ function rating(score) {
 /* Score every daylight hour for one beach on one day. */
 function evalBeachDay(b, day, act, tides, ctx) {
   const sr = hm(day.sunrise || "06:30"), ss = hm(day.sunset || "19:30");
-  const slots = (day.slots || []).filter((s) => { const t = hm(s.time); return t >= sr - 30 && t <= ss + 15; });
+  const slots = (day.slotsByBeach?.[b.id] || day.slots || []).filter((s) => { const t = hm(s.time); return t >= sr - 30 && t <= ss + 15; });
   const traffic = b.viaMatakana && (ctx.weekend || !!day.traffic);
   const evals = slots.map((s) => {
     const e = evalSlot(b, day, s, act, tides);
@@ -470,7 +470,7 @@ function nowLater(today, tomorrow, now, prefs) {
       nowCard = `<article class="card nl r-${rt.key}"><span class="nl-tag">${icon("clock")}Right now</span>
         <div class="rhead"><h4>${bname(c.R.b)}</h4>${pill(fake)}</div>
         <p class="when sm"><b>${sc < 30 ? "Not great anywhere" : `Good till ~${fmtTime(c.until)}`}</b></p>
-        <div class="chips">${windChip(fake, c.R.act, [c.e])}${rainChip([c.e])}${tide}</div>${liveBasis(STATE.fc, now)}</article>`;
+        <div class="chips">${windChip(fake, c.R.act, [c.e])}${rainChip([c.e])}${tide}</div>${liveBasis(STATE.fc, now, c.R.b.id)}</article>`;
     }
   }
   // best later today: windows starting at least an hour from now
@@ -561,31 +561,42 @@ function obsMinutes(iso, dayIso) {   // "2026-10-17T13:05:00+13:00" -> local min
    Local stations (Algies IWARKW15, Snells ISNELL2) are preferred; several are combined by median.
    An airport reading is too far away to use, so then everything stays forecast-based. */
 const LOCAL_IDS = ["IWARKW15", "ISNELL2"];
+const NEAR_KM = 7, FAR_KM = 15;   // per-beach station radius: median of the nearest two within 7 km, else nearest within 15 km
 const median = (xs) => { const v = xs.filter((x) => x != null).sort((p, q) => p - q); if (!v.length) return null; const m = v.length >> 1; return v.length % 2 ? v[m] : (v[m - 1] + v[m]) / 2; };
-function liveNow(fc, now) {
+const kmBetween = (a, b) => { const R = 6371, r = Math.PI / 180, dLa = (b.lat - a.lat) * r, dLo = (b.lon - a.lon) * r * Math.cos(((a.lat + b.lat) / 2) * r); return R * Math.hypot(dLa, dLo); };
+function freshHome(fc, now) {
   const o = fc.observations;
   if (!o?.stations?.length) return { mode: "none" };
   if (o.kind !== "home") return { mode: "airport", label: o.stations[0].name };
   const fresh = o.stations.map((s) => ({ s, t: obsMinutes(s.time, now.date) })).filter((x) => x.t != null && now.min - x.t <= 90 && now.min - x.t >= -15);
-  if (!fresh.length) return { mode: "stale" };
-  const local = fresh.filter((x) => LOCAL_IDS.includes(x.s.id));
-  const use = (local.length ? local : fresh).map((x) => x.s);
-  const t0 = Math.max(...(local.length ? local : fresh).map((x) => x.t));
+  return fresh.length ? { mode: "live", fresh } : { mode: "stale" };
+}
+function combine(list, why) {
+  const use = list.map((x) => x.s);
   const kn = median(use.map((s) => s.windKn)), gust = median(use.map((s) => s.gustKn));
   let x = 0, y = 0;
   for (const s of use) if (s.windDirDeg != null && s.windKn >= 1) { x += Math.sin(s.windDirDeg * Math.PI / 180) * s.windKn; y += Math.cos(s.windDirDeg * Math.PI / 180) * s.windKn; }
-  const dir = x || y ? norm(Math.atan2(x, y) * 180 / Math.PI) : null;
-  const rain = median(use.map((s) => s.rainRateMmH));
-  return { mode: "live", kn, gust, dir, rain, t0, stations: use, label: use.map((s) => `${s.name} ${s.id}`).join(", ") };
+  return { mode: "live", kn, gust, dir: x || y ? norm(Math.atan2(x, y) * 180 / Math.PI) : null, rain: median(use.map((s) => s.rainRateMmH)),
+           t0: Math.max(...list.map((q) => q.t)), stations: use, why, label: use.map((s) => `${s.name} ${s.id}`).join(", ") };
 }
-function blendObservations(fc, now) {
-  const L = liveNow(fc, now);
-  fc.liveNow = L;
-  if (L.mode !== "live") return;
-  const day = fc.days.find((d) => d.date === now.date); if (!day) return;
-  for (const sl of day.slots || []) {
-    const dt = hm(sl.time) - now.min;             // minutes ahead of now
-    if (dt < -30 || dt >= 180) continue;           // only the current hour and the next ~3 h
+/* Which live reading drives "now" at a beach: nearest fresh station(s), else the Algies/Snells median, else forecast. */
+function liveNow(fc, now, beach = null) {
+  const F = freshHome(fc, now);
+  if (F.mode !== "live") return F;
+  if (beach?.lat != null) {
+    const near = F.fresh.filter((x) => x.s.lat != null).map((x) => ({ ...x, km: kmBetween(beach, x.s) })).sort((p, q) => p.km - q.km);
+    const close = near.filter((x) => x.km <= NEAR_KM).slice(0, 2);
+    if (close.length) return combine(close, "nearest");
+    if (near[0] && near[0].km <= FAR_KM) return combine([near[0]], "nearest");
+  }
+  const local = F.fresh.filter((x) => LOCAL_IDS.includes(x.s.id));
+  return combine(local.length ? local : F.fresh, "local");
+}
+function applyLive(slots, L, now) {
+  return slots.map((sl0) => {
+    const dt = hm(sl0.time) - now.min;             // minutes ahead of now
+    if (dt < -30 || dt >= 180) return sl0;          // only the current hour and the next ~3 h
+    const sl = { ...sl0 };
     const w = dt <= 30 ? 1 : lerp([[30, 1], [90, 0.8], [150, 0.4], [180, 0]], dt);
     const k0 = sl.windKn;
     if (L.kn != null) sl.windKn = +(k0 * (1 - w) + L.kn * w).toFixed(1);
@@ -600,11 +611,27 @@ function blendObservations(fc, now) {
       sl.rainProbPct = Math.round((sl.rainProbPct ?? 0) * (1 - w) + p * w);
     }
     sl.obsAdj = w;
+    return sl;
+  });
+}
+function blendObservations(fc, now, beaches = STATE?.beaches) {
+  const day = fc.days.find((d) => d.date === now.date);
+  if (day && !day.fcSlots) day.fcSlots = day.slots || [];
+  if (day) { day.slots = day.fcSlots; day.slotsByBeach = {}; }
+  fc.liveByBeach = {};
+  const L = liveNow(fc, now);
+  fc.liveNow = L;
+  if (L.mode !== "live" || !day) return;
+  day.slots = applyLive(day.fcSlots, L, now);    // the "at a glance" strip uses the Algies/Snells reading
+  for (const b of beaches?.beaches || []) {
+    const Lb = liveNow(fc, now, b);
+    fc.liveByBeach[b.id] = Lb;
+    day.slotsByBeach[b.id] = applyLive(day.fcSlots, Lb, now);
   }
   fc.observations.applied = true;
 }
-function liveBasis(fc, now) {
-  const L = fc.liveNow || {};
+function liveBasis(fc, now, beachId = null) {
+  const L = (beachId && fc.liveByBeach?.[beachId]) || fc.liveNow || {};
   if (L.mode === "live") return `<p class="basis live">${icon("wind")}Based on live readings (${esc(L.label)}, ${fmtTime(L.t0)})</p>`;
   if (L.mode === "airport") return `<p class="basis">${icon("dot")}Forecast-based: only a distant airport reading is live</p>`;
   if (L.mode === "stale") return `<p class="basis">${icon("dot")}Forecast-based: home-station readings are over 90 min old</p>`;
@@ -614,7 +641,7 @@ function liveCard(fc, now) {
   const o = fc.observations;
   if (!o?.stations?.length) return "";
   const home = o.kind === "home";
-  const rows = o.stations.slice(0, 4).map((s) => {
+  const rows = o.stations.slice(0, 12).map((s) => {
     const t = obsMinutes(s.time, now.date);
     const old = t == null || now.min - t > 120;
     const wind = s.windKn < 1 ? `${icon("wind")}Calm` : `${s.windDirDeg != null ? arrow(s.windDirDeg) : icon("wind")}${s.windDirDeg != null ? dir16(s.windDirDeg) + " " : ""}${Math.round(s.windKn)}<small>kn</small>${s.gustKn ? ` <small>gust ${Math.round(s.gustKn)}</small>` : ""}`;
@@ -834,7 +861,7 @@ async function main() {
   try {
     const [beaches, fc] = await Promise.all([getJSON("data/beaches.json"), getJSON("data/forecast.json")]);
     if (!fc?.days?.length) throw new Error("forecast.json has no days in it");
-    blendObservations(fc, nzNow());
+    blendObservations(fc, nzNow(), beaches);
     Object.assign(STATE, { beaches, fc });
     wireFavs();
     render();

@@ -84,7 +84,13 @@ def metar(now):
 # The dashboard is Angular SSR; the server embeds the station's recent 5-minute readings in
 # <script id="app-root-state">. We read only that served content: no API key is extracted or
 # reused, one request per station, short timeout, and any block/captcha just means "no data".
-PAGE_STATIONS = [("IWARKW15", "Algies Bay"), ("ISNELL2", "Snells Beach")]
+# (id, name, lat, lon). Found via weatherwatch.co.nz's station list and checked on wunderground.com, 18 Oct 2026.
+PAGE_STATIONS = [
+    ("IWARKW15", "Algies Bay", -36.435, 174.74), ("ISNELL2", "Snells Beach", -36.415, 174.726),
+    ("ISNELL1", "Snells Beach", -36.415, 174.726), ("IWARKW128", "Sandspit", -36.397, 174.724),
+    ("IWARKW125", "Mahurangi East", -36.473, 174.734), ("IWARKW107", "Mahurangi East", -36.474, 174.735),
+    ("IWARKWOR11", "Point Wells (Omaha)", -36.3425, 174.7594), ("IWARKW99", "Omaha Flats", -36.34, 174.742),
+]
 BROWSER_UA = "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/129.0 Safari/537.36"
 MPH_TO_KN, INHG_TO_HPA, IN_TO_MM = 0.868976, 33.8639, 25.4
 
@@ -113,7 +119,7 @@ def _parse_state(html, sid):
     return max(obs, key=lambda o: o["epoch"]) if obs else None
 
 
-def page_station(sid, name, now, log):
+def page_station(sid, name, now, log, lat=None, lon=None):
     import requests, time
     headers = {"User-Agent": BROWSER_UA, "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
                "Accept-Language": "en-NZ,en;q=0.9"}
@@ -129,7 +135,7 @@ def page_station(sid, name, now, log):
         except Exception as e:
             tries.append(f"err:{type(e).__name__}")
         if o: break
-        time.sleep(2 * (i + 1))
+        if i < 3: time.sleep(2 * (i + 1))
     entry = {"id": sid, "ok": False, "attempts": len(tries), "tries": tries}
     log.append(entry)
     if not o: entry["error"] = "no readings in served page (client-rendered variant)"; raise ValueError(entry["error"])
@@ -149,7 +155,7 @@ def page_station(sid, name, now, log):
     r1 = lambda v, f: None if v is None else round(v * f, 1)
     entry["ok"] = True
     return {
-        "id": sid, "name": name, "kind": "home", "lat": o.get("lat"), "lon": o.get("lon"),
+        "id": sid, "name": name, "kind": "home", "lat": o.get("lat") or lat, "lon": o.get("lon") or lon,
         "time": t.replace(microsecond=0).isoformat(),
         "windKn": r1(wind, k), "gustKn": r1(gust, k), "windDirDeg": o.get("winddirAvg"),
         "airC": None if temp is None else round(tc(temp), 1), "pressureHpa": r1(pres, pk),
@@ -159,11 +165,18 @@ def page_station(sid, name, now, log):
 
 
 def pages(now, log):
-    out = []
-    for sid, name in PAGE_STATIONS:
-        try: out.append(page_station(sid, name, now, log))
-        except Exception as e: print(f"warning: WU page {sid}: {e}", file=sys.stderr)
-    return out
+    """All stations in parallel (one thread each), so a run takes about as long as the slowest station."""
+    from concurrent.futures import ThreadPoolExecutor
+    def one(st):
+        sid, name, lat, lon = st
+        sub = []
+        try: return page_station(sid, name, now, sub, lat, lon), sub
+        except Exception as e:
+            print(f"warning: WU page {sid}: {e}", file=sys.stderr); return None, sub
+    with ThreadPoolExecutor(max_workers=len(PAGE_STATIONS)) as ex:
+        res = list(ex.map(one, PAGE_STATIONS))
+    for _, sub in res: log.extend(sub)
+    return [r for r, _ in res if r]
 
 
 def collect(now=None):
@@ -203,4 +216,4 @@ def live_line(obs):
     if obs["kind"] == "home" and len(obs["stations"]) == 1:
         return "Live: " + one(obs["stations"][0]).replace(" (", " home station (", 1)
     lead = "Live home stations" if obs["kind"] == "home" else "Live (airport, 50+ km away; the Algies/Snells station pages did not load this run)"
-    return lead + ": " + "; ".join(one(s) for s in obs["stations"][:3])
+    return lead + ": " + "; ".join(one(s) for s in obs["stations"][:5])
