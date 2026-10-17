@@ -140,6 +140,7 @@ Written by `scripts/observations.py` each run; omitted when nothing fresh (≤ 9
 | `fetched` | ISO time with offset | when the readings were pulled |
 | `kind` | `"home"` \| `"airport"` | `home` = Weather Underground personal stations (needs env `WU_API_KEY`); `airport` = keyless METAR fallback (NZWP/NZAA) |
 | `blend` | bool | `true` only for home stations: the page nudges today's wind/gust/direction (≤ 50 % weight, fading to 0 over ±3 h) and current-hour rain toward the readings |
+| `fetchLog` | array | per home-station page fetch this run: `{ id, ok, attempts, tries: ["200:wu-next-prod", "200:WuNext-Preview-Phased", …], error? }` (for tracking reliability) |
 | `stations[]` | array | `{ id, name, kind, time, windKn, gustKn?, windDirDeg?, airC?, pressureHpa?, rainRateMmH?, rainTodayMm?, raining?, lat?, lon?, url }` |
 
 `data/live.txt` gets one plain-text line summarising the same readings, for the hourly message to quote.

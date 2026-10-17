@@ -2,7 +2,7 @@
 
 Home weather stations (Weather Underground PWS) need an API key: weather.com only gives
 PWS API keys to people who register a station (free). Set WU_API_KEY to switch them on.
-Without a key we fall back to the official airport METAR (aviationweather.gov, keyless),
+Without a key we read the public station pages (below), then fall back to the official airport METAR (aviationweather.gov, keyless),
 which is 50+ km away, so it is shown but NOT blended into near-term scoring.
 Nothing is invented: missing or stale readings are dropped.
 """
@@ -89,48 +89,79 @@ BROWSER_UA = "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Ge
 MPH_TO_KN, INHG_TO_HPA, IN_TO_MM = 0.868976, 33.8639, 25.4
 
 
-def page_station(sid, name, now):
-    import requests
+def _page_urls(sid, now):
+    d = now.date().isoformat()
+    return [f"https://www.wunderground.com/dashboard/pws/{sid}",
+            f"https://www.wunderground.com/dashboard/pws/{sid}/table/{d}/{d}/daily",
+            f"https://www.wunderground.com/dashboard/pws/{sid}/graph/{d}/{d}/daily"]
+
+
+def _parse_state(html, sid):
+    """Latest 5-minute reading from the server-rendered app-root-state, or None if this page variant has none.
+    WU is A/B-testing a new front end (x-origin-hint: WuNext-Preview-Phased) that renders nothing server-side;
+    those pages carry no readings at all, so the only legitimate option is to ask again."""
     from bs4 import BeautifulSoup
-    import time
-    for attempt in (1, 2):   # the page is sometimes served without the state block; retry once
-        r = requests.get(f"https://www.wunderground.com/dashboard/pws/{sid}", headers={"User-Agent": BROWSER_UA}, timeout=15)
-        r.raise_for_status()
-        tag = BeautifulSoup(r.text, "html.parser").find("script", id="app-root-state")
-        if tag and tag.string: break
-        if attempt == 1: time.sleep(4)
-    if not tag or not tag.string: raise ValueError("no app-root-state in page (after one retry)")
+    tag = BeautifulSoup(html, "html.parser").find("script", id="app-root-state")
+    if not tag or not tag.string: return None
     raw = tag.string
-    for a, b in (("&q;", '"'), ("&s;", "'"), ("&l;", "<"), ("&g;", ">"), ("&a;", "&")): raw = raw.replace(a, b)
-    state = json.loads(raw)
+    for x, y in (("&q;", '"'), ("&s;", "'"), ("&l;", "<"), ("&g;", ">"), ("&a;", "&")): raw = raw.replace(x, y)
     obs = []
-    for v in state.values():
-        b = v.get("b") if isinstance(v, dict) else None
-        if isinstance(b, dict) and isinstance(b.get("observations"), list) and "/pws/observations/" in str(v.get("u", "")):
-            obs = [o for o in b["observations"] if o.get("stationID") == sid] or obs
-    if not obs: raise ValueError("no observations in page state")
-    o = max(obs, key=lambda x: x.get("epoch", 0))
+    for v in json.loads(raw).values():
+        bb = v.get("b") if isinstance(v, dict) else None
+        if isinstance(bb, dict) and isinstance(bb.get("observations"), list) and "/pws/observations/" in str(v.get("u", "")):
+            obs = [o for o in bb["observations"] if o.get("stationID") == sid and o.get("epoch")] or obs
+    return max(obs, key=lambda o: o["epoch"]) if obs else None
+
+
+def page_station(sid, name, now, log):
+    import requests, time
+    headers = {"User-Agent": BROWSER_UA, "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
+               "Accept-Language": "en-NZ,en;q=0.9"}
+    urls = _page_urls(sid, now)
+    o, tries = None, []
+    for i in range(4):   # fresh request each time (no cookies), so each try gets a new A/B assignment
+        url = urls[i % len(urls)]
+        try:
+            r = requests.get(url, headers=headers, timeout=15)
+            variant = r.headers.get("x-origin-hint", "?")
+            tries.append(f"{r.status_code}:{variant}")
+            if r.status_code == 200: o = _parse_state(r.text, sid)
+        except Exception as e:
+            tries.append(f"err:{type(e).__name__}")
+        if o: break
+        time.sleep(2 * (i + 1))
+    entry = {"id": sid, "ok": False, "attempts": len(tries), "tries": tries}
+    log.append(entry)
+    if not o: entry["error"] = "no readings in served page (client-rendered variant)"; raise ValueError(entry["error"])
     t = dt.datetime.fromtimestamp(o["epoch"], dt.timezone.utc).astimezone(TZ)
-    if not _fresh(t, now): raise ValueError(f"latest reading is old ({t:%Y-%m-%d %H:%M})")
-    i = o.get("imperial") or {}
-    if i.get("windspeedAvg") is None: raise ValueError("no wind in latest reading")
-    f2c = lambda f: None if f is None else round((f - 32) * 5 / 9, 1)
-    r1 = lambda x, k: None if x is None else round(x * k, 1)
+    if not _fresh(t, now): entry["error"] = f"latest reading old ({t:%H:%M})"; raise ValueError(entry["error"])
+    if "metric" in o and isinstance(o["metric"], dict):
+        m = o["metric"]; k = KMH_TO_KN
+        wind, gust, temp, pres = m.get("windspeedAvg"), m.get("windgustHigh"), m.get("tempAvg"), m.get("pressureMax")
+        rate, tot = m.get("precipRate"), m.get("precipTotal"); pk, rk = 1, 1
+        tc = lambda v: v
+    else:
+        m = o.get("imperial") or {}; k = MPH_TO_KN
+        wind, gust, temp, pres = m.get("windspeedAvg"), m.get("windgustHigh"), m.get("tempAvg"), m.get("pressureMax")
+        rate, tot = m.get("precipRate"), m.get("precipTotal"); pk, rk = INHG_TO_HPA, IN_TO_MM
+        tc = lambda f: None if f is None else (f - 32) * 5 / 9
+    if wind is None: entry["error"] = "no wind in latest reading"; raise ValueError(entry["error"])
+    r1 = lambda v, f: None if v is None else round(v * f, 1)
+    entry["ok"] = True
     return {
         "id": sid, "name": name, "kind": "home", "lat": o.get("lat"), "lon": o.get("lon"),
         "time": t.replace(microsecond=0).isoformat(),
-        "windKn": r1(i["windspeedAvg"], MPH_TO_KN), "gustKn": r1(i.get("windgustHigh"), MPH_TO_KN),
-        "windDirDeg": o.get("winddirAvg"), "airC": f2c(i.get("tempAvg")),
-        "pressureHpa": r1(i.get("pressureMax"), INHG_TO_HPA),
-        "rainRateMmH": r1(i.get("precipRate"), IN_TO_MM), "rainTodayMm": r1(i.get("precipTotal"), IN_TO_MM),
+        "windKn": r1(wind, k), "gustKn": r1(gust, k), "windDirDeg": o.get("winddirAvg"),
+        "airC": None if temp is None else round(tc(temp), 1), "pressureHpa": r1(pres, pk),
+        "rainRateMmH": r1(rate, rk), "rainTodayMm": r1(tot, rk),
         "url": f"https://www.wunderground.com/dashboard/pws/{sid}", "via": "page",
     }
 
 
-def pages(now):
+def pages(now, log):
     out = []
     for sid, name in PAGE_STATIONS:
-        try: out.append(page_station(sid, name, now))
+        try: out.append(page_station(sid, name, now, log))
         except Exception as e: print(f"warning: WU page {sid}: {e}", file=sys.stderr)
     return out
 
@@ -140,10 +171,11 @@ def collect(now=None):
     now = now or dt.datetime.now(TZ)
     key = os.environ.get("WU_API_KEY", "").strip()
     st = wu(key, now) if key else []
+    log = []
     if not st:
-        st = pages(now)
+        st = pages(now, log)
         if st:
-            return ({"fetched": now.replace(microsecond=0).isoformat(), "kind": "home", "blend": True, "stations": st},
+            return ({"fetched": now.replace(microsecond=0).isoformat(), "kind": "home", "blend": True, "stations": st, "fetchLog": log},
                     {"what": "Live wind & rain (home stations)", "name": "Weather Underground station pages: " + ", ".join(f"{x['name']} ({x['id']})" for x in st),
                      "url": st[0]["url"]})
     if st:
@@ -153,7 +185,7 @@ def collect(now=None):
         st = metar(now); kind = "airport"
         src = {"what": "Live wind (airport, shown only)", "name": "aviationweather.gov METAR", "url": "https://aviationweather.gov/"}
     if not st: return None, None
-    return {"fetched": now.replace(microsecond=0).isoformat(), "kind": kind, "blend": kind == "home", "stations": st}, src
+    return {"fetched": now.replace(microsecond=0).isoformat(), "kind": kind, "blend": kind == "home", "stations": st, "fetchLog": log}, src
 
 
 DIRS = "N NNE NE ENE E ESE SE SSE S SSW SW WSW W WNW NW NNW".split()
@@ -167,8 +199,8 @@ def live_line(obs):
         g = f" gust {round(s['gustKn'])}" if s.get("gustKn") else ""
         tc = f", {round(s['airC'])}°C" if s.get("airC") is not None else ""
         r = f", rain {s['rainRateMmH']} mm/h" if s.get("rainRateMmH") else (", raining" if s.get("raining") else "")
-        return f"{s['name']} ({s['id']}) {d}{round(s['windKn'])} kn{g}{tc}{r} (at {h}:{t.minute:02d}{'pm' if t.hour >= 12 else 'am'})"
+        return f"{s['name']} ({s['id']}) {('calm' if s['windKn'] < 1 else d + str(round(s['windKn'])) + ' kn')}{g}{tc}{r} (at {h}:{t.minute:02d}{'pm' if t.hour >= 12 else 'am'})"
     if obs["kind"] == "home" and len(obs["stations"]) == 1:
         return "Live: " + one(obs["stations"][0]).replace(" (", " home station (", 1)
-    lead = "Live home stations" if obs["kind"] == "home" else "Live (airport obs, 50+ km away; home stations need a WU key)"
+    lead = "Live home stations" if obs["kind"] == "home" else "Live (airport, 50+ km away; the Algies/Snells station pages did not load this run)"
     return lead + ": " + "; ".join(one(s) for s in obs["stations"][:3])
