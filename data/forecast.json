@@ -1,6 +1,6 @@
 {
  "schemaVersion": 1,
- "updated": "2026-10-18T09:21:03+13:00",
+ "updated": "2026-10-18T10:20:48+13:00",
  "timezone": "Pacific/Auckland",
  "location": {
   "name": "Snells Beach",
@@ -31,7 +31,7 @@
   },
   {
    "what": "Live wind & rain (home stations)",
-   "name": "Weather Underground station pages: Algies Bay (IWARKW15), Snells Beach (ISNELL2)",
+   "name": "Weather Underground station pages: Algies Bay (IWARKW15)",
    "url": "https://www.wunderground.com/dashboard/pws/IWARKW15"
   }
  ],
@@ -103,20 +103,16 @@
     },
     {
      "time": "08:00",
-     "windDirDeg": 186,
-     "windKn": 9.7,
+     "windDirDeg": 194,
+     "windKn": 7.0,
      "gustKn": 12.6,
      "rainMm": 0.0,
      "rainProbPct": 0,
      "airC": 11.2,
      "cloudPct": 0,
      "sky": "sun",
-     "src": "metno+openmeteo",
+     "src": "openmeteo",
      "models": {
-      "metno": [
-       182,
-       12.4
-      ],
       "openmeteo": [
        194,
        7.0
@@ -125,19 +121,19 @@
     },
     {
      "time": "09:00",
-     "windDirDeg": 184,
-     "windKn": 9.5,
+     "windDirDeg": 185,
+     "windKn": 9.1,
      "gustKn": 15.4,
      "rainMm": 0.0,
      "rainProbPct": 0,
-     "airC": 12.8,
-     "cloudPct": 0,
+     "airC": 13.0,
+     "cloudPct": 1,
      "sky": "sun",
      "src": "metno+openmeteo",
      "models": {
       "metno": [
-       182,
-       11.6
+       183,
+       10.7
       ],
       "openmeteo": [
        187,
@@ -148,7 +144,7 @@
     {
      "time": "10:00",
      "windDirDeg": 185,
-     "windKn": 8.8,
+     "windKn": 8.3,
      "gustKn": 15.9,
      "rainMm": 0.0,
      "rainProbPct": 0,
@@ -159,7 +155,7 @@
      "models": {
       "metno": [
        183,
-       10.4
+       9.4
       ],
       "openmeteo": [
        187,
@@ -1718,7 +1714,7 @@
   }
  ],
  "observations": {
-  "fetched": "2026-10-18T09:21:03+13:00",
+  "fetched": "2026-10-18T10:20:48+13:00",
   "kind": "home",
   "blend": true,
   "stations": [
@@ -1728,32 +1724,15 @@
     "kind": "home",
     "lat": -36.435,
     "lon": 174.74,
-    "time": "2026-10-18T09:19:47+13:00",
-    "windKn": 8.1,
-    "gustKn": 17.3,
-    "windDirDeg": 155,
-    "airC": 14.1,
+    "time": "2026-10-18T10:19:47+13:00",
+    "windKn": 4.2,
+    "gustKn": 10.7,
+    "windDirDeg": 121,
+    "airC": 14.8,
     "pressureHpa": 1030.5,
     "rainRateMmH": 0.0,
     "rainTodayMm": 0.0,
     "url": "https://www.wunderground.com/dashboard/pws/IWARKW15",
-    "via": "page"
-   },
-   {
-    "id": "ISNELL2",
-    "name": "Snells Beach",
-    "kind": "home",
-    "lat": -36.415,
-    "lon": 174.726,
-    "time": "2026-10-18T09:19:12+13:00",
-    "windKn": 4.5,
-    "gustKn": 8.3,
-    "windDirDeg": 206,
-    "airC": 16.2,
-    "pressureHpa": 1026.1,
-    "rainRateMmH": 0.0,
-    "rainTodayMm": 0.0,
-    "url": "https://www.wunderground.com/dashboard/pws/ISNELL2",
     "via": "page"
    }
   ],
@@ -1761,19 +1740,23 @@
    {
     "id": "IWARKW15",
     "ok": true,
-    "attempts": 1,
-    "tries": [
-     "200:wu-next-prod"
-    ]
-   },
-   {
-    "id": "ISNELL2",
-    "ok": true,
     "attempts": 2,
     "tries": [
      "200:WuNext-Preview-Phased",
      "200:wu-next-prod"
     ]
+   },
+   {
+    "id": "ISNELL2",
+    "ok": false,
+    "attempts": 4,
+    "tries": [
+     "200:WuNext-Preview-Phased",
+     "200:WuNext-Preview-Phased",
+     "200:WuNext-Preview-Phased",
+     "200:WuNext-Preview-Phased"
+    ],
+    "error": "no readings in served page (client-rendered variant)"
    }
   ]
  }
