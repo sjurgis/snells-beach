@@ -3,7 +3,7 @@
 "use strict";
 
 const TZ = "Pacific/Auckland";
-const APP_VERSION = "2026-10-18e";   // bump with data/version.txt when app.js/style.css/index.html change
+const APP_VERSION = "2026-10-19a";   // bump with data/version.txt when app.js/style.css/index.html change
 const PREF_KEY = "snells-beach-prefs-v1";
 const DEFAULT_PREFS = { activities: ["hangout"], favs: [], drive: 1, dog: false };
 const ACT = {
@@ -738,7 +738,6 @@ function render() {
     html += `<div class="notice warn">${icon("clock")}<span>This forecast is from <b>${esc(updated.toLocaleString("en-NZ", { timeZone: TZ, weekday: "short", day: "numeric", month: "short", hour: "numeric", minute: "2-digit" }))}</b>. The morning update hasn't run yet, so treat it as a rough guide.</span></div>`;
   }
 
-  if (today.ctx.isToday) html += liveCard(fc, now);
   const heur = acts.filter((a) => ACT[a].heuristic);
   if (heur.length) html += `<div class="notice">${icon("dot")}<span>${esc(heur.map((a) => ACT[a].label).join(", "))}: rough heuristic scores, not proper forecasts for ${heur.length > 1 ? "these" : "this"}.</span></div>`;
   const elig = today.picks.filter((r) => r.eligible);
@@ -818,6 +817,7 @@ function render() {
     </details>`;
   }).join("")}</div>`;
 
+  if (today.ctx.isToday) html += liveCard(fc, now);   // live station readings sit at the bottom
   app.innerHTML = html;
 
   const src = (fc.sources || []).map((s) => `<li><b>${esc(s.what)}</b>: ${s.url ? `<a href="${esc(s.url)}" rel="noopener">${esc(s.name)}</a>` : esc(s.name)}</li>`).join("");
