@@ -1,0 +1,18 @@
+{
+  "id": "./",
+  "name": "Snells Beach",
+  "short_name": "Beach",
+  "description": "Daily beach pick around Snells Beach, Mahurangi: wind, swell, tide, dogs and drive time.",
+  "lang": "en-NZ",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait",
+  "theme_color": "#f6f4ef",
+  "background_color": "#f6f4ef",
+  "icons": [
+    { "src": "icons/icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "icons/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
+    { "src": "icons/icon-maskable-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ]
+}

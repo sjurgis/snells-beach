@@ -182,6 +182,26 @@ def check_beaches(b):
     if not ids: err("beaches.json: no beaches")
 
 
+def check_site_versions():
+    """PWA: app.js APP_VERSION, sw.js VERSION and data/version.txt should match. Warning only, so a
+    mismatch never blocks the hourly data push."""
+    import re
+    try:
+        app = re.search(r'APP_VERSION = "([^"]+)"', (ROOT / "app.js").read_text(encoding="utf-8"))
+        sw = re.search(r'const VERSION = "([^"]+)"', (ROOT / "sw.js").read_text(encoding="utf-8"))
+        txt = (ROOT / "data" / "version.txt").read_text(encoding="utf-8").strip()
+    except FileNotFoundError as e:
+        warnings.append(f"site version check skipped: {e.filename} missing"); return
+    vals = {"app.js": app and app.group(1), "sw.js": sw and sw.group(1), "version.txt": txt}
+    if len(set(vals.values())) != 1: warnings.append(f"site versions differ: {vals}")
+    try:
+        m = json.loads((ROOT / "manifest.webmanifest").read_text(encoding="utf-8"))
+        for i in m.get("icons", []):
+            if not (ROOT / i["src"]).exists(): warnings.append(f"manifest icon missing: {i['src']}")
+    except Exception as e:
+        warnings.append(f"manifest.webmanifest: {e}")
+
+
 def main():
     path = Path(sys.argv[1]) if len(sys.argv) > 1 else ROOT / "data" / "forecast.json"
     for p, fn in ((path, check_forecast), (ROOT / "data" / "beaches.json", check_beaches)):
@@ -190,6 +210,7 @@ def main():
         except Exception as e:
             err(f"{p}: cannot read/parse JSON: {e}"); continue
         fn(data)
+    check_site_versions()
     for w in warnings: print("warning:", w)
     for e in errors: print("ERROR:", e)
     if errors:

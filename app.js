@@ -3,7 +3,7 @@
 "use strict";
 
 const TZ = "Pacific/Auckland";
-const APP_VERSION = "2026-10-19e2";   // bump with data/version.txt when app.js/style.css/index.html change
+const APP_VERSION = "2026-10-20pwa";   // bump with data/version.txt when app.js/style.css/index.html change
 const PREF_KEY = "snells-beach-prefs-v1";
 const DEFAULT_PREFS = { activities: ["hangout"], favs: [], drive: 1, dog: false };
 const ACT = {
@@ -98,9 +98,11 @@ function fixPrefs(p) {
 function savePrefs(p) { try { localStorage.setItem(PREF_KEY, JSON.stringify(p)); } catch { /* private mode */ } }
 
 /* ---------- data ---------- */
+const OFFLINE = {};   // path -> true when the service worker answered from its cache (no network)
 async function getJSON(path) {
   const r = await fetch(`${path}?t=${Date.now()}`, { cache: "no-store" });
   if (!r.ok) throw new Error(`${path} returned HTTP ${r.status}`);
+  OFFLINE[path] = r.headers.get("x-sw-offline") === "1";
   return r.json();
 }
 
@@ -734,6 +736,11 @@ function render() {
   $("#subtitle").innerHTML = `${esc(fmtDate(d.date, { weekday: "long", day: "numeric", month: "short" }))}${d.airMaxC != null ? ` · ${Math.round(d.airMaxC)}°` : ""} · sunset ${fmtTime(hm(d.sunset))} · <span class="updlbl">Updated ${esc(updHM)}</span>`;
 
   let html = "";
+  if (OFFLINE["data/forecast.json"]) {
+    const sameDay = updated.toLocaleDateString("en-CA", { timeZone: TZ }) === now.date;
+    const when = updated.toLocaleString("en-NZ", { timeZone: TZ, ...(sameDay ? {} : { weekday: "short" }), hour: "numeric", minute: "2-digit" }).replace(/\s?([ap]m)/i, "$1").replace(",", "");
+    html += `<p class="note offline">${icon("clock")}<span>Offline · data from ${esc(when)}</span></p>`;
+  }
   if (stale || ageH > 30) {
     html += `<p class="note warn">${icon("clock")}<span>This forecast is from ${esc(updated.toLocaleString("en-NZ", { timeZone: TZ, weekday: "short", day: "numeric", month: "short", hour: "numeric", minute: "2-digit" }))}. The update hasn't run since, so treat it as a rough guide.</span></p>`;
   }
@@ -929,12 +936,47 @@ async function refresh() {
   refreshing = true; lastCheck = Date.now();
   try {
     const vr = await fetch(`data/version.txt?t=${Date.now()}`, { cache: "no-store" }).catch(() => null);
-    if (vr?.ok) { const v = (await vr.text()).trim(); if (v && v !== APP_VERSION) { location.reload(); return; } }
+    if (vr?.ok && vr.headers.get("x-sw-offline") !== "1") { const v = (await vr.text()).trim(); if (v && v !== APP_VERSION && await updateApp(v)) return; }
     const fc = await getJSON("data/forecast.json");
     if (fc?.days?.length && (fc.updated !== STATE.fc?.updated || fc.observations?.fetched !== STATE.fc?.observations?.fetched)) { blendObservations(fc, nzNow()); STATE.fc = fc; }
     if (STATE.fc) render();
   } catch (e) { console.warn("refresh failed", e); }
   finally { refreshing = false; }
+}
+
+/* Service worker (offline shell + last data). New code arrives via version.txt -> updateApp(), or when the
+   browser finds a new sw.js; either way the page reloads at most once per version (no loops). */
+function reloadOnce(tag) {
+  const key = "snells-beach-reloaded";
+  try {
+    const prev = JSON.parse(sessionStorage.getItem(key) || "null");
+    if (prev && prev.tag === tag && Date.now() - prev.at < 10 * 60 * 1000) { console.info("already reloaded for", tag); return false; }
+    sessionStorage.setItem(key, JSON.stringify({ tag, at: Date.now() }));
+  } catch { /* storage off: still reload, the version check guards the rest */ }
+  location.reload();
+  return true;
+}
+let swReg = null;
+async function updateApp(v) {
+  if (swReg) {
+    try { await swReg.update(); } catch { /* offline or blocked: plain reload below */ }
+    // A new worker activates (skipWaiting + claim) -> controllerchange -> reload. Give it a moment first.
+    await new Promise((r) => setTimeout(r, 4000));
+  }
+  return reloadOnce(v);   // false = already tried for this version: carry on refreshing data
+}
+function registerSW() {
+  if (!("serviceWorker" in navigator) || location.protocol === "file:") return;
+  const hadController = !!navigator.serviceWorker.controller;
+  navigator.serviceWorker.addEventListener("controllerchange", async () => {
+    if (!hadController) return;   // first install: this page is already current
+    // Reload only when this page's code is older than the worker now in charge.
+    const current = await caches.has("snells-beach-" + APP_VERSION).catch(() => true);
+    if (!current) reloadOnce("sw:" + APP_VERSION);
+  });
+  navigator.serviceWorker.register("sw.js", { scope: "./", updateViaCache: "none" })
+    .then((reg) => { swReg = reg; })
+    .catch((e) => console.warn("service worker not registered", e));
 }
 
 function showError(err) {
@@ -984,6 +1026,7 @@ async function main() {
   if (/^\d{1,2}:\d{2}$/.test(q.get("at") || "")) NOW_OVERRIDE = hm(q.get("at"));
   STATE = { prefs };
   wirePrefs();
+  registerSW();
   try {
     const [beaches, fc] = await Promise.all([getJSON("data/beaches.json"), getJSON("data/forecast.json")]);
     if (!fc?.days?.length) throw new Error("forecast.json has no days in it");
@@ -994,6 +1037,7 @@ async function main() {
     setInterval(refresh, 5 * 60 * 1000);   // pick up new hourly data and keep "now" fresh
     document.addEventListener("visibilitychange", () => { if (document.visibilityState === "visible") refresh(); });
     window.addEventListener("focus", refresh);
+    window.addEventListener("online", () => { lastCheck = 0; refresh(); });
   } catch (err) {
     console.error(err);
     showError(err);
