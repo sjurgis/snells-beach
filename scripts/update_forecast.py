@@ -12,7 +12,7 @@ Usage:  python3 scripts/update_forecast.py [--days 4] [--start YYYY-MM-DD] [--ou
 Then:   python3 scripts/validate.py
 See data/SCHEMA.md for the file format.
 """
-import argparse, os, datetime as dt, html, json, math, re, sys, urllib.request
+import argparse, time, os, datetime as dt, html, json, math, re, sys, urllib.request
 from zoneinfo import ZoneInfo
 
 TZ = ZoneInfo("Pacific/Auckland")
@@ -84,6 +84,84 @@ def parse_tides(page, year, month):
             for d, v in days.items()}
 
 
+TIDE_TRIES = 3
+HALF_TIDE = dt.timedelta(hours=6, minutes=12, seconds=37)   # mean semidiurnal half-cycle (M2 / 2)
+
+
+def get_retry(url, tries=TIDE_TRIES, raw=True):
+    """GET with a short backoff; tides4fishing sometimes resets the TLS connection."""
+    errs = []
+    for i in range(tries):
+        try:
+            return get(url, raw=raw), errs
+        except Exception as e:  # noqa: BLE001 - network errors of every kind
+            errs.append(f"{type(e).__name__}: {e}"[:160])
+            if i < tries - 1: time.sleep(3 * (i + 1))
+    raise RuntimeError("; ".join(errs))
+
+
+def previous_tides(path):
+    """{date: [tides]} from the last forecast.json we wrote (still valid for the days it covers)."""
+    try:
+        with open(path, encoding="utf-8") as f:
+            old = json.load(f)
+        return {dt.date.fromisoformat(d["date"]): d["tides"] for d in old.get("days", [])
+                if isinstance(d.get("tides"), list) and len(d["tides"]) >= 2 and d.get("tidesSource", "tides4fishing") != "computed"}
+    except Exception:  # noqa: BLE001
+        return {}
+
+
+def extrapolate_tides(known, want):
+    """Rough fallback: carry the last known high/low sequence forward one half tide-cycle at a time.
+    Accurate to ~15-30 min for a few days; flagged as 'computed' so it's obvious."""
+    ev = sorted((dt.datetime.combine(d, dt.time.fromisoformat(t["time"])), t["type"], t["heightM"])
+                for d, ts in known.items() for t in ts)
+    if len(ev) < 2: return {}
+    out, last_day = {}, max(want)
+    while ev[-1][0].date() <= last_day:
+        t, typ, _ = ev[-1]
+        ev.append((t + HALF_TIDE, "low" if typ == "high" else "high", ev[-2][2]))
+    for t, typ, h in ev:
+        if t.date() in want and t.date() not in known:
+            out.setdefault(t.date(), []).append({"time": t.strftime("%H:%M"), "type": typ, "heightM": h})
+    return {d: ts for d, ts in out.items() if len(ts) >= 2}
+
+
+def fetch_tides(dates, start, end, out_path, now):
+    """Tides never abort the run: retry, then previous forecast.json, then a computed extrapolation."""
+    log = {"source": "tides4fishing", "url": TIDE_URL, "at": now.replace(microsecond=0).isoformat(), "ok": False}
+    tides = {}
+    months = sorted({(d.year, d.month) for d in dates + [start - dt.timedelta(days=1), end + dt.timedelta(days=1)]})
+    try:
+        page, errs = get_retry(TIDE_URL)
+        log["attempts"] = len(errs) + 1
+        tides.update(parse_tides(page, *months[0]))
+        log["ok"] = True
+    except Exception as e:  # noqa: BLE001
+        log["attempts"] = TIDE_TRIES; log["error"] = str(e)[:300]
+        print("warning: tides4fishing failed:", e, file=sys.stderr)
+    if log["ok"]:
+        for y, m in months[1:]:
+            if not all(d in tides for d in dates):
+                try:
+                    tides.update(parse_tides(get_retry(f"{TIDE_URL}/forecast/{y}-{m:02d}")[0], y, m))  # best effort
+                except Exception as e:  # noqa: BLE001
+                    print("warning: tides for", y, m, e, file=sys.stderr)
+    src = {d: "tides4fishing" for d in tides}
+    missing = [d for d in dates if len(tides.get(d, [])) < 2]
+    if missing:
+        prev = previous_tides(out_path)
+        for d in missing:
+            if d in prev: tides[d] = prev[d]; src[d] = "previous"
+        still = {d for d in dates if len(tides.get(d, [])) < 2}
+        if still:
+            base = {d: ts for d, ts in {**prev, **{d: tides[d] for d in tides}}.items() if len(ts) >= 2}
+            for d, ts in extrapolate_tides(base, still).items():
+                tides[d] = ts; src[d] = "computed"
+        log["fallback"] = {str(d): src.get(d, "none") for d in missing}
+    return tides, {**log, "bySource": {str(d): src.get(d, "none") for d in dates}}
+
+
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--days", type=int, default=4)
@@ -126,16 +204,7 @@ def main():
               f"&timezone=Pacific%2FAuckland&start_date={start}&end_date={end}")
     inner, open_ = mar[0]["hourly"], mar[1]["hourly"]
 
-    tides = {}
-    months = sorted({(d.year, d.month) for d in dates + [start - dt.timedelta(days=1), end + dt.timedelta(days=1)]})
-    page = get(TIDE_URL, raw=True)
-    tides.update(parse_tides(page, *months[0]))
-    for y, m in months[1:]:
-        if not all(d in tides for d in dates):
-            try:
-                tides.update(parse_tides(get(f"{TIDE_URL}/forecast/{y}-{m:02d}", raw=True), y, m))  # best effort
-            except Exception as e:  # noqa
-                print("warning: tides for", y, m, e, file=sys.stderr)
+    tides, tide_log = fetch_tides(dates, start, end, a.out, now)
 
     def wmo_sky(code):
         if code is None: return None
@@ -217,6 +286,7 @@ def main():
                "airMaxC": om["daily"]["temperature_2m_max"][di_om],
                "waterTempC": round(sum(sst) / len(sst), 1) if sst else None,
                "tides": tides.get(d, []),
+               **({"tidesSource": tide_log["bySource"][str(d)]} if tide_log["bySource"].get(str(d)) not in ("tides4fishing", None) else {}),
                "slots": slots, "swell": swell}
         if d.weekday() >= 5:
             day["traffic"] = {"level": "busy",
@@ -235,9 +305,12 @@ def main():
              "issued": dt.datetime.fromisoformat(met["properties"]["meta"]["updated_at"].replace("Z", "+00:00")).astimezone(TZ).replace(microsecond=0).isoformat()},
             {"what": "Wind (blended), gusts, rain chance, sun", "name": "Open-Meteo forecast (best match)", "url": f"https://api.open-meteo.com/v1/forecast?latitude={LAT}&longitude={LON}"},
             {"what": "Swell & sea temp", "name": "Open-Meteo Marine (Kawau Bay; off Te Ārai)", "url": "https://open-meteo.com/en/docs/marine-weather-api"},
-            {"what": "Tides", "name": "tides4fishing Mahurangi Harbour", "url": TIDE_URL},
+            {"what": "Tides", "name": "tides4fishing Mahurangi Harbour" + ("" if tide_log["ok"] else
+                     " (site unreachable this run: using the last good table" + (", some days estimated" if "computed" in tide_log["bySource"].values() else "") + ")"),
+             "url": TIDE_URL},
         ],
         "days": days,
+        "fetchLog": [tide_log],
     }
     try:
         sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))

@@ -30,6 +30,7 @@ Units are in the field names: `Kn` knots, `M` metres, `S` seconds, `Deg` degrees
 | `airMaxC` | number | no | daily max air temp °C |
 | `waterTempC` | number | no | sea surface temp °C (daytime mean, Kawau Bay) |
 | `tides` | array | yes | every high/low turn that day **in time order, alternating**: `{ "time": "06:59", "type": "high", "heightM": 2.7 }`. Mahurangi Harbour. At least 2. |
+| `tidesSource` | string | no | only when the tide site failed: `"previous"` (copied from the last good forecast.json) or `"computed"` (last known highs/lows carried forward by half tide-cycles, ~15–30 min off). Absent = fresh from tides4fishing. |
 | `slots` | array | yes | weather **every hour** `06:00`–`20:00`, in time order (at least 2, at least one in daylight). The page scores each hour, so hourly data gives the best windows and the now-vs-later timeline. |
 | `swell` | array | yes | sea state at `06:00, 09:00, 12:00, 15:00, 18:00` (at least 1). The nearest entry to each slot is used. |
 | `traffic` | object | no | `{ "level": "light" \| "moderate" \| "busy", "note": "short text" }`. Put it on Saturdays, Sundays and public holidays (Labour Day = 4th Monday of October). Its presence turns on the Matakana chip and a small score penalty for beaches through Matakana; weekends get the chip even without it. It is a heuristic note, not live traffic. |
@@ -144,3 +145,9 @@ Written by `scripts/observations.py` each run; omitted when nothing fresh (≤ 9
 | `stations[]` | array | `{ id, name, kind, time, windKn, gustKn?, windDirDeg?, airC?, pressureHpa?, rainRateMmH?, rainTodayMm?, raining?, lat?, lon?, url }` |
 
 `data/live.txt` gets one plain-text line summarising the same readings, for the hourly message to quote.
+
+## `fetchLog` (optional, top level) — forecast fetch audit
+
+Array of fetch records from `update_forecast.py`. Today one entry for tides:
+`{ "source": "tides4fishing", "url", "at", "ok": bool, "attempts": n, "error"?: "...", "fallback"?: {date: "previous"|"computed"|"none"}, "bySource": {date: "tides4fishing"|"previous"|"computed"|"none"} }`.
+A failed tide fetch never stops the run; the forecast and live readings still update.

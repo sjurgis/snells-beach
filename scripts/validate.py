@@ -84,6 +84,8 @@ def check_forecast(fc):
         if sr is not None and ss is not None and not sr < ss: err(f"{w}: sunrise must be before sunset")
         num(d.get("airMaxC"), -5, 40, f"{w}.airMaxC", required=False)
         num(d.get("waterTempC"), 5, 30, f"{w}.waterTempC", required=False)
+        if d.get("tidesSource") not in (None, "previous", "computed"): err(f"{w}.tidesSource: 'previous' | 'computed' if present")
+        elif d.get("tidesSource") == "computed": warnings.append(f"{w}: tides estimated (tide site unreachable)")
         tides = d.get("tides")
         if not isinstance(tides, list) or len(tides) < 2:
             err(f"{w}.tides: need at least 2 tide turns (high/low)")

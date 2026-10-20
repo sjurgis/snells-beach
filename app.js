@@ -3,7 +3,7 @@
 "use strict";
 
 const TZ = "Pacific/Auckland";
-const APP_VERSION = "2026-10-20r1";   // bump with data/version.txt when app.js/style.css/index.html change
+const APP_VERSION = "2026-10-20r2";   // bump with data/version.txt when app.js/style.css/index.html change
 const PREF_KEY = "snells-beach-prefs-v1";
 const DEFAULT_PREFS = { activities: ["hangout"], favs: [], drive: 1, dog: false };
 const ACT = {
@@ -513,7 +513,7 @@ function timeline(today, now, { limit = 6, label = "Hour by hour, best beaches" 
   const nowM = isToday && now.min > x0 && now.min < x1 ? `<i class="tl-now" style="left:${P(now.min)}%"></i>` : "";
   const night = `<i class="tl-night" style="left:0;width:${P(clamp(today.sr, x0, x1))}%"></i><i class="tl-night" style="left:${P(clamp(today.ss, x0, x1))}%;right:0"></i>`;
   const axis = [6, 9, 12, 15, 18, 21].map((h) => `<span style="left:${P(h * 60)}%">${h === 12 ? "12pm" : h > 12 ? h - 12 + (h === 18 || h === 21 ? "pm" : "") : h + "am"}</span>`).join("");
-  return `<section class="card tl" aria-label="${esc(label)}">
+  return `<section class="card tl${limit > 6 ? " full" : ""}" aria-label="${esc(label)}">
     <div class="tl-axis">${axis}</div>
     ${rows.map(({ R }) => `<div class="tl-row"><span class="tl-name">${bname(R.b)}</span><div class="tl-bar">${night}${R.evals.map((e) => {
       const k = rating(e.score).key, past = isToday && e.t + 30 < now.min;
