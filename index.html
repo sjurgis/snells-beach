@@ -3,42 +3,53 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<meta name="theme-color" content="#f6f4ef">
+<meta name="theme-color" content="#0f4c5c">
 <title>Snells Beach · where to go today</title>
 <meta name="description" content="Daily beach pick around Snells Beach, Mahurangi: wind, swell, tide, dogs and drive time.">
 <link rel="manifest" href="manifest.webmanifest">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-title" content="Beach">
-<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="application-name" content="Snells Beach">
 <link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
 <link rel="icon" type="image/png" sizes="32x32" href="icons/favicon-32.png">
 <link rel="stylesheet" href="style.css">
 </head>
 <body>
-<header class="top wrap">
-  <p class="sub" id="subtitle">Loading the forecast…</p>
-  <h1 id="title">Where to go today</h1>
+<header class="top">
+  <div class="wrap">
+    <p class="eyebrow">Snells Beach · Mahurangi</p>
+    <h1 id="title">Where to go today</h1>
+    <p class="sub" id="subtitle">Loading the forecast…</p>
+  </div>
 </header>
 
-<form class="prefs wrap" id="prefs" aria-label="Your preferences" onsubmit="return false">
-  <div class="pills" role="group" aria-label="Activities (pick any)" id="activity">
-      <label class="pill"><input type="checkbox" name="activity" value="hangout"><span><svg class="ic" aria-hidden="true"><use href="#i-hangout"/></svg>Hangout</span></label>
-      <label class="pill"><input type="checkbox" name="activity" value="swim"><span><svg class="ic" aria-hidden="true"><use href="#i-swim"/></svg>Swim</span></label>
-      <label class="pill"><input type="checkbox" name="activity" value="surf"><span><svg class="ic" aria-hidden="true"><use href="#i-surf"/></svg>Surf</span></label>
-      <label class="pill"><input type="checkbox" name="activity" value="snorkel"><span><svg class="ic" aria-hidden="true"><use href="#i-snorkel"/></svg>Snorkel</span></label>
-      <label class="pill"><input type="checkbox" name="activity" value="sup"><span><svg class="ic" aria-hidden="true"><use href="#i-sup"/></svg>SUP/Kayak</span></label>
-      <label class="pill"><input type="checkbox" name="activity" value="sailing"><span><svg class="ic" aria-hidden="true"><use href="#i-sail"/></svg>Sail</span></label>
-      <label class="pill"><input type="checkbox" name="activity" value="fishing"><span><svg class="ic" aria-hidden="true"><use href="#i-fish"/></svg>Fish</span></label>
-      <label class="pill"><input type="checkbox" name="activity" value="walking"><span><svg class="ic" aria-hidden="true"><use href="#i-walk"/></svg>Walk</span></label>
-  </div>
-  <div class="pills" role="group" aria-label="Drive and dog">
-    <label class="pill"><input type="radio" name="drive" value="0"><span><svg class="ic" aria-hidden="true"><use href="#i-car"/></svg>Local ≤15 min</span></label>
-    <label class="pill"><input type="radio" name="drive" value="1"><span>Nearby ≤35</span></label>
-    <label class="pill"><input type="radio" name="drive" value="2"><span>Road trip</span></label>
-    <label class="pill"><input type="checkbox" id="dog"><span><svg class="ic" aria-hidden="true"><use href="#i-dog"/></svg>Dog</span></label>
-    <details class="favs pillish"><summary>★ Favourites <small id="favcount">none</small></summary><div id="favlist" class="favlist"></div></details>
+<form class="prefs" id="prefs" aria-label="Your preferences" onsubmit="return false">
+  <div class="wrap prefs-inner">
+    <div class="seg" role="group" aria-label="Activities (pick any)" id="activity">
+      <label><input type="checkbox" name="activity" value="hangout"><span aria-label="Hangout, picnic, kids"><svg class="ic"><use href="#i-hangout"/></svg>Hangout</span></label>
+      <label><input type="checkbox" name="activity" value="swim"><span><svg class="ic"><use href="#i-swim"/></svg>Swim</span></label>
+      <label><input type="checkbox" name="activity" value="surf"><span><svg class="ic"><use href="#i-surf"/></svg>Surf</span></label>
+      <label><input type="checkbox" name="activity" value="snorkel"><span><svg class="ic"><use href="#i-snorkel"/></svg>Snorkel</span></label>
+      <label><input type="checkbox" name="activity" value="sup"><span aria-label="SUP / Kayak"><svg class="ic"><use href="#i-sup"/></svg>SUP/Kayak</span></label>
+      <label><input type="checkbox" name="activity" value="sailing"><span><svg class="ic"><use href="#i-sail"/></svg>Sail</span></label>
+      <label><input type="checkbox" name="activity" value="fishing"><span><svg class="ic"><use href="#i-fish"/></svg>Fish</span></label>
+      <label><input type="checkbox" name="activity" value="walking"><span aria-label="Beach walk"><svg class="ic"><use href="#i-walk"/></svg>Walk</span></label>
+    </div>
+    <div class="row2">
+      <div class="drive">
+        <label for="drive" class="mini"><svg class="ic"><use href="#i-car"/></svg><span id="driveLabel">Local</span></label>
+        <input type="range" id="drive" min="0" max="2" step="1" value="1" aria-describedby="driveHint">
+        <div class="ticks" id="driveHint"><span>Local</span><span>Nearby</span><span>Road trip</span></div>
+      </div>
+      <label class="switch">
+        <input type="checkbox" id="dog">
+        <span class="track" aria-hidden="true"><span class="knob"></span></span>
+        <span class="mini"><svg class="ic"><use href="#i-dog"/></svg>Dog</span>
+      </label>
+    </div>
+    <details class="favs"><summary><span>★ Favourite beaches</span> <small id="favcount">none</small></summary><div id="favlist" class="favlist"></div></details>
   </div>
 </form>
 

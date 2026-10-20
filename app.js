@@ -3,7 +3,7 @@
 "use strict";
 
 const TZ = "Pacific/Auckland";
-const APP_VERSION = "2026-10-20pwa";   // bump with data/version.txt when app.js/style.css/index.html change
+const APP_VERSION = "2026-10-20r1";   // bump with data/version.txt when app.js/style.css/index.html change
 const PREF_KEY = "snells-beach-prefs-v1";
 const DEFAULT_PREFS = { activities: ["hangout"], favs: [], drive: 1, dog: false };
 const ACT = {
@@ -438,6 +438,21 @@ function ring(score, key) {
 const skyIcon = (s) => icon(s === "sun" ? "sun" : s === "partly" ? "partly" : s === "rain" || s === "showers" || s === "storm" ? "rain" : "cloud", `ic sky sky-${s || "cloud"}`);
 
 /* ---------- now vs later ---------- */
+/* Card heatline: inset bottom rail, one segment per hour (old rating colours), 1px gaps, past dimmed, now dot. */
+const HX0 = 6 * 60, HX1 = 21 * 60, HP = (m) => ((clamp(m, HX0, HX1) - HX0) / (HX1 - HX0) * 100).toFixed(2);
+function heatEdge(R, isToday, now, { labels = false } = {}) {
+  const evals = R?.evals || [];
+  if (!evals.length) return "";
+  const W = (60 / (HX1 - HX0) * 100).toFixed(2);
+  const segs = evals.filter((e) => e.t + 30 > HX0 && e.t - 30 < HX1).map((e) => {
+    const k = rating(e.score);
+    return `<i class="k-${k.key}${isToday && e.t + 30 <= now.min ? " past" : ""}" style="left:${HP(e.t - 30)}%;width:${W}%" title="${fmtTime(e.t)}: ${k.label}"></i>`;
+  }).join("");
+  const dot = isToday && now.min > HX0 && now.min < HX1 ? `<span class="hdot" style="left:${HP(now.min)}%"></span>` : "";
+  const ax = labels ? `<div class="hax" aria-hidden="true"><span>6am</span><span>9</span><span>12pm</span><span>3</span><span>6</span><span>9pm</span></div>` : "";
+  return `<div class="heat${labels ? " lbl" : ""}" role="img" aria-label="Hour by hour rating, 6am to 9pm">${ax}<div class="hrail">${segs}${dot}</div></div>`;
+}
+const fullOf = (res, r) => (res.all || []).find((a) => a.b.id === r.b.id && a.act === r.act) || r;
 function nowLater(today, tomorrow, now, prefs) {
   const d = today.day, sr = hm(d.sunrise), ss = hm(d.sunset);
   const elig = today.all.filter((R) => R.eligible);
@@ -468,7 +483,7 @@ function nowLater(today, tomorrow, now, prefs) {
         <div class="rhead"><h4>${bname(c.R.b)}</h4>${pill(fake)}</div>
         <p class="when sm"><b>${sc < 30 ? "Not great anywhere" : `Good till ~${fmtTime(c.until)}`}</b></p>
         ${windPair(STATE.fc, d, c.R.b, now)}
-        <div class="chips">${rainChip([c.e])}${tide}</div>${liveBasis(STATE.fc, now, c.R.b.id)}</article>`;
+        <div class="chips">${rainChip([c.e])}${tide}</div>${liveBasis(STATE.fc, now, c.R.b.id)}${heatEdge(c.R, true, now)}</article>`;
     }
   }
   // best later today: windows starting at least an hour from now
@@ -479,26 +494,26 @@ function nowLater(today, tomorrow, now, prefs) {
       <div class="rhead"><h4>${bname(later.b)}</h4>${pill(later)}</div>
       <p class="when sm"><b>${esc(later.window)}</b></p>
       ${windPair(STATE.fc, d, later.b, now, { at: later.start })}
-      ${chips(later, later.act, prefs, { compact: true })}</article>`;
+      ${chips(later, later.act, prefs, { compact: true })}${heatEdge(later, true, now)}</article>`;
   } else {
     const t = tomorrow?.picks[0];
-    if (t && now.min <= ss) laterCard = `<article class="card nl r-${t.rating.key}"><span class="nl-tag">${icon("clock")}Tomorrow</span><div class="rhead"><h4>${bname(t.b)}</h4>${pill(t)}</div><p class="when sm"><b>${esc(t.window)}</b></p>${windPair(STATE.fc, t.day, t.b, now, { at: t.best.t })}${chips(t, t.act, prefs, { compact: true })}</article>`;
+    if (t && now.min <= ss) laterCard = `<article class="card nl r-${t.rating.key}"><span class="nl-tag">${icon("clock")}Tomorrow</span><div class="rhead"><h4>${bname(t.b)}</h4>${pill(t)}</div><p class="when sm"><b>${esc(t.window)}</b></p>${windPair(STATE.fc, t.day, t.b, now, { at: t.best.t })}${chips(t, t.act, prefs, { compact: true })}${heatEdge(fullOf(tomorrow, t), false, now)}</article>`;
   }
   return `<div class="nlgrid">${nowCard}${laterCard}</div>`;
 }
 
 /* Hour-by-hour coloured blocks for the top beaches, with a now marker. */
-function timeline(today, now) {
+function timeline(today, now, { limit = 6, label = "Hour by hour, best beaches" } = {}) {
   const x0 = 6 * 60, x1 = 21 * 60, span = x1 - x0;
   const P = (m) => ((m - x0) / span * 100).toFixed(2);
   const rows = today.all.filter((R) => R.eligible)
     .map((R) => ({ R, top: Math.max(0, ...R.evals.map((e) => e.score)) }))
-    .sort((a, b) => b.top - a.top).slice(0, 6);
+    .sort((a, b) => b.top - a.top).filter((x, i, arr) => arr.findIndex((y) => y.R.b.id === x.R.b.id) === i).slice(0, limit);
   const isToday = today.ctx.isToday;
   const nowM = isToday && now.min > x0 && now.min < x1 ? `<i class="tl-now" style="left:${P(now.min)}%"></i>` : "";
   const night = `<i class="tl-night" style="left:0;width:${P(clamp(today.sr, x0, x1))}%"></i><i class="tl-night" style="left:${P(clamp(today.ss, x0, x1))}%;right:0"></i>`;
   const axis = [6, 9, 12, 15, 18, 21].map((h) => `<span style="left:${P(h * 60)}%">${h === 12 ? "12pm" : h > 12 ? h - 12 + (h === 18 || h === 21 ? "pm" : "") : h + "am"}</span>`).join("");
-  return `<section class="card tl" aria-label="Hour by hour, best beaches">
+  return `<section class="card tl" aria-label="${esc(label)}">
     <div class="tl-axis">${axis}</div>
     ${rows.map(({ R }) => `<div class="tl-row"><span class="tl-name">${bname(R.b)}</span><div class="tl-bar">${night}${R.evals.map((e) => {
       const k = rating(e.score).key, past = isToday && e.t + 30 < now.min;
@@ -576,7 +591,7 @@ function combine(list, why) {
   let x = 0, y = 0;
   for (const s of use) if (s.windDirDeg != null && s.windKn >= 1) { x += Math.sin(s.windDirDeg * Math.PI / 180) * s.windKn; y += Math.cos(s.windDirDeg * Math.PI / 180) * s.windKn; }
   return { mode: "live", kn, gust, dir: x || y ? norm(Math.atan2(x, y) * 180 / Math.PI) : null, rain: median(use.map((s) => s.rainRateMmH)),
-           t0: Math.max(...list.map((q) => q.t)), stations: use, why, label: use.map((s) => `${s.name} ${s.id}`).join(", ") };
+           t0: Math.max(...list.map((q) => q.t)), stations: use, why, label: [...new Set(use.map((s) => s.name))].join(", ") };
 }
 /* Which live reading drives "now" at a beach: nearest fresh station(s), else the Algies/Snells median, else forecast. */
 function liveNow(fc, now, beach = null) {
@@ -652,8 +667,8 @@ function windPair(fc, day, b, now, { at = null } = {}) {
   const L = fc.liveByBeach?.[b.id] || fc.liveNow;
   let actual;
   if (L?.mode === "live") {
-    const ids = L.stations.map((x) => x.id).join(", ");
-    actual = windCell(`Actual ${fmtTime(L.t0)}`, L.kn, L.dir, L.gust, "act", L.why === "local" ? `Algies/Snells (${ids})` : ids);
+    const names = [...new Set(L.stations.map((x) => x.name))];
+    actual = windCell(`Actual ${fmtTime(L.t0)}`, L.kn, L.dir, L.gust, "act", L.why === "local" ? "Algies/Snells" : names.slice(0, 2).join(", "));
   } else {
     const why = L?.mode === "airport" ? "airport only" : L?.mode === "stale" ? "readings old" : "no live data";
     actual = windCell("Actual", null, null, null, "act", why);
@@ -700,6 +715,7 @@ function render() {
   const actLabel = acts.map((a) => ACT[a].label.toLowerCase()).join(", ");
   const stops = beaches.drive?.stops || [{ label: "Local", maxMin: 15 }, { label: "Nearby", maxMin: 35 }, { label: "Road trip", maxMin: 999 }];
   const stop = stops[clamp(prefs.drive, 0, stops.length - 1)];
+  $("#driveLabel").textContent = stop.maxMin >= 999 ? `${stop.label} · any distance` : `${stop.label} · ≤${stop.maxMin} min`;
 
   const tides = buildTides(fc.days);
   let days = fc.days.filter((d) => d.date >= now.date);
@@ -729,204 +745,117 @@ function render() {
   });
 
   const today = results[0];
-  const T = today, d = today.day;
-  const titleVerb = acts.length === 1 ? ACT[act].verb : "go";
-  $("#title").textContent = today.ctx.isToday ? `Where to ${titleVerb} today` : `Where to ${titleVerb} · ${fmtDate(d.date, { weekday: "long" })}`;
+  const dLabel = (d, ctx) => ctx.isToday ? "Today" : (dayNum(d.date) - dayNum(now.date) === 1 ? "Tomorrow" : fmtDate(d.date, { weekday: "long" }));
+  $("#title").textContent = today.ctx.isToday ? `Where to ${acts.length === 1 ? ACT[act].verb : "go"} today` : `Where to ${acts.length === 1 ? ACT[act].verb : "go"} · ${fmtDate(today.day.date, { weekday: "long" })}`;
   const updHM = new Intl.DateTimeFormat("en-NZ", { timeZone: TZ, hour: "numeric", minute: "2-digit" }).format(updated).replace(" ", "");
-  $("#subtitle").innerHTML = `${esc(fmtDate(d.date, { weekday: "long", day: "numeric", month: "short" }))}${d.airMaxC != null ? ` · ${Math.round(d.airMaxC)}°` : ""} · sunset ${fmtTime(hm(d.sunset))} · <span class="updlbl">Updated ${esc(updHM)}</span>`;
+  $("#subtitle").innerHTML = `<span class="updlbl">${icon("clock")}Updated ${esc(updHM)}</span> · ${esc(fmtDate(today.day.date, { weekday: "short", day: "numeric", month: "short" }))}${today.day.airMaxC != null ? ` · ${icon("temp")}${Math.round(today.day.airMaxC)}° air` : ""}${today.day.waterTempC != null ? ` · ${icon("wave")}${Math.round(today.day.waterTempC)}° water` : ""} · ${icon("sun")}${fmtTime(hm(today.day.sunrise))}–${fmtTime(hm(today.day.sunset))}`;
 
   let html = "";
   if (OFFLINE["data/forecast.json"]) {
     const sameDay = updated.toLocaleDateString("en-CA", { timeZone: TZ }) === now.date;
     const when = updated.toLocaleString("en-NZ", { timeZone: TZ, ...(sameDay ? {} : { weekday: "short" }), hour: "numeric", minute: "2-digit" }).replace(/\s?([ap]m)/i, "$1").replace(",", "");
-    html += `<p class="note offline">${icon("clock")}<span>Offline · data from ${esc(when)}</span></p>`;
+    html += `<div class="notice offline">${icon("clock")}<span>Offline · data from ${esc(when)}</span></div>`;
   }
   if (stale || ageH > 30) {
-    html += `<p class="note warn">${icon("clock")}<span>This forecast is from ${esc(updated.toLocaleString("en-NZ", { timeZone: TZ, weekday: "short", day: "numeric", month: "short", hour: "numeric", minute: "2-digit" }))}. The update hasn't run since, so treat it as a rough guide.</span></p>`;
+    html += `<div class="notice warn">${icon("clock")}<span>This forecast is from <b>${esc(updated.toLocaleString("en-NZ", { timeZone: TZ, weekday: "short", day: "numeric", month: "short", hour: "numeric", minute: "2-digit" }))}</b>. The morning update hasn't run yet, so treat it as a rough guide.</span></div>`;
   }
+
   const heur = acts.filter((a) => ACT[a].heuristic);
-  if (heur.length) html += `<p class="note">${icon("dot")}<span>${esc(heur.map((a) => ACT[a].label).join(", "))}: rough heuristic scores.</span></p>`;
+  if (heur.length) html += `<div class="notice">${icon("dot")}<span>${esc(heur.map((a) => ACT[a].label).join(", "))}: rough heuristic scores, not proper forecasts for ${heur.length > 1 ? "these" : "this"}.</span></div>`;
   const elig = today.picks.filter((r) => r.eligible);
   if (acts.includes("snorkel")) {
     const goat = today.picks.find((r) => r.b.doc);
-    if (goat?.best.docOff) html += `<p class="note bad">${icon("x")}<span>Goat Island is off today (${esc(goat.best.docOff)}). DOC says skip it in E/NE wind over ~20 kn or E/NE swell over 1 m.</span></p>`;
+    if (goat?.best.docOff) html += `<div class="notice bad">${icon("x")}<span><b>Goat Island is off today</b>: ${esc(goat.best.docOff)}. DOC says skip it in E/NE wind over ~20 kn or E/NE swell over 1 m.</span></div>`;
+    else if (goat && !goat.eligible) html += `<div class="notice">${icon("dot")}<span>Goat Island is the snorkel spot, but it's hidden: ${esc(goat.filters.join(", ").toLowerCase())}.</span></div>`;
   }
 
   if (!elig.length) {
-    html += `<article class="card hero"><h2 class="bn">Nothing fits</h2><p class="win sm">Every beach is filtered out by your settings. Try a longer drive${prefs.dog ? " or leave the dog home" : ""}.</p></article>`;
+    html += `<section class="hero r-nope"><h2>Nothing fits</h2><p class="when">Every beach is filtered out by your settings. Try a longer drive${prefs.dog ? " or leave the dog home" : ""}.</p></section>`;
   } else {
     const top = elig[0];
-    const kick = `${today.ctx.isToday ? "Today's pick" : esc(fmtDate(d.date, { weekday: "long" })) + "'s pick"}${acts.length > 1 ? ` · ${esc(ACT[top.act].label)}` : ""}`;
-    let nl = "";
-    if (today.ctx.isToday) {
-      const nw = nowPick(today, now), lt = laterPick(today, now);
-      if (nw && lt && (nw.R.b.id !== lt.b.id || !(top.nowStart))) {
-        nl = `<div class="nl"><div><small>Now</small>${nw.e.score >= 30 ? bname(nw.R.b) : "Not great anywhere"}</div><div><small>Later</small>${bname(lt.b)} · ${esc(lt.window)}</div></div>`;
-      }
-    }
-    html += `<article class="card hero"><div class="kick"><i class="dot ${top.rating.key}" title="${top.rating.label}"></i>${kick}</div>
-      <h2 class="bn">${bname(top.b)}</h2>
-      <div class="win">${esc(top.window)}</div>
-      ${cardWind(fc, d, top, now)}
-      ${nl}
-      ${top.score < 30 ? `<p class="lownote">Nothing's really on for ${esc(actLabel)}. This is the least-bad option.</p>` : ""}
-      ${swimLine(d, top, tides, now)}
-      ${iconRow(top, d, tides, now, prefs)}
-      ${heatEdge(top, today, now, { labels: true })}
-    </article>`;
-    const ru = elig.slice(1, 4);
+    const lowNote = top.score < 30 ? `<p class="lownote">Nothing's really on for ${esc(actLabel)}. This is the least-bad option.</p>` : "";
+    html += `<div class="topgrid"><section class="hero r-${top.rating.key}" aria-label="Top pick">
+      <div class="hero-head"><div><span class="badge">${today.ctx.isToday ? "Today's pick" : esc(dLabel(today.day, today.ctx)) + "'s pick"}</span>${pill(top)}</div>${ring(top.score, top.rating.key)}</div>
+      <h2>${bname(top.b)}</h2>
+      <p class="when">${icon("clock")}<span>${top.done ? "" : "Best "}<b>${esc(top.window)}</b></span></p>
+      ${windPair(fc, today.day, top.b, now, { at: top.done ? null : top.start })}
+      ${chips(top, top.act, prefs)}
+      ${bullets(reasons(top, top.act))}
+      ${lowNote}
+      ${heatEdge(fullOf(today, top), today.ctx.isToday, now, { labels: true })}
+    </section>`;
+    const ru = elig.slice(1, 3);
+    html += `<div class="side">`;
     if (ru.length) {
-      html += `<h3 class="sec">${today.ctx.isToday ? "Also good today" : "Also good"}</h3>` + ru.map((r) => `
-      <article class="card"><div class="nm"><i class="dot ${r.rating.key}" title="${r.rating.label}"></i><h4>${bname(r.b)}</h4>${acts.length > 1 ? `<span class="act">${esc(ACT[r.act].label)}</span>` : ""}</div>
-        <div class="win">${esc(r.window)}</div>
-        ${cardWind(fc, d, r, now)}
-        ${swimLine(d, r, tides, now)}
-        ${iconRow(r, d, tides, now, prefs)}
-        ${heatEdge(r, today, now)}
-      </article>`).join("");
+      html += `<h3 class="sec">${ru.every((r) => r.score >= 50) ? (today.ctx.isToday ? "Also good today" : "Also good") : "Next best"}</h3><div class="runners">${ru.map((r) => `
+        <article class="card runner r-${r.rating.key}">
+          <div class="rhead"><h4>${bname(r.b)}</h4>${pill(r)}</div>
+          <p class="when sm">${icon("clock")}<b>${esc(r.window)}</b></p>
+          ${windPair(fc, today.day, r.b, now, { at: r.done ? null : r.start })}
+          ${chips(r, r.act, prefs, { compact: true })}
+          ${bullets(reasons(r, r.act).slice(0, 2))}
+          ${heatEdge(fullOf(today, r), today.ctx.isToday, now)}
+        </article>`).join("")}</div>`;
     }
+    html += `</div></div>`;
   }
+
+  if (today.ctx.isToday) {
+    html += `<h3 class="sec" id="nowlater">Now vs later</h3>` + nowLater(today, results[1], now, prefs) + timeline(today, now);
+  }
+  if (today.ctx.isToday || stale) html += `<h3 class="sec">${stale ? "Last forecast day" : "Today"} at a glance</h3>` + todayStrip(today.day, tides, today.ctx);
 
   const ahead = results.slice(1, 4);
-  for (const res of ahead) {
-    const top = res.picks.find((r) => r.eligible);
-    const dl = dayNum(res.day.date) - dayNum(now.date) === 1 ? "Tomorrow" : fmtDate(res.day.date, { weekday: "long" });
-    html += `<h3 class="sec">${esc(dl)}${res.day.airMaxC != null ? ` <span>· ${Math.round(res.day.airMaxC)}°</span>` : ""}</h3>`;
-    if (!top) { html += `<article class="card"><p class="muted">Nothing fits your filters.</p></article>`; continue; }
-    html += `<article class="card"><div class="nm"><i class="dot ${top.rating.key}" title="${top.rating.label}"></i><h4>${bname(top.b)}</h4>${acts.length > 1 ? `<span class="act">${esc(ACT[top.act].label)}</span>` : ""}</div>
-      <div class="win">${esc(top.window)}</div>
-      ${cardWind(fc, res.day, top, now)}
-      ${swimLine(res.day, top, tides, now)}
-      ${iconRow(top, res.day, tides, now, prefs)}
-      ${heatEdge(top, res, now, { showNow: false })}
-    </article>`;
+  if (ahead.length) {
+    html += `<h3 class="sec">Next days</h3><div class="days">${ahead.map((res) => {
+      const { day, ctx, picks } = res;
+      const top = picks.find((r) => r.eligible);
+      const mid = (day.slots || []).reduce((a, s) => (a && Math.abs(hm(a.time) - 13 * 60) < Math.abs(hm(s.time) - 13 * 60) ? a : s), null);
+      const wk = ctx.weekend ? `<span class="tag">Weekend</span>` : "";
+      if (!top) return `<article class="card day"><div class="dhead"><h4>${esc(dLabel(day, ctx))}</h4>${wk}</div><p class="muted">Nothing fits your filters.</p></article>`;
+      return `<article class="card day r-${top.rating.key}">
+        <div class="dhead"><div><h4>${esc(dLabel(day, ctx))}</h4><span class="muted">${esc(fmtDate(day.date, { day: "numeric", month: "short" }))}</span></div>${wk}<span class="wx">${mid ? skyIcon(mid.sky) : ""}${day.airMaxC != null ? Math.round(day.airMaxC) + "°" : ""}</span></div>
+        <div class="dpick"><span class="dname">${bname(top.b)}</span>${pill(top)}</div>
+        <p class="when sm">${icon("clock")}<b>${esc(top.window)}</b></p>
+        ${windPair(fc, day, top.b, now, { at: top.best.t })}
+        ${chips(top, top.act, prefs, { compact: true })}
+        ${bullets(reasons(top, top.act).slice(0, 2))}
+        ${heatEdge(fullOf(res, top), false, now)}
+      </article>`;
+    }).join("")}</div>`;
   }
 
-  if (today.ctx.isToday && elig.length) html += heatmap(today, elig, now);
-
-  html += `<h3 class="sec">All beaches · ${today.ctx.isToday ? "today" : esc(fmtDate(d.date, { weekday: "short" }))}</h3><div class="card list">${today.picks.map((r) => {
-    const dogLine = r.dog ? `<p class="dogrule">${icon("dog")}<span>${esc(r.dog.text)}${r.b.dog?.source ? ` · <a href="${esc(r.b.dog.source)}" rel="noopener">source</a>` : ""}${r.b.dog?.verified === false ? " · unverified, check signs" : ""}</span></p>` : "";
-    return `<details class="row${r.eligible ? "" : " off"}"><summary><i class="dot ${r.eligible ? r.rating.key : "off"}"></i><span class="rn">${bname(r.b)}<small>${esc(r.b.area)} · ${r.b.driveMin} min</small></span><span class="rw">${r.eligible ? esc(r.window) : esc(r.filters.join(" · "))}</span></summary>
-      <div class="rbody">${cardWind(fc, d, r, now)}${swimLine(d, r, tides, now)}${iconRow(r, d, tides, now, { ...prefs, dog: true })}
-        <ul class="notes">${(r.b.notes || []).map((n) => `<li>${esc(n)}</li>`).join("")}</ul>${dogLine}</div></details>`;
+  html += `<h3 class="sec">All beaches · ${today.ctx.isToday ? "today" : esc(fmtDate(today.day.date, { weekday: "short" }))}</h3><div class="list">${today.picks.map((r) => {
+    const dogLine = r.dog ? `<p class="dogrule">${icon("dog")}<span>${esc(r.dog.text)}${r.b.dog?.source ? ` · <a href="${esc(r.b.dog.source)}" rel="noopener">source</a>` : ""}${r.b.dog?.verified === false ? " · <b>unverified, check signs</b>" : ""}</span></p>` : "";
+    return `<details class="row ${r.eligible ? "r-" + r.rating.key : "off"}">
+      <summary>
+        <span class="rname"><b>${bname(r.b)}</b><small>${esc(r.b.area)} · ${r.b.driveMin} min</small></span>
+        ${r.eligible ? `<span class="bar"><i style="width:${r.score}%"></i></span><span class="rs">${r.score}</span>${pill(r)}` : `<span class="why">${esc(r.filters.join(" · "))}</span>`}
+        ${r.eligible ? heatEdge(fullOf(today, r), today.ctx.isToday, now) : ""}
+      </summary>
+      <div class="rbody">
+        <p class="when sm">${icon("clock")}<b>${esc(r.window)}</b></p>
+        ${windPair(fc, today.day, r.b, now, { at: r.done ? null : r.start })}
+        ${chips(r, r.act, { ...prefs, dog: true })}
+        ${bullets(reasons(r, r.act))}
+        <ul class="notes">${(r.b.notes || []).map((n) => `<li>${esc(n)}</li>`).join("")}</ul>
+        ${dogLine}
+      </div>
+    </details>`;
   }).join("")}</div>`;
 
-  if (today.ctx.isToday) html += liveSection(fc, now);
+  if (today.ctx.isToday && today.all.some((R) => R.eligible)) html += `<h3 class="sec">Hour by hour · every beach</h3>` + timeline(today, now, { limit: 99, label: "Hour by hour, every beach that fits" });
+  if (today.ctx.isToday) html += liveCard(fc, now);   // live station readings sit at the bottom
   app.innerHTML = html;
 
-  const src = (fc.sources || []).map((s) => `<li>${esc(s.what)}: ${s.url ? `<a href="${esc(s.url)}" rel="noopener">${esc(s.name)}</a>` : esc(s.name)}</li>`).join("");
+  const src = (fc.sources || []).map((s) => `<li><b>${esc(s.what)}</b>: ${s.url ? `<a href="${esc(s.url)}" rel="noopener">${esc(s.name)}</a>` : esc(s.name)}</li>`).join("");
   $("#foot").innerHTML = `
-    <p>Updated ${esc(updated.toLocaleString("en-NZ", { timeZone: TZ, weekday: "short", day: "numeric", month: "short", hour: "numeric", minute: "2-digit" }))} NZT · times rounded to the half hour</p>
+    <p class="upd">${icon("clock")}Updated ${esc(updated.toLocaleString("en-NZ", { timeZone: TZ, weekday: "short", day: "numeric", month: "short", hour: "numeric", minute: "2-digit" }))} NZT</p>
     <ul class="srcs">${src}
-      <li>Drive times: ${esc(beaches.drive?.source || "")}, from ${esc(beaches.origin?.name || "Snells Beach")}</li>
-      <li>Dog rules: Auckland Council park pages and DOC, checked ${esc(beaches.beaches[0]?.dog?.checked || "")}. Open a beach in the list for its rule and link.</li>
+      <li><b>Drive times</b>: ${esc(beaches.drive?.source || "")}, from ${esc(beaches.origin?.name || "Snells Beach")}</li>
+      <li><b>Dog rules</b>: Auckland Council park pages and DOC, checked ${esc(beaches.beaches[0]?.dog?.checked || "")}. Tap a beach for its rule and link.</li>
     </ul>
-    <p>Wind is a blend of met.no and Open-Meteo, replaced by nearby home-station readings for the next few hours when they're fresh; arrows point where the wind blows to. Scores are a rough guide: check <a href="https://safeswim.org.nz/" rel="noopener">Safeswim</a> and the signs at the beach.</p>`;
-}
-
-/* ---------- E2 card pieces ---------- */
-/* One wind value per card: the beach's live reading when the window starts now, otherwise the forecast for the window. */
-function cardWind(fc, day, r, now) {
-  const isToday = day.date === now.date;
-  const L = isToday ? fc.liveByBeach?.[r.b.id] : null;
-  let kn, dir, gust, tag;
-  if (L?.mode === "live" && (r.nowStart || r.start <= now.min + 30) && !r.done) { kn = L.kn; dir = L.dir; gust = L.gust; tag = "now"; }
-  else {
-    const at = r.done ? Math.round(now.min / 60) * 60 : (isToday && r.start <= now.min + 30 ? Math.round(now.min / 60) * 60 : isToday ? r.start : r.best.t);
-    const s = nearestSlot(day.fcSlots || day.slots || [], at);
-    if (!s) return "";
-    kn = s.windKn; dir = s.windDirDeg; gust = s.gustKn; tag = isToday && at <= now.min + 30 ? "forecast now" : `forecast ${fmtTime(at)}`;
-  }
-  if (kn == null) return "";
-  const calm = kn < 1 || dir == null;
-  return `<div class="wind" title="Arrow points where the wind blows to">${calm ? icon("wind") : arrow(dir)}<b>${calm ? "Calm" : `${dir16(dir)} ${Math.round(kn)} kn`}</b>${gust != null && gust >= kn + 4 ? ` <span class="g">gust ${Math.round(gust)}</span>` : ""} <small>${tag}</small></div>`;
-}
-/* Swim line only when the tide works for a swim at a high-tide beach. */
-function swimLine(day, r, tides, now) {
-  if ((r.b.tide?.mode || "all") !== "high") return "";
-  const ctx = { isToday: day.date === now.date, nowMin: now.min, weekend: false, maxDrive: 999, dog: false };
-  const R = evalBeachDay(r.b, day, "swim", tides, ctx);
-  if (!R.evals.length) return "";
-  const P = pickWindow(R, ctx.isToday ? now.min - 30 : -Infinity);
-  if (!P?.tideWin || P.done) return "";
-  const a = Math.max(P.tideWin.rise, R.sr, ctx.isToday ? now.min : 0), z = Math.min(P.tideWin.fall, R.ss);
-  return z - a >= 60 ? `<div class="swim">${icon("swim")}Swim ${ctx.isToday && a <= now.min ? `now–${fmtTime(z)}` : fmtRange(a, z)}</div>` : "";
-}
-function tideNear(day, at, now) {
-  const L = (day.tides || []).map((x) => ({ ...x, m: hm(x.time) }));
-  const isToday = day.date === now.date;
-  let t = isToday ? L.find((x) => x.m > now.min) : null;
-  if (!t) { const hi = L.filter((x) => x.type === "high" && x.m >= hm(day.sunrise) && x.m <= hm(day.sunset)); t = (hi.length ? hi : L.filter((x) => x.type === "high")).sort((a, b) => Math.abs(a.m - at) - Math.abs(b.m - at))[0]; }
-  return t ? `${t.type === "high" ? "High" : "Low"} ${fmtTime(t.m)}` : "";
-}
-function iconRow(r, day, tides, now, prefs) {
-  const e = r.best, out = [`<span>${icon("car")}${r.b.driveMin} min</span>`];
-  const td = tideNear(day, e.t, now); if (td) out.push(`<span>${icon("tide")}${td}</span>`);
-  const rs = rainSummary(r.inWin);
-  if (rs.show) out.push(`<span class="${rs.prob >= 60 || rs.mm >= 0.5 ? "bad" : ""}">${icon("rain")}${rs.prob}%${rs.mm >= 0.1 ? ` · ${rs.mm.toFixed(1)} mm/h` : ""}</span>`);
-  if (r.act === "surf") out.push(`<span>${icon("wave")}${e.surfH.toFixed(1)} m · ${Math.round(e.period)} s</span>`);
-  else if (TIDE_ACTS.has(r.act) || r.act === "sailing") out.push(`<span>${icon("wave")}${e.water < 0.2 ? "Flat" : e.water.toFixed(1) + " m"}</span>`);
-  if (TIDE_ACTS.has(r.act) && r.tideWin && e.tideQ < 0.9) out.push(`<span class="bad">${icon("tide")}Too shallow now</span>`);
-  const ds = r.dog?.status;
-  if (prefs.dog || ds === "banned" || ds === "offlead") out.push(`<span title="${esc(r.dog?.text || "")}">${icon("dog")}${ds === "banned" ? "No dogs" : ds === "offlead" ? "Off-lead" : esc(r.dog?.chip || "Check signs")}</span>`);
-  if (r.traffic) out.push(`<span title="${esc(r.day.traffic?.note || "Weekend traffic through Matakana")}">${icon("traffic")}Matakana</span>`);
-  if (e.docOff) out.push(`<span class="bad">${icon("x")}DOC: skip</span>`);
-  return `<div class="icons">${out.join("")}</div>`;
-}
-/* E2: 2px pastel hairline inset at the card's bottom edge, past hours faded, a dot for now. */
-const HX0 = 6 * 60, HX1 = 21 * 60, HP = (m) => ((clamp(m, HX0, HX1) - HX0) / (HX1 - HX0) * 100).toFixed(2);
-const PASTEL = { great: "#9cc7b0", good: "#c3d6a9", meh: "#e9d7a8", nope: "#e6c3ba" };
-function heatEdge(r, res, now, { showNow = true, labels = false } = {}) {
-  const evals = (res.all.find((a) => a.b.id === r.b.id && a.act === r.act) || r).evals || [];
-  const W = (60 / (HX1 - HX0) * 100).toFixed(2);
-  const blocks = evals.map((e) => `<i style="left:${HP(e.t - 30)}%;width:${W}%;background:${PASTEL[rating(e.score).key]}${showNow && res.ctx.isToday && e.t + 30 < now.min ? ";opacity:.35" : ""}" title="${fmtTime(e.t)}: ${rating(e.score).label}"></i>`).join("");
-  const dot = showNow && res.ctx.isToday && now.min > HX0 && now.min < HX1 ? `<span class="edot" style="left:${HP(now.min)}%"></span>` : "";
-  const ax = labels ? `<div class="edgeax" aria-hidden="true"><span>6am</span><span>9</span><span>12pm</span><span>3</span><span>6</span><span>9pm</span></div>` : "";
-  return `${ax}<div class="edge" role="img" aria-label="Hour by hour rating">${blocks}${dot}</div>`;
-}
-function heatmap(T, elig, now) {
-  const W = (60 / (HX1 - HX0) * 100).toFixed(2);
-  const rows = elig.slice(0, 6).map((r) => {
-    const R = T.all.find((a) => a.b.id === r.b.id && a.act === r.act) || r;
-    const night = `<i class="night" style="left:0;width:${HP(T.sr)}%"></i><i class="night" style="left:${HP(T.ss)}%;right:0"></i>`;
-    const b = R.evals.map((e) => `<i class="k-${rating(e.score).key}${e.t + 30 < now.min ? " past" : ""}${e.wet >= 0.4 ? " wet" : ""}" style="left:${HP(e.t - 30)}%;width:${W}%" title="${fmtTime(e.t)}: ${rating(e.score).label}"></i>`).join("");
-    const nm = now.min > HX0 && now.min < HX1 ? `<span class="now" style="left:${HP(now.min)}%"></span>` : "";
-    return `<div class="hmrow"><span class="hmn">${bname(r.b)}</span><div class="hmbar">${night}${b}${nm}</div></div>`;
-  }).join("");
-  return `<h3 class="sec">Hour by hour</h3><div class="card hm"><div class="hmrow ax"><span class="hmn"></span><div class="hmax"><span>6am</span><span>9</span><span>12pm</span><span>3</span><span>6</span><span>9pm</span></div></div>${rows}
-    <div class="hmleg"><span><i class="k-great"></i>Great</span><span><i class="k-good"></i>Good</span><span><i class="k-meh"></i>Meh</span><span><i class="k-nope"></i>Nope</span><span><i class="wetkey"></i>Rain</span></div></div>`;
-}
-/* Best beach for the current hour, using the live-adjusted hourly scores (same logic as the old Right-now card). */
-function nowPick(today, now) {
-  const d = today.day, sr = hm(d.sunrise), ss = hm(d.sunset);
-  if (now.min > ss || now.min < sr - 30) return null;
-  const hr = Math.min(Math.max(Math.round(now.min / 60) * 60, Math.ceil((sr - 30) / 60) * 60), ss);
-  return today.all.filter((R) => R.eligible).map((R) => { const e = R.evals.find((x) => Math.abs(x.t - hr) <= 30); return e ? { R, e } : null; })
-    .filter(Boolean).sort((a, b) => b.e.score - a.e.score)[0] || null;
-}
-function laterPick(today, now) {
-  const sr = hm(today.day.sunrise), ss = hm(today.day.sunset);
-  if (now.min >= ss - 60) return null;
-  return today.all.filter((R) => R.eligible).map((R) => pickWindow(R, Math.max(now.min + 60, sr))).filter((x) => x && !x.done).sort((a, b) => b.score - a.score)[0] || null;
-}
-/* Quiet live-stations section at the very bottom: one summary line, stations on tap. */
-function liveSection(fc, now) {
-  const o = fc.observations;
-  if (!o?.stations?.length) return `<p class="live quiet">No live station readings right now.</p>`;
-  const home = o.kind === "home";
-  const ts = o.stations.map((s) => obsMinutes(s.time, now.date)).filter((t) => t != null);
-  const latest = ts.length ? Math.max(...ts) : null;
-  const ks = o.stations.map((s) => s.windKn).sort((a, b) => a - b), med = ks[ks.length >> 1];
-  const head = home ? `Live from ${o.stations.length} home station${o.stations.length > 1 ? "s" : ""}` : "Live reading from a distant airport";
-  const sub = `${latest != null ? `latest ${fmtTime(latest)}` : "earlier"} · typical ${Math.round(med)} kn${latest != null && now.min - latest > 90 ? " · old, not used" : ""}`;
-  const rows = o.stations.map((s) => {
-    const t = obsMinutes(s.time, now.date);
-    const w = s.windKn < 1 || s.windDirDeg == null ? `${icon("wind")}calm` : `${arrow(s.windDirDeg)}${dir16(s.windDirDeg)} ${Math.round(s.windKn)} kn`;
-    const extra = [s.gustKn ? `gust ${Math.round(s.gustKn)}` : "", s.airC != null ? `${Math.round(s.airC)}°` : "", s.rainRateMmH ? `${s.rainRateMmH} mm/h` : (s.raining ? "raining" : "")].filter(Boolean).join(" · ");
-    return `<li><a href="${esc(s.url)}" rel="noopener">${esc(s.name)}</a><span class="lw">${w}</span><span class="lx">${extra}</span><span class="lt">${t != null ? fmtTime(t) : ""}</span></li>`;
-  }).join("");
-  const note = home ? "Used for each beach's wind right now (nearest stations), fading back to the forecast over about 3 hours." : "Too far from Snells to use, so the scores stay forecast-based.";
-  return `<details class="live"><summary>${icon("wind")}<span>${head}</span><small>${sub}</small></summary><ul>${rows}</ul><p class="muted">${note}</p></details>`;
+    <p class="muted">Wind is a blend of met.no and Open-Meteo; arrows point where the wind blows to. Times are rounded to the half hour. Scores are a rough guide: check <a href="https://safeswim.org.nz/" rel="noopener">Safeswim</a> and the signs at the beach.</p>`;
 }
 
 /* Auto-refresh: new forecast -> re-render in place; new site code -> full reload. */
@@ -1006,12 +935,10 @@ function wirePrefs() {
       prefs.activities = on; savePrefs(prefs); if (STATE.fc) render();
     });
   }
-  for (const el of document.querySelectorAll('input[name="drive"]')) {
-    el.checked = +el.value === prefs.drive;
-    el.addEventListener("change", () => { if (el.checked) { prefs.drive = +el.value; savePrefs(prefs); if (STATE.fc) render(); } });
-  }
+  const drive = $("#drive"); drive.value = prefs.drive;
+  drive.addEventListener("input", () => { prefs.drive = +drive.value; savePrefs(prefs); render(); });
   const dog = $("#dog"); dog.checked = !!prefs.dog;
-  dog.addEventListener("change", () => { prefs.dog = dog.checked; savePrefs(prefs); if (STATE.fc) render(); });
+  dog.addEventListener("change", () => { prefs.dog = dog.checked; savePrefs(prefs); render(); });
 }
 
 async function main() {
