@@ -1,6 +1,6 @@
 {
  "schemaVersion": 1,
- "updated": "2026-10-21T19:19:52+13:00",
+ "updated": "2026-10-21T20:23:11+13:00",
  "timezone": "Pacific/Auckland",
  "location": {
   "name": "Snells Beach",
@@ -12,7 +12,7 @@
    "what": "Wind & weather (blended)",
    "name": "met.no Locationforecast (Snells Beach)",
    "url": "https://api.met.no/weatherapi/locationforecast/2.0/compact?lat=-36.42&lon=174.73",
-   "issued": "2026-10-21T18:19:23+13:00"
+   "issued": "2026-10-21T20:17:18+13:00"
   },
   {
    "what": "Wind (blended), gusts, rain chance, sun",
@@ -231,7 +231,7 @@
      "time": "15:00",
      "windDirDeg": 221,
      "windKn": 8.9,
-     "gustKn": 18.7,
+     "gustKn": 19.4,
      "rainMm": 0.0,
      "rainProbPct": 18,
      "airC": 18.1,
@@ -249,11 +249,11 @@
      "time": "16:00",
      "windDirDeg": 221,
      "windKn": 9.3,
-     "gustKn": 18.9,
+     "gustKn": 21.2,
      "rainMm": 0.0,
      "rainProbPct": 18,
      "airC": 17.6,
-     "cloudPct": 100,
+     "cloudPct": 95,
      "sky": "cloud",
      "src": "openmeteo",
      "models": {
@@ -267,7 +267,7 @@
      "time": "17:00",
      "windDirDeg": 226,
      "windKn": 9.8,
-     "gustKn": 19.4,
+     "gustKn": 20.8,
      "rainMm": 0.0,
      "rainProbPct": 13,
      "airC": 17.0,
@@ -283,20 +283,16 @@
     },
     {
      "time": "18:00",
-     "windDirDeg": 224,
-     "windKn": 10.4,
+     "windDirDeg": 227,
+     "windKn": 9.3,
      "gustKn": 19.6,
      "rainMm": 0.0,
      "rainProbPct": 6,
      "airC": 16.2,
-     "cloudPct": 58,
-     "sky": "partly",
-     "src": "metno+openmeteo",
+     "cloudPct": 93,
+     "sky": "cloud",
+     "src": "openmeteo",
      "models": {
-      "metno": [
-       221,
-       11.5
-      ],
       "openmeteo": [
        227,
        9.3
@@ -305,19 +301,19 @@
     },
     {
      "time": "19:00",
-     "windDirDeg": 222,
-     "windKn": 10.2,
-     "gustKn": 18.3,
+     "windDirDeg": 220,
+     "windKn": 10.4,
+     "gustKn": 18.9,
      "rainMm": 0.0,
      "rainProbPct": 0,
      "airC": 15.0,
-     "cloudPct": 98,
+     "cloudPct": 100,
      "sky": "cloud",
      "src": "metno+openmeteo",
      "models": {
       "metno": [
-       221,
-       11.2
+       219,
+       11.7
       ],
       "openmeteo": [
        222,
@@ -327,19 +323,19 @@
     },
     {
      "time": "20:00",
-     "windDirDeg": 223,
-     "windKn": 9.1,
-     "gustKn": 17.5,
+     "windDirDeg": 222,
+     "windKn": 9.4,
+     "gustKn": 18.3,
      "rainMm": 0.0,
      "rainProbPct": 0,
-     "airC": 13.6,
-     "cloudPct": 49,
+     "airC": 13.9,
+     "cloudPct": 41,
      "sky": "partly",
      "src": "metno+openmeteo",
      "models": {
       "metno": [
-       223,
-       10.8
+       220,
+       11.3
       ],
       "openmeteo": [
        224,
@@ -452,19 +448,19 @@
    "slots": [
     {
      "time": "06:00",
-     "windDirDeg": 252,
-     "windKn": 6.6,
-     "gustKn": 8.9,
+     "windDirDeg": 246,
+     "windKn": 6.5,
+     "gustKn": 8.6,
      "rainMm": 0.0,
      "rainProbPct": 0,
-     "airC": 10.6,
-     "cloudPct": 29,
+     "airC": 10.2,
+     "cloudPct": 12,
      "sky": "sun",
      "src": "metno+openmeteo",
      "models": {
       "metno": [
-       249,
-       8.1
+       239,
+       8.0
       ],
       "openmeteo": [
        257,
@@ -474,19 +470,19 @@
     },
     {
      "time": "07:00",
-     "windDirDeg": 249,
-     "windKn": 6.5,
-     "gustKn": 8.6,
+     "windDirDeg": 247,
+     "windKn": 6.4,
+     "gustKn": 8.4,
      "rainMm": 0.0,
      "rainProbPct": 0,
-     "airC": 11.0,
-     "cloudPct": 49,
-     "sky": "partly",
+     "airC": 10.7,
+     "cloudPct": 21,
+     "sky": "sun",
      "src": "metno+openmeteo",
      "models": {
       "metno": [
-       244,
-       7.9
+       240,
+       7.8
       ],
       "openmeteo": [
        257,
@@ -496,19 +492,19 @@
     },
     {
      "time": "08:00",
-     "windDirDeg": 239,
-     "windKn": 7.2,
-     "gustKn": 10.7,
+     "windDirDeg": 241,
+     "windKn": 6.9,
+     "gustKn": 9.5,
      "rainMm": 0.0,
      "rainProbPct": 0,
-     "airC": 13.6,
-     "cloudPct": 73,
+     "airC": 13.4,
+     "cloudPct": 45,
      "sky": "partly",
      "src": "metno+openmeteo",
      "models": {
       "metno": [
-       232,
-       8.6
+       235,
+       8.1
       ],
       "openmeteo": [
        249,
@@ -518,19 +514,19 @@
     },
     {
      "time": "09:00",
-     "windDirDeg": 223,
-     "windKn": 8.8,
-     "gustKn": 16.9,
+     "windDirDeg": 224,
+     "windKn": 8.2,
+     "gustKn": 15.9,
      "rainMm": 0.0,
      "rainProbPct": 0,
-     "airC": 14.9,
-     "cloudPct": 99,
-     "sky": "cloud",
+     "airC": 15.3,
+     "cloudPct": 47,
+     "sky": "partly",
      "src": "metno+openmeteo",
      "models": {
       "metno": [
-       225,
-       9.2
+       228,
+       8.1
       ],
       "openmeteo": [
        221,
@@ -541,18 +537,18 @@
     {
      "time": "10:00",
      "windDirDeg": 221,
-     "windKn": 8.7,
+     "windKn": 8.3,
      "gustKn": 17.1,
      "rainMm": 0.0,
      "rainProbPct": 0,
-     "airC": 16.1,
-     "cloudPct": 72,
+     "airC": 16.7,
+     "cloudPct": 60,
      "sky": "partly",
      "src": "metno+openmeteo",
      "models": {
       "metno": [
        221,
-       9.5
+       8.7
       ],
       "openmeteo": [
        221,
@@ -562,19 +558,19 @@
     },
     {
      "time": "11:00",
-     "windDirDeg": 222,
-     "windKn": 8.6,
+     "windDirDeg": 223,
+     "windKn": 8.5,
      "gustKn": 18.1,
      "rainMm": 0.0,
      "rainProbPct": 0,
-     "airC": 17.4,
-     "cloudPct": 95,
+     "airC": 17.8,
+     "cloudPct": 99,
      "sky": "cloud",
      "src": "metno+openmeteo",
      "models": {
       "metno": [
-       222,
-       9.0
+       223,
+       8.8
       ],
       "openmeteo": [
        223,
@@ -584,19 +580,19 @@
     },
     {
      "time": "12:00",
-     "windDirDeg": 222,
-     "windKn": 8.5,
-     "gustKn": 18.5,
+     "windDirDeg": 223,
+     "windKn": 8.6,
+     "gustKn": 18.7,
      "rainMm": 0.0,
      "rainProbPct": 0,
-     "airC": 18.4,
-     "cloudPct": 82,
-     "sky": "partly",
+     "airC": 18.6,
+     "cloudPct": 99,
+     "sky": "cloud",
      "src": "metno+openmeteo",
      "models": {
       "metno": [
-       223,
-       8.7
+       224,
+       8.8
       ],
       "openmeteo": [
        222,
@@ -606,9 +602,9 @@
     },
     {
      "time": "13:00",
-     "windDirDeg": 224,
-     "windKn": 8.6,
-     "gustKn": 18.7,
+     "windDirDeg": 225,
+     "windKn": 8.9,
+     "gustKn": 19.0,
      "rainMm": 0.0,
      "rainProbPct": 0,
      "airC": 19.1,
@@ -618,165 +614,165 @@
      "models": {
       "metno": [
        225,
-       8.8
+       9.0
       ],
       "openmeteo": [
-       223,
-       8.4
-      ]
-     }
-    },
-    {
-     "time": "14:00",
-     "windDirDeg": 228,
-     "windKn": 8.8,
-     "gustKn": 19.0,
-     "rainMm": 0.0,
-     "rainProbPct": 2,
-     "airC": 19.3,
-     "cloudPct": 78,
-     "sky": "partly",
-     "src": "metno+openmeteo",
-     "models": {
-      "metno": [
-       228,
-       9.1
-      ],
-      "openmeteo": [
-       228,
-       8.6
-      ]
-     }
-    },
-    {
-     "time": "15:00",
-     "windDirDeg": 232,
-     "windKn": 9.3,
-     "gustKn": 18.9,
-     "rainMm": 0.0,
-     "rainProbPct": 4,
-     "airC": 19.1,
-     "cloudPct": 79,
-     "sky": "partly",
-     "src": "metno+openmeteo",
-     "models": {
-      "metno": [
-       230,
-       9.8
-      ],
-      "openmeteo": [
-       233,
+       225,
        8.7
       ]
      }
     },
     {
-     "time": "16:00",
-     "windDirDeg": 233,
-     "windKn": 10.1,
-     "gustKn": 19.6,
+     "time": "14:00",
+     "windDirDeg": 225,
+     "windKn": 9.0,
+     "gustKn": 19.2,
      "rainMm": 0.0,
-     "rainProbPct": 6,
-     "airC": 18.3,
-     "cloudPct": 72,
+     "rainProbPct": 2,
+     "airC": 19.1,
+     "cloudPct": 77,
      "sky": "partly",
      "src": "metno+openmeteo",
      "models": {
       "metno": [
-       232,
+       225,
+       9.3
+      ],
+      "openmeteo": [
+       226,
+       8.7
+      ]
+     }
+    },
+    {
+     "time": "15:00",
+     "windDirDeg": 225,
+     "windKn": 9.5,
+     "gustKn": 19.2,
+     "rainMm": 0.0,
+     "rainProbPct": 4,
+     "airC": 18.9,
+     "cloudPct": 61,
+     "sky": "partly",
+     "src": "metno+openmeteo",
+     "models": {
+      "metno": [
+       224,
+       10.0
+      ],
+      "openmeteo": [
+       226,
+       9.0
+      ]
+     }
+    },
+    {
+     "time": "16:00",
+     "windDirDeg": 226,
+     "windKn": 10.3,
+     "gustKn": 20.2,
+     "rainMm": 0.0,
+     "rainProbPct": 6,
+     "airC": 18.2,
+     "cloudPct": 70,
+     "sky": "partly",
+     "src": "metno+openmeteo",
+     "models": {
+      "metno": [
+       225,
        10.8
       ],
       "openmeteo": [
-       233,
-       9.4
+       227,
+       9.8
       ]
      }
     },
     {
      "time": "17:00",
-     "windDirDeg": 231,
+     "windDirDeg": 227,
      "windKn": 10.8,
-     "gustKn": 20.2,
+     "gustKn": 20.0,
      "rainMm": 0.0,
      "rainProbPct": 7,
-     "airC": 16.8,
-     "cloudPct": 100,
-     "sky": "cloud",
+     "airC": 17.2,
+     "cloudPct": 73,
+     "sky": "partly",
      "src": "metno+openmeteo",
      "models": {
       "metno": [
-       230,
+       225,
        11.8
       ],
       "openmeteo": [
-       233,
-       9.9
+       229,
+       9.8
       ]
      }
     },
     {
      "time": "18:00",
-     "windDirDeg": 227,
-     "windKn": 10.8,
-     "gustKn": 20.0,
+     "windDirDeg": 224,
+     "windKn": 11.0,
+     "gustKn": 19.8,
      "rainMm": 0.0,
      "rainProbPct": 8,
-     "airC": 15.9,
-     "cloudPct": 100,
+     "airC": 16.1,
+     "cloudPct": 99,
      "sky": "cloud",
      "src": "metno+openmeteo",
      "models": {
       "metno": [
-       228,
-       12.0
+       224,
+       12.1
       ],
       "openmeteo": [
-       226,
-       9.5
+       224,
+       9.8
       ]
      }
     },
     {
      "time": "19:00",
-     "windDirDeg": 226,
-     "windKn": 10.8,
-     "gustKn": 18.7,
+     "windDirDeg": 223,
+     "windKn": 11.0,
+     "gustKn": 19.4,
      "rainMm": 0.0,
      "rainProbPct": 8,
-     "airC": 15.1,
-     "cloudPct": 87,
-     "sky": "cloud",
+     "airC": 15.2,
+     "cloudPct": 83,
+     "sky": "partly",
      "src": "metno+openmeteo",
      "models": {
       "metno": [
-       226,
-       11.9
+       223,
+       12.4
       ],
       "openmeteo": [
-       227,
+       223,
        9.6
       ]
      }
     },
     {
      "time": "20:00",
-     "windDirDeg": 226,
-     "windKn": 9.8,
+     "windDirDeg": 222,
+     "windKn": 10.2,
      "gustKn": 18.5,
      "rainMm": 0.0,
      "rainProbPct": 6,
-     "airC": 14.0,
-     "cloudPct": 29,
+     "airC": 14.2,
+     "cloudPct": 30,
      "sky": "sun",
      "src": "metno+openmeteo",
      "models": {
       "metno": [
-       226,
-       11.4
+       221,
+       12.0
       ],
       "openmeteo": [
-       227,
-       8.2
+       224,
+       8.4
       ]
      }
     }
@@ -858,7 +854,7 @@
    "date": "2026-10-23",
    "sunrise": "06:27",
    "sunset": "19:44",
-   "airMaxC": 20.6,
+   "airMaxC": 20.5,
    "waterTempC": 17.1,
    "tides": [
     {
@@ -880,331 +876,331 @@
    "slots": [
     {
      "time": "06:00",
-     "windDirDeg": 224,
-     "windKn": 7.9,
-     "gustKn": 11.3,
+     "windDirDeg": 225,
+     "windKn": 7.4,
+     "gustKn": 9.9,
      "rainMm": 0.0,
      "rainProbPct": 0,
-     "airC": 11.8,
-     "cloudPct": 34,
+     "airC": 10.7,
+     "cloudPct": 36,
      "sky": "sun",
      "src": "metno+openmeteo",
      "models": {
       "metno": [
-       227,
-       9.4
+       226,
+       9.5
       ],
       "openmeteo": [
-       221,
-       6.3
+       224,
+       5.3
       ]
      }
     },
     {
      "time": "07:00",
-     "windDirDeg": 226,
-     "windKn": 7.8,
-     "gustKn": 11.1,
+     "windDirDeg": 222,
+     "windKn": 7.5,
+     "gustKn": 9.3,
      "rainMm": 0.0,
      "rainProbPct": 0,
-     "airC": 11.8,
-     "cloudPct": 40,
-     "sky": "partly",
+     "airC": 11.1,
+     "cloudPct": 24,
+     "sky": "sun",
      "src": "metno+openmeteo",
      "models": {
       "metno": [
-       222,
-       9.5
+       220,
+       9.2
       ],
       "openmeteo": [
-       231,
-       6.0
+       224,
+       5.8
       ]
      }
     },
     {
      "time": "08:00",
-     "windDirDeg": 219,
+     "windDirDeg": 211,
      "windKn": 8.2,
-     "gustKn": 12.8,
+     "gustKn": 12.6,
      "rainMm": 0.0,
      "rainProbPct": 0,
      "airC": 13.6,
-     "cloudPct": 78,
+     "cloudPct": 49,
      "sky": "partly",
      "src": "metno+openmeteo",
      "models": {
       "metno": [
-       216,
-       10.0
+       211,
+       9.8
       ],
       "openmeteo": [
-       224,
-       6.5
-      ]
-     }
-    },
-    {
-     "time": "09:00",
-     "windDirDeg": 204,
-     "windKn": 9.0,
-     "gustKn": 17.5,
-     "rainMm": 0.0,
-     "rainProbPct": 0,
-     "airC": 14.9,
-     "cloudPct": 100,
-     "sky": "cloud",
-     "src": "metno+openmeteo",
-     "models": {
-      "metno": [
-       207,
-       9.7
-      ],
-      "openmeteo": [
-       201,
-       8.3
-      ]
-     }
-    },
-    {
-     "time": "10:00",
-     "windDirDeg": 198,
-     "windKn": 7.5,
-     "gustKn": 16.9,
-     "rainMm": 0.0,
-     "rainProbPct": 0,
-     "airC": 16.2,
-     "cloudPct": 72,
-     "sky": "partly",
-     "src": "metno+openmeteo",
-     "models": {
-      "metno": [
-       197,
-       8.4
-      ],
-      "openmeteo": [
-       199,
+       212,
        6.6
       ]
      }
     },
     {
-     "time": "11:00",
-     "windDirDeg": 187,
-     "windKn": 5.8,
-     "gustKn": 14.8,
+     "time": "09:00",
+     "windDirDeg": 202,
+     "windKn": 8.8,
+     "gustKn": 17.3,
      "rainMm": 0.0,
      "rainProbPct": 0,
-     "airC": 17.8,
-     "cloudPct": 30,
+     "airC": 15.1,
+     "cloudPct": 100,
+     "sky": "cloud",
+     "src": "metno+openmeteo",
+     "models": {
+      "metno": [
+       204,
+       9.2
+      ],
+      "openmeteo": [
+       200,
+       8.4
+      ]
+     }
+    },
+    {
+     "time": "10:00",
+     "windDirDeg": 201,
+     "windKn": 7.3,
+     "gustKn": 17.1,
+     "rainMm": 0.0,
+     "rainProbPct": 0,
+     "airC": 16.5,
+     "cloudPct": 69,
+     "sky": "partly",
+     "src": "metno+openmeteo",
+     "models": {
+      "metno": [
+       199,
+       8.3
+      ],
+      "openmeteo": [
+       203,
+       6.4
+      ]
+     }
+    },
+    {
+     "time": "11:00",
+     "windDirDeg": 193,
+     "windKn": 5.7,
+     "gustKn": 14.4,
+     "rainMm": 0.0,
+     "rainProbPct": 0,
+     "airC": 18.0,
+     "cloudPct": 13,
      "sky": "sun",
      "src": "metno+openmeteo",
      "models": {
       "metno": [
-       187,
-       6.7
+       193,
+       6.5
       ],
       "openmeteo": [
-       188,
+       194,
        4.8
       ]
      }
     },
     {
      "time": "12:00",
-     "windDirDeg": 163,
-     "windKn": 4.8,
-     "gustKn": 13.0,
+     "windDirDeg": 172,
+     "windKn": 4.9,
+     "gustKn": 12.8,
      "rainMm": 0.0,
      "rainProbPct": 0,
-     "airC": 18.9,
+     "airC": 19.0,
      "cloudPct": 9,
      "sky": "sun",
      "src": "metno+openmeteo",
      "models": {
       "metno": [
-       163,
-       6.1
+       170,
+       6.3
       ],
       "openmeteo": [
-       164,
-       3.5
+       175,
+       3.6
       ]
      }
     },
     {
      "time": "13:00",
-     "windDirDeg": 129,
-     "windKn": 4.4,
+     "windDirDeg": 131,
+     "windKn": 4.7,
      "gustKn": 11.5,
      "rainMm": 0.0,
      "rainProbPct": 0,
-     "airC": 19.6,
-     "cloudPct": 5,
+     "airC": 19.7,
+     "cloudPct": 27,
      "sky": "sun",
      "src": "metno+openmeteo",
      "models": {
       "metno": [
        125,
-       6.4
+       6.9
       ],
       "openmeteo": [
-       137,
-       2.5
+       150,
+       2.4
       ]
      }
     },
     {
      "time": "14:00",
-     "windDirDeg": 90,
-     "windKn": 4.9,
-     "gustKn": 10.3,
+     "windDirDeg": 86,
+     "windKn": 5.0,
+     "gustKn": 10.1,
      "rainMm": 0.0,
      "rainProbPct": 0,
-     "airC": 20.0,
-     "cloudPct": 7,
+     "airC": 19.8,
+     "cloudPct": 12,
      "sky": "sun",
      "src": "metno+openmeteo",
      "models": {
       "metno": [
-       83,
-       7.3
+       82,
+       8.0
       ],
       "openmeteo": [
-       108,
-       2.5
+       99,
+       2.0
       ]
      }
     },
     {
      "time": "15:00",
-     "windDirDeg": 61,
-     "windKn": 6.1,
+     "windDirDeg": 59,
+     "windKn": 6.4,
      "gustKn": 11.9,
      "rainMm": 0.0,
      "rainProbPct": 0,
-     "airC": 19.8,
-     "cloudPct": 9,
+     "airC": 19.9,
+     "cloudPct": 28,
      "sky": "sun",
      "src": "metno+openmeteo",
      "models": {
       "metno": [
-       56,
-       8.0
+       57,
+       8.9
       ],
       "openmeteo": [
-       69,
-       4.1
+       63,
+       4.0
       ]
      }
     },
     {
      "time": "16:00",
-     "windDirDeg": 51,
-     "windKn": 6.6,
-     "gustKn": 14.4,
+     "windDirDeg": 52,
+     "windKn": 7.1,
+     "gustKn": 14.0,
      "rainMm": 0.0,
      "rainProbPct": 0,
      "airC": 19.7,
-     "cloudPct": 18,
+     "cloudPct": 16,
      "sky": "sun",
      "src": "metno+openmeteo",
      "models": {
       "metno": [
-       48,
-       8.0
+       49,
+       8.9
       ],
       "openmeteo": [
-       54,
-       5.2
+       56,
+       5.3
       ]
      }
     },
     {
      "time": "17:00",
-     "windDirDeg": 56,
-     "windKn": 5.3,
+     "windDirDeg": 51,
+     "windKn": 6.4,
      "gustKn": 13.6,
      "rainMm": 0.0,
      "rainProbPct": 0,
-     "airC": 19.6,
-     "cloudPct": 65,
-     "sky": "partly",
+     "airC": 19.5,
+     "cloudPct": 16,
+     "sky": "sun",
      "src": "metno+openmeteo",
      "models": {
       "metno": [
-       48,
-       7.8
+       44,
+       8.6
       ],
       "openmeteo": [
-       78,
-       2.8
+       64,
+       4.2
       ]
      }
     },
     {
      "time": "18:00",
-     "windDirDeg": 60,
-     "windKn": 4.7,
-     "gustKn": 9.1,
+     "windDirDeg": 29,
+     "windKn": 5.2,
+     "gustKn": 11.3,
      "rainMm": 0.0,
      "rainProbPct": 0,
-     "airC": 18.8,
-     "cloudPct": 47,
-     "sky": "partly",
+     "airC": 18.7,
+     "cloudPct": 29,
+     "sky": "sun",
      "src": "metno+openmeteo",
      "models": {
       "metno": [
-       48,
-       7.7
+       19,
+       7.6
       ],
       "openmeteo": [
-       142,
-       1.6
+       56,
+       2.9
       ]
      }
     },
     {
      "time": "19:00",
-     "windDirDeg": 230,
-     "windKn": 6.0,
-     "gustKn": 9.1,
+     "windDirDeg": 320,
+     "windKn": 3.8,
+     "gustKn": 8.4,
      "rainMm": 0.0,
      "rainProbPct": 0,
-     "airC": 17.2,
-     "cloudPct": 23,
+     "airC": 17.7,
+     "cloudPct": 13,
      "sky": "sun",
      "src": "metno+openmeteo",
      "models": {
       "metno": [
-       234,
-       7.7
+       322,
+       7.0
       ],
       "openmeteo": [
-       224,
-       4.3
+       162,
+       0.6
       ]
      }
     },
     {
      "time": "20:00",
-     "windDirDeg": 233,
-     "windKn": 6.7,
-     "gustKn": 10.5,
+     "windDirDeg": 244,
+     "windKn": 5.1,
+     "gustKn": 5.8,
      "rainMm": 0.0,
      "rainProbPct": 0,
-     "airC": 15.0,
-     "cloudPct": 10,
+     "airC": 15.5,
+     "cloudPct": 21,
      "sky": "sun",
      "src": "metno+openmeteo",
      "models": {
       "metno": [
-       233,
-       7.7
+       256,
+       6.7
       ],
       "openmeteo": [
-       233,
-       5.7
+       221,
+       3.6
       ]
      }
     }
@@ -1286,7 +1282,7 @@
    "date": "2026-10-24",
    "sunrise": "06:26",
    "sunset": "19:45",
-   "airMaxC": 20.0,
+   "airMaxC": 20.8,
    "waterTempC": 17.4,
    "tides": [
     {
@@ -1313,13 +1309,35 @@
    "slots": [
     {
      "time": "06:00",
-     "windDirDeg": 266,
-     "windKn": 3.5,
-     "gustKn": 6.4,
+     "windDirDeg": 259,
+     "windKn": 3.0,
+     "gustKn": 5.4,
      "rainMm": 0.0,
      "rainProbPct": 0,
-     "airC": 8.4,
-     "cloudPct": 84,
+     "airC": 8.8,
+     "cloudPct": 99,
+     "sky": "fog",
+     "src": "metno+openmeteo",
+     "models": {
+      "metno": [
+       253,
+       3.8
+      ],
+      "openmeteo": [
+       270,
+       2.1
+      ]
+     }
+    },
+    {
+     "time": "07:00",
+     "windDirDeg": 263,
+     "windKn": 3.0,
+     "gustKn": 5.4,
+     "rainMm": 0.0,
+     "rainProbPct": 0,
+     "airC": 9.4,
+     "cloudPct": 100,
      "sky": "fog",
      "src": "metno+openmeteo",
      "models": {
@@ -1328,150 +1346,148 @@
        3.8
       ],
       "openmeteo": [
-       273,
-       3.3
-      ]
-     }
-    },
-    {
-     "time": "07:00",
-     "windDirDeg": 272,
-     "windKn": 3.7,
-     "gustKn": 7.4,
-     "rainMm": 0.0,
-     "rainProbPct": 0,
-     "airC": 7.7,
-     "cloudPct": 98,
-     "sky": "fog",
-     "src": "metno+openmeteo",
-     "models": {
-      "metno": [
-       266,
-       3.7
-      ],
-      "openmeteo": [
-       278,
-       3.6
+       270,
+       2.1
       ]
      }
     },
     {
      "time": "08:00",
-     "windDirDeg": 275,
-     "windKn": 3.4,
-     "gustKn": 7.8,
+     "windDirDeg": 266,
+     "windKn": 2.8,
+     "gustKn": 6.4,
      "rainMm": 0.0,
      "rainProbPct": 0,
-     "airC": 11.6,
-     "cloudPct": 98,
-     "sky": "cloud",
-     "src": "openmeteo",
+     "airC": 11.7,
+     "cloudPct": 73,
+     "sky": "fog",
+     "src": "metno+openmeteo",
      "models": {
+      "metno": [
+       262,
+       3.5
+      ],
       "openmeteo": [
-       275,
-       3.4
+       273,
+       2.1
       ]
      }
     },
     {
      "time": "09:00",
-     "windDirDeg": 252,
-     "windKn": 2.6,
-     "gustKn": 8.2,
+     "windDirDeg": 268,
+     "windKn": 2.3,
+     "gustKn": 6.8,
      "rainMm": 0.0,
      "rainProbPct": 0,
-     "airC": 15.2,
-     "cloudPct": 75,
+     "airC": 14.9,
+     "cloudPct": 59,
      "sky": "partly",
-     "src": "openmeteo",
+     "src": "metno+openmeteo",
      "models": {
+      "metno": [
+       274,
+       3.2
+      ],
       "openmeteo": [
-       252,
-       2.6
+       254,
+       1.4
       ]
      }
     },
     {
      "time": "10:00",
-     "windDirDeg": 251,
-     "windKn": 2.4,
-     "gustKn": 9.1,
+     "windDirDeg": 283,
+     "windKn": 2.6,
+     "gustKn": 7.6,
      "rainMm": 0.0,
      "rainProbPct": 0,
-     "airC": 17.3,
-     "cloudPct": 100,
+     "airC": 16.9,
+     "cloudPct": 88,
      "sky": "cloud",
-     "src": "openmeteo",
+     "src": "metno+openmeteo",
      "models": {
+      "metno": [
+       288,
+       3.6
+      ],
       "openmeteo": [
-       251,
-       2.4
+       274,
+       1.6
       ]
      }
     },
     {
      "time": "11:00",
-     "windDirDeg": 270,
-     "windKn": 1.7,
-     "gustKn": 9.3,
+     "windDirDeg": 303,
+     "windKn": 3.4,
+     "gustKn": 8.7,
      "rainMm": 0.0,
      "rainProbPct": 1,
-     "airC": 18.7,
-     "cloudPct": 95,
+     "airC": 18.5,
+     "cloudPct": 98,
      "sky": "cloud",
-     "src": "openmeteo",
+     "src": "metno+openmeteo",
      "models": {
+      "metno": [
+       313,
+       5.2
+      ],
       "openmeteo": [
-       270,
-       1.7
+       266,
+       1.5
       ]
      }
     },
     {
      "time": "12:00",
-     "windDirDeg": 331,
-     "windKn": 1.2,
-     "gustKn": 8.7,
+     "windDirDeg": 321,
+     "windKn": 3.4,
+     "gustKn": 8.6,
      "rainMm": 0.0,
      "rainProbPct": 3,
-     "airC": 19.3,
-     "cloudPct": 91,
+     "airC": 19.4,
+     "cloudPct": 100,
      "sky": "cloud",
-     "src": "openmeteo",
+     "src": "metno+openmeteo",
      "models": {
+      "metno": [
+       317,
+       6.2
+      ],
       "openmeteo": [
-       331,
-       1.2
+       22,
+       0.5
       ]
      }
     },
     {
      "time": "13:00",
-     "windDirDeg": 30,
-     "windKn": 2.4,
-     "gustKn": 8.9,
+     "windDirDeg": 332,
+     "windKn": 4.4,
+     "gustKn": 8.2,
      "rainMm": 0.0,
      "rainProbPct": 4,
      "airC": 19.6,
-     "cloudPct": 99,
+     "cloudPct": 100,
      "sky": "cloud",
      "src": "metno+openmeteo",
      "models": {
       "metno": [
-       28,
-       2.7
+       330,
+       7.6
       ],
       "openmeteo": [
-       33,
-       2.0
+       342,
+       1.2
       ]
      }
     },
     {
      "time": "14:00",
-     "windDirDeg": 42,
-     "windKn": 1.2,
-     "gustKn": 9.3,
+     "windDirDeg": 298,
+     "windKn": 1.9,
+     "gustKn": 8.7,
      "rainMm": 0.0,
      "rainProbPct": 4,
      "airC": 20.1,
@@ -1480,16 +1496,16 @@
      "src": "openmeteo",
      "models": {
       "openmeteo": [
-       42,
-       1.2
+       298,
+       1.9
       ]
      }
     },
     {
      "time": "15:00",
-     "windDirDeg": 241,
-     "windKn": 2.2,
-     "gustKn": 9.1,
+     "windDirDeg": 289,
+     "windKn": 2.1,
+     "gustKn": 9.5,
      "rainMm": 0.0,
      "rainProbPct": 3,
      "airC": 20.0,
@@ -1498,74 +1514,74 @@
      "src": "openmeteo",
      "models": {
       "openmeteo": [
-       241,
-       2.2
+       289,
+       2.1
       ]
      }
     },
     {
      "time": "16:00",
-     "windDirDeg": 239,
-     "windKn": 4.0,
-     "gustKn": 11.5,
+     "windDirDeg": 268,
+     "windKn": 3.1,
+     "gustKn": 10.3,
      "rainMm": 0.0,
      "rainProbPct": 2,
      "airC": 19.7,
-     "cloudPct": 100,
+     "cloudPct": 94,
      "sky": "cloud",
      "src": "openmeteo",
      "models": {
       "openmeteo": [
-       239,
-       4.0
+       268,
+       3.1
       ]
      }
     },
     {
      "time": "17:00",
-     "windDirDeg": 235,
-     "windKn": 4.7,
-     "gustKn": 11.9,
+     "windDirDeg": 251,
+     "windKn": 5.7,
+     "gustKn": 13.4,
      "rainMm": 0.0,
      "rainProbPct": 1,
      "airC": 19.0,
-     "cloudPct": 84,
-     "sky": "cloud",
-     "src": "openmeteo",
-     "models": {
-      "openmeteo": [
-       235,
-       4.7
-      ]
-     }
-    },
-    {
-     "time": "18:00",
-     "windDirDeg": 239,
-     "windKn": 5.8,
-     "gustKn": 13.0,
-     "rainMm": 0.0,
-     "rainProbPct": 1,
-     "airC": 18.5,
      "cloudPct": 98,
      "sky": "cloud",
      "src": "openmeteo",
      "models": {
       "openmeteo": [
-       239,
-       5.8
+       251,
+       5.7
+      ]
+     }
+    },
+    {
+     "time": "18:00",
+     "windDirDeg": 233,
+     "windKn": 6.5,
+     "gustKn": 14.0,
+     "rainMm": 0.0,
+     "rainProbPct": 1,
+     "airC": 18.5,
+     "cloudPct": 45,
+     "sky": "partly",
+     "src": "openmeteo",
+     "models": {
+      "openmeteo": [
+       233,
+       6.5
       ]
      }
     },
     {
      "time": "19:00",
-     "windDirDeg": 233,
+     "windDirDeg": 228,
      "windKn": 5.9,
-     "gustKn": 13.0,
+     "gustKn": 14.0,
      "rainMm": 0.0,
      "rainProbPct": 0,
      "airC": 17.2,
-     "cloudPct": 7,
+     "cloudPct": 13,
      "sky": "sun",
      "src": "metno+openmeteo",
      "models": {
@@ -1574,26 +1590,26 @@
        5.4
       ],
       "openmeteo": [
-       231,
+       221,
        6.4
       ]
      }
     },
     {
      "time": "20:00",
-     "windDirDeg": 231,
-     "windKn": 5.7,
+     "windDirDeg": 216,
+     "windKn": 4.5,
      "gustKn": 12.6,
      "rainMm": 0.0,
      "rainProbPct": 0,
      "airC": 15.4,
-     "cloudPct": 9,
-     "sky": "sun",
+     "cloudPct": 20,
+     "sky": "partly",
      "src": "openmeteo",
      "models": {
       "openmeteo": [
-       231,
-       5.7
+       216,
+       4.5
       ]
      }
     }
@@ -1680,7 +1696,7 @@
   {
    "source": "tides4fishing",
    "url": "https://tides4fishing.com/nz/auckland/mahurangi-harbour",
-   "at": "2026-10-21T19:19:52+13:00",
+   "at": "2026-10-21T20:23:11+13:00",
    "ok": true,
    "attempts": 1,
    "bySource": {
@@ -1692,7 +1708,7 @@
   }
  ],
  "observations": {
-  "fetched": "2026-10-21T19:19:52+13:00",
+  "fetched": "2026-10-21T20:23:11+13:00",
   "kind": "home",
   "blend": true,
   "stations": [
@@ -1702,12 +1718,12 @@
     "kind": "home",
     "lat": -36.435,
     "lon": 174.74,
-    "time": "2026-10-21T19:14:54+13:00",
-    "windKn": 5.6,
-    "gustKn": 19.5,
-    "windDirDeg": 191,
-    "airC": 15.2,
-    "pressureHpa": 1029.8,
+    "time": "2026-10-21T20:19:58+13:00",
+    "windKn": 6.2,
+    "gustKn": 15.1,
+    "windDirDeg": 209,
+    "airC": 13.7,
+    "pressureHpa": 1030.1,
     "rainRateMmH": 0.0,
     "rainTodayMm": 0.0,
     "url": "https://www.wunderground.com/dashboard/pws/IWARKW15",
@@ -1719,12 +1735,12 @@
     "kind": "home",
     "lat": -36.415,
     "lon": 174.726,
-    "time": "2026-10-21T19:14:34+13:00",
-    "windKn": 1.8,
-    "gustKn": 4.4,
-    "windDirDeg": 208,
-    "airC": 15.7,
-    "pressureHpa": 1025.1,
+    "time": "2026-10-21T20:19:33+13:00",
+    "windKn": 1.0,
+    "gustKn": 2.5,
+    "windDirDeg": 300,
+    "airC": 12.7,
+    "pressureHpa": 1025.7,
     "rainRateMmH": 0.0,
     "rainTodayMm": 0.0,
     "url": "https://www.wunderground.com/dashboard/pws/ISNELL2",
@@ -1736,12 +1752,12 @@
     "kind": "home",
     "lat": -36.415,
     "lon": 174.726,
-    "time": "2026-10-21T19:14:53+13:00",
-    "windKn": 1.7,
-    "gustKn": 3.9,
-    "windDirDeg": 270,
-    "airC": 15.8,
-    "pressureHpa": 1023.7,
+    "time": "2026-10-21T20:19:57+13:00",
+    "windKn": 0.6,
+    "gustKn": 1.9,
+    "windDirDeg": 354,
+    "airC": 13.2,
+    "pressureHpa": 1024.0,
     "rainRateMmH": 0.0,
     "rainTodayMm": 0.0,
     "url": "https://www.wunderground.com/dashboard/pws/ISNELL1",
@@ -1753,12 +1769,12 @@
     "kind": "home",
     "lat": -36.397,
     "lon": 174.724,
-    "time": "2026-10-21T19:14:51+13:00",
-    "windKn": 0.1,
+    "time": "2026-10-21T20:19:55+13:00",
+    "windKn": 0.2,
     "gustKn": 1.0,
-    "windDirDeg": 35,
-    "airC": 15.2,
-    "pressureHpa": 1034.2,
+    "windDirDeg": 293,
+    "airC": 12.6,
+    "pressureHpa": 1034.9,
     "rainRateMmH": 0.0,
     "rainTodayMm": 0.0,
     "url": "https://www.wunderground.com/dashboard/pws/IWARKW128",
@@ -1770,12 +1786,12 @@
     "kind": "home",
     "lat": -36.473,
     "lon": 174.734,
-    "time": "2026-10-21T19:14:48+13:00",
-    "windKn": 2.7,
-    "gustKn": 8.0,
-    "windDirDeg": 222,
-    "airC": 14.8,
-    "pressureHpa": 1026.1,
+    "time": "2026-10-21T20:19:49+13:00",
+    "windKn": 1.7,
+    "gustKn": 5.0,
+    "windDirDeg": 236,
+    "airC": 13.2,
+    "pressureHpa": 1026.4,
     "rainRateMmH": 0.0,
     "rainTodayMm": 0.0,
     "url": "https://www.wunderground.com/dashboard/pws/IWARKW125",
@@ -1787,12 +1803,12 @@
     "kind": "home",
     "lat": -36.474,
     "lon": 174.735,
-    "time": "2026-10-21T19:14:52+13:00",
-    "windKn": 0.5,
-    "gustKn": 5.0,
-    "windDirDeg": 240,
+    "time": "2026-10-21T20:19:40+13:00",
+    "windKn": 0.3,
+    "gustKn": 1.0,
+    "windDirDeg": 299,
     "airC": null,
-    "pressureHpa": 1032.5,
+    "pressureHpa": 1032.8,
     "rainRateMmH": 0.0,
     "rainTodayMm": 0.0,
     "url": "https://www.wunderground.com/dashboard/pws/IWARKW107",
@@ -1804,12 +1820,12 @@
     "kind": "home",
     "lat": -36.342522,
     "lon": 174.759415,
-    "time": "2026-10-21T19:00:32+13:00",
+    "time": "2026-10-21T20:15:35+13:00",
     "windKn": 0.0,
-    "gustKn": 0.9,
-    "windDirDeg": 195,
-    "airC": 14.2,
-    "pressureHpa": 1028.4,
+    "gustKn": 3.5,
+    "windDirDeg": 185,
+    "airC": 12.4,
+    "pressureHpa": 1029.1,
     "rainRateMmH": 0.0,
     "rainTodayMm": 0.0,
     "url": "https://www.wunderground.com/dashboard/pws/IWARKWOR11",
@@ -1821,12 +1837,12 @@
     "kind": "home",
     "lat": -36.34,
     "lon": 174.742,
-    "time": "2026-10-21T19:14:50+13:00",
-    "windKn": 3.3,
-    "gustKn": 8.8,
-    "windDirDeg": 199,
-    "airC": 15.2,
-    "pressureHpa": 1023.4,
+    "time": "2026-10-21T20:19:54+13:00",
+    "windKn": 0.5,
+    "gustKn": 4.3,
+    "windDirDeg": 201,
+    "airC": 13.2,
+    "pressureHpa": 1023.7,
     "rainRateMmH": 0.0,
     "rainTodayMm": 0.0,
     "url": "https://www.wunderground.com/dashboard/pws/IWARKW99",
@@ -1838,8 +1854,9 @@
     "id": "IWARKW15",
     "ok": true,
     "method": "page",
-    "attempts": 1,
+    "attempts": 2,
     "tries": [
+     "200:WuNext-Preview-Phased",
      "200:wu-next-prod"
     ]
    },
@@ -1856,9 +1873,8 @@
     "id": "ISNELL1",
     "ok": true,
     "method": "page",
-    "attempts": 2,
+    "attempts": 1,
     "tries": [
-     "200:WuNext-Preview-Phased",
      "200:wu-next-prod"
     ]
    },
@@ -1894,8 +1910,9 @@
     "id": "IWARKWOR11",
     "ok": true,
     "method": "page",
-    "attempts": 1,
+    "attempts": 2,
     "tries": [
+     "200:WuNext-Preview-Phased",
      "200:wu-next-prod"
     ]
    },
@@ -1903,8 +1920,11 @@
     "id": "IWARKW99",
     "ok": true,
     "method": "page",
-    "attempts": 1,
+    "attempts": 4,
     "tries": [
+     "200:WuNext-Preview-Phased",
+     "200:WuNext-Preview-Phased",
+     "200:WuNext-Preview-Phased",
      "200:wu-next-prod"
     ]
    }
