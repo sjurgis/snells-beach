@@ -1,6 +1,6 @@
 {
  "schemaVersion": 1,
- "updated": "2026-10-23T10:26:10+13:00",
+ "updated": "2026-10-23T11:23:46+13:00",
  "timezone": "Pacific/Auckland",
  "location": {
   "name": "Snells Beach",
@@ -116,20 +116,16 @@
     },
     {
      "time": "09:00",
-     "windDirDeg": 196,
-     "windKn": 8.1,
+     "windDirDeg": 199,
+     "windKn": 8.2,
      "gustKn": 17.5,
      "rainMm": 0.0,
      "rainProbPct": 0,
      "airC": 15.5,
      "cloudPct": 95,
      "sky": "cloud",
-     "src": "metno+openmeteo",
+     "src": "openmeteo",
      "models": {
-      "metno": [
-       193,
-       8.0
-      ],
       "openmeteo": [
        199,
        8.2
@@ -138,19 +134,19 @@
     },
     {
      "time": "10:00",
-     "windDirDeg": 189,
-     "windKn": 6.8,
+     "windDirDeg": 184,
+     "windKn": 6.4,
      "gustKn": 17.1,
      "rainMm": 0.0,
      "rainProbPct": 0,
-     "airC": 16.9,
-     "cloudPct": 27,
+     "airC": 17.2,
+     "cloudPct": 17,
      "sky": "sun",
      "src": "metno+openmeteo",
      "models": {
       "metno": [
-       186,
-       7.3
+       177,
+       6.6
       ],
       "openmeteo": [
        192,
@@ -160,8 +156,8 @@
     },
     {
      "time": "11:00",
-     "windDirDeg": 172,
-     "windKn": 5.9,
+     "windDirDeg": 165,
+     "windKn": 5.7,
      "gustKn": 14.4,
      "rainMm": 0.0,
      "rainProbPct": 0,
@@ -171,8 +167,8 @@
      "src": "metno+openmeteo",
      "models": {
       "metno": [
-       173,
-       7.3
+       162,
+       6.9
       ],
       "openmeteo": [
        170,
@@ -1716,7 +1712,7 @@
   {
    "source": "tides4fishing",
    "url": "https://tides4fishing.com/nz/auckland/mahurangi-harbour",
-   "at": "2026-10-23T10:26:10+13:00",
+   "at": "2026-10-23T11:23:46+13:00",
    "ok": true,
    "attempts": 1,
    "bySource": {
@@ -1728,7 +1724,7 @@
   }
  ],
  "observations": {
-  "fetched": "2026-10-23T10:26:10+13:00",
+  "fetched": "2026-10-23T11:23:46+13:00",
   "kind": "home",
   "blend": true,
   "stations": [
@@ -1738,16 +1734,16 @@
     "kind": "home",
     "lat": -36.435,
     "lon": 174.74,
-    "time": "2026-10-23T10:24:47+13:00",
-    "windKn": 6.3,
-    "gustKn": 13.0,
-    "windDirDeg": 165,
-    "airC": 16.2,
-    "pressureHpa": 1028.4,
+    "time": "2026-10-23T11:23:00+13:00",
+    "windKn": 0.2,
+    "gustKn": 2.2,
+    "windDirDeg": 107,
+    "airC": 17.3,
+    "pressureHpa": 1028.1,
     "rainRateMmH": 0.0,
     "rainTodayMm": 0.0,
     "url": "https://www.wunderground.com/dashboard/pws/IWARKW15",
-    "via": "page"
+    "via": "render"
    },
    {
     "id": "ISNELL1",
@@ -1755,12 +1751,12 @@
     "kind": "home",
     "lat": -36.415,
     "lon": 174.726,
-    "time": "2026-10-23T10:24:58+13:00",
-    "windKn": 3.2,
-    "gustKn": 7.0,
-    "windDirDeg": 191,
-    "airC": 16.7,
-    "pressureHpa": 1022.7,
+    "time": "2026-10-23T11:19:53+13:00",
+    "windKn": 1.8,
+    "gustKn": 6.0,
+    "windDirDeg": 197,
+    "airC": 18.3,
+    "pressureHpa": 1022.4,
     "rainRateMmH": 0.0,
     "rainTodayMm": 0.0,
     "url": "https://www.wunderground.com/dashboard/pws/ISNELL1",
@@ -1772,16 +1768,16 @@
     "kind": "home",
     "lat": -36.397,
     "lon": 174.724,
-    "time": "2026-10-23T10:24:57+13:00",
-    "windKn": 0.8,
+    "time": "2026-10-23T11:23:00+13:00",
+    "windKn": 1.1,
     "gustKn": 1.9,
-    "windDirDeg": 44,
-    "airC": 16.7,
-    "pressureHpa": 1033.2,
+    "windDirDeg": 10,
+    "airC": 18.6,
+    "pressureHpa": 1032.8,
     "rainRateMmH": 0.0,
     "rainTodayMm": 0.0,
     "url": "https://www.wunderground.com/dashboard/pws/IWARKW128",
-    "via": "page"
+    "via": "render"
    },
    {
     "id": "IWARKW125",
@@ -1789,12 +1785,12 @@
     "kind": "home",
     "lat": -36.473,
     "lon": 174.734,
-    "time": "2026-10-23T10:24:45+13:00",
-    "windKn": 0.8,
-    "gustKn": 3.0,
-    "windDirDeg": 140,
-    "airC": 16.3,
-    "pressureHpa": 1025.1,
+    "time": "2026-10-23T11:19:47+13:00",
+    "windKn": 1.9,
+    "gustKn": 6.0,
+    "windDirDeg": 137,
+    "airC": 18.9,
+    "pressureHpa": 1024.7,
     "rainRateMmH": 0.0,
     "rainTodayMm": 0.0,
     "url": "https://www.wunderground.com/dashboard/pws/IWARKW125",
@@ -1806,16 +1802,16 @@
     "kind": "home",
     "lat": -36.474,
     "lon": 174.735,
-    "time": "2026-10-23T10:09:58+13:00",
-    "windKn": 1.3,
-    "gustKn": 3.9,
-    "windDirDeg": 138,
+    "time": "2026-10-23T11:23:00+13:00",
+    "windKn": 4.1,
+    "gustKn": 6.0,
+    "windDirDeg": 116,
     "airC": null,
-    "pressureHpa": 1031.2,
+    "pressureHpa": 1030.8,
     "rainRateMmH": 0.0,
     "rainTodayMm": 0.0,
     "url": "https://www.wunderground.com/dashboard/pws/IWARKW107",
-    "via": "page"
+    "via": "render"
    },
    {
     "id": "IWARKWOR11",
@@ -1823,11 +1819,11 @@
     "kind": "home",
     "lat": -36.342522,
     "lon": 174.759415,
-    "time": "2026-10-23T10:15:59+13:00",
-    "windKn": 0.0,
-    "gustKn": 2.6,
+    "time": "2026-10-23T11:15:08+13:00",
+    "windKn": 2.6,
+    "gustKn": 8.7,
     "windDirDeg": 195,
-    "airC": 15.2,
+    "airC": 16.2,
     "pressureHpa": 1027.4,
     "rainRateMmH": 0.0,
     "rainTodayMm": 0.0,
@@ -1840,11 +1836,11 @@
     "kind": "home",
     "lat": -36.34,
     "lon": 174.742,
-    "time": "2026-10-23T10:24:43+13:00",
+    "time": "2026-10-23T11:09:47+13:00",
     "windKn": 1.0,
-    "gustKn": 6.6,
-    "windDirDeg": 195,
-    "airC": 18.4,
+    "gustKn": 4.3,
+    "windDirDeg": 197,
+    "airC": 19.7,
     "pressureHpa": 1022.0,
     "rainRateMmH": 0.0,
     "rainTodayMm": 0.0,
@@ -1856,31 +1852,41 @@
    {
     "id": "IWARKW15",
     "ok": true,
-    "method": "page",
-    "attempts": 1,
-    "tries": [
-     "200:wu-next-prod"
-    ]
-   },
-   {
-    "id": "ISNELL2",
-    "ok": false,
-    "method": "page",
+    "method": "render",
     "attempts": 4,
     "tries": [
      "200:WuNext-Preview-Phased",
      "200:WuNext-Preview-Phased",
      "200:WuNext-Preview-Phased",
-     "200:wu-next-prod"
+     "200:WuNext-Preview-Phased"
     ],
+    "pageError": "no readings in served page (client-rendered variant)",
+    "renderS": 3.9,
+    "parse": "display"
+   },
+   {
+    "id": "ISNELL2",
+    "ok": false,
+    "method": "render",
+    "attempts": 4,
+    "tries": [
+     "200:WuNext-Preview-Phased",
+     "200:WuNext-Preview-Phased",
+     "200:WuNext-Preview-Phased",
+     "200:WuNext-Preview-Phased"
+    ],
+    "pageError": "no readings in served page (client-rendered variant)",
+    "renderS": 5.6,
+    "parse": "state",
     "error": "latest reading old (07:01)"
    },
    {
     "id": "ISNELL1",
     "ok": true,
     "method": "page",
-    "attempts": 2,
+    "attempts": 3,
     "tries": [
+     "200:WuNext-Preview-Phased",
      "200:WuNext-Preview-Phased",
      "200:wu-next-prod"
     ]
@@ -1888,44 +1894,48 @@
    {
     "id": "IWARKW128",
     "ok": true,
-    "method": "page",
-    "attempts": 3,
-    "tries": [
-     "200:WuNext-Preview-Phased",
-     "200:WuNext-Preview-Phased",
-     "200:wu-next-prod"
-    ]
-   },
-   {
-    "id": "IWARKW125",
-    "ok": true,
-    "method": "page",
+    "method": "render",
     "attempts": 4,
     "tries": [
      "200:WuNext-Preview-Phased",
      "200:WuNext-Preview-Phased",
      "200:WuNext-Preview-Phased",
+     "200:WuNext-Preview-Phased"
+    ],
+    "pageError": "no readings in served page (client-rendered variant)",
+    "renderS": 4.2,
+    "parse": "display"
+   },
+   {
+    "id": "IWARKW125",
+    "ok": true,
+    "method": "page",
+    "attempts": 1,
+    "tries": [
      "200:wu-next-prod"
     ]
    },
    {
     "id": "IWARKW107",
     "ok": true,
-    "method": "page",
-    "attempts": 3,
+    "method": "render",
+    "attempts": 4,
     "tries": [
      "200:WuNext-Preview-Phased",
      "200:WuNext-Preview-Phased",
-     "200:wu-next-prod"
-    ]
+     "200:WuNext-Preview-Phased",
+     "200:WuNext-Preview-Phased"
+    ],
+    "pageError": "no readings in served page (client-rendered variant)",
+    "renderS": 4.1,
+    "parse": "display"
    },
    {
     "id": "IWARKWOR11",
     "ok": true,
     "method": "page",
-    "attempts": 4,
+    "attempts": 3,
     "tries": [
-     "200:WuNext-Preview-Phased",
      "200:WuNext-Preview-Phased",
      "200:WuNext-Preview-Phased",
      "200:wu-next-prod"
@@ -1935,9 +1945,8 @@
     "id": "IWARKW99",
     "ok": true,
     "method": "page",
-    "attempts": 2,
+    "attempts": 1,
     "tries": [
-     "200:WuNext-Preview-Phased",
      "200:wu-next-prod"
     ]
    }
