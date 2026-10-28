@@ -1,6 +1,6 @@
 {
  "schemaVersion": 1,
- "updated": "2026-10-29T08:27:27+13:00",
+ "updated": "2026-10-29T09:20:26+13:00",
  "timezone": "Pacific/Auckland",
  "location": {
   "name": "Snells Beach",
@@ -85,20 +85,16 @@
     },
     {
      "time": "07:00",
-     "windDirDeg": 287,
-     "windKn": 10.7,
+     "windDirDeg": 291,
+     "windKn": 8.2,
      "gustKn": 13.4,
      "rainMm": 0.0,
      "rainProbPct": 63,
      "airC": 11.6,
      "cloudPct": 85,
      "sky": "cloud",
-     "src": "metno+openmeteo",
+     "src": "openmeteo",
      "models": {
-      "metno": [
-       285,
-       13.2
-      ],
       "openmeteo": [
        291,
        8.2
@@ -107,19 +103,19 @@
     },
     {
      "time": "08:00",
-     "windDirDeg": 286,
-     "windKn": 11.9,
+     "windDirDeg": 287,
+     "windKn": 12.1,
      "gustKn": 18.5,
      "rainMm": 0.2,
      "rainProbPct": 70,
      "airC": 13.2,
-     "cloudPct": 95,
+     "cloudPct": 98,
      "sky": "rain",
      "src": "metno+openmeteo",
      "models": {
       "metno": [
-       286,
-       13.5
+       287,
+       13.8
       ],
       "openmeteo": [
        286,
@@ -130,7 +126,7 @@
     {
      "time": "09:00",
      "windDirDeg": 286,
-     "windKn": 12.0,
+     "windKn": 12.3,
      "gustKn": 21.0,
      "rainMm": 0.2,
      "rainProbPct": 80,
@@ -140,8 +136,8 @@
      "src": "metno+openmeteo",
      "models": {
       "metno": [
-       284,
-       14.4
+       283,
+       15.0
       ],
       "openmeteo": [
        289,
@@ -1725,7 +1721,7 @@
   {
    "source": "tides4fishing",
    "url": "https://tides4fishing.com/nz/auckland/mahurangi-harbour",
-   "at": "2026-10-29T08:27:27+13:00",
+   "at": "2026-10-29T09:20:26+13:00",
    "ok": true,
    "attempts": 1,
    "fallback": {
@@ -1740,7 +1736,7 @@
   }
  ],
  "observations": {
-  "fetched": "2026-10-29T08:27:27+13:00",
+  "fetched": "2026-10-29T09:20:26+13:00",
   "kind": "airport",
   "blend": false,
   "stations": [
@@ -1750,11 +1746,11 @@
     "kind": "airport",
     "lat": -37.008,
     "lon": 174.792,
-    "time": "2026-10-29T08:00:00+13:00",
-    "windKn": 12.0,
+    "time": "2026-10-29T09:00:00+13:00",
+    "windKn": 19.0,
     "gustKn": null,
-    "windDirDeg": 280,
-    "airC": 16,
+    "windDirDeg": 270,
+    "airC": 17,
     "pressureHpa": 1009,
     "rainRateMmH": null,
     "rainTodayMm": null,
