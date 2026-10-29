@@ -1,6 +1,6 @@
 {
  "schemaVersion": 1,
- "updated": "2026-10-29T16:28:24+13:00",
+ "updated": "2026-10-29T17:26:41+13:00",
  "timezone": "Pacific/Auckland",
  "location": {
   "name": "Snells Beach",
@@ -12,7 +12,7 @@
    "what": "Wind & weather (blended)",
    "name": "met.no Locationforecast (Snells Beach)",
    "url": "https://api.met.no/weatherapi/locationforecast/2.0/compact?lat=-36.42&lon=174.73",
-   "issued": "2026-10-29T14:17:48+13:00"
+   "issued": "2026-10-29T14:17:56+13:00"
   },
   {
    "what": "Wind (blended), gusts, rain chance, sun",
@@ -229,20 +229,16 @@
     },
     {
      "time": "15:00",
-     "windDirDeg": 273,
-     "windKn": 17.6,
+     "windDirDeg": 274,
+     "windKn": 16.5,
      "gustKn": 32.9,
      "rainMm": 0.1,
      "rainProbPct": 50,
      "airC": 19.6,
      "cloudPct": 98,
      "sky": "rain",
-     "src": "metno+openmeteo",
+     "src": "openmeteo",
      "models": {
-      "metno": [
-       273,
-       18.7
-      ],
       "openmeteo": [
        274,
        16.5
@@ -251,19 +247,19 @@
     },
     {
      "time": "16:00",
-     "windDirDeg": 274,
-     "windKn": 17.3,
+     "windDirDeg": 275,
+     "windKn": 17.0,
      "gustKn": 32.3,
      "rainMm": 0.0,
      "rainProbPct": 57,
-     "airC": 18.7,
+     "airC": 18.9,
      "cloudPct": 100,
      "sky": "cloud",
      "src": "metno+openmeteo",
      "models": {
       "metno": [
-       274,
-       18.0
+       275,
+       17.3
       ],
       "openmeteo": [
        274,
@@ -274,7 +270,7 @@
     {
      "time": "17:00",
      "windDirDeg": 275,
-     "windKn": 17.0,
+     "windKn": 16.9,
      "gustKn": 32.1,
      "rainMm": 0.1,
      "rainProbPct": 59,
@@ -284,8 +280,8 @@
      "src": "metno+openmeteo",
      "models": {
       "metno": [
-       274,
-       18.1
+       275,
+       17.8
       ],
       "openmeteo": [
        276,
@@ -1697,7 +1693,7 @@
   {
    "source": "tides4fishing",
    "url": "https://tides4fishing.com/nz/auckland/mahurangi-harbour",
-   "at": "2026-10-29T16:28:24+13:00",
+   "at": "2026-10-29T17:26:41+13:00",
    "ok": true,
    "attempts": 1,
    "fallback": {
@@ -1712,7 +1708,7 @@
   }
  ],
  "observations": {
-  "fetched": "2026-10-29T16:28:24+13:00",
+  "fetched": "2026-10-29T17:26:41+13:00",
   "kind": "airport",
   "blend": false,
   "stations": [
@@ -1722,12 +1718,12 @@
     "kind": "airport",
     "lat": -37.008,
     "lon": 174.792,
-    "time": "2026-10-29T16:00:00+13:00",
-    "windKn": 21.0,
+    "time": "2026-10-29T17:00:00+13:00",
+    "windKn": 16.0,
     "gustKn": null,
     "windDirDeg": 270,
-    "airC": 18,
-    "pressureHpa": 1005,
+    "airC": 19,
+    "pressureHpa": 1004,
     "rainRateMmH": null,
     "rainTodayMm": null,
     "raining": false,
