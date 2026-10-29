@@ -1,6 +1,6 @@
 {
  "schemaVersion": 1,
- "updated": "2026-10-29T21:24:46+13:00",
+ "updated": "2026-10-29T22:21:33+13:00",
  "timezone": "Pacific/Auckland",
  "location": {
   "name": "Snells Beach",
@@ -12,7 +12,7 @@
    "what": "Wind & weather (blended)",
    "name": "met.no Locationforecast (Snells Beach)",
    "url": "https://api.met.no/weatherapi/locationforecast/2.0/compact?lat=-36.42&lon=174.73",
-   "issued": "2026-10-29T21:20:39+13:00"
+   "issued": "2026-10-29T22:19:38+13:00"
   },
   {
    "what": "Wind (blended), gusts, rain chance, sun",
@@ -319,20 +319,16 @@
     },
     {
      "time": "20:00",
-     "windDirDeg": 277,
-     "windKn": 13.7,
+     "windDirDeg": 278,
+     "windKn": 13.0,
      "gustKn": 27.2,
      "rainMm": 0.2,
      "rainProbPct": 75,
      "airC": 15.0,
      "cloudPct": 100,
      "sky": "rain",
-     "src": "metno+openmeteo",
+     "src": "openmeteo",
      "models": {
-      "metno": [
-       277,
-       14.4
-      ],
       "openmeteo": [
        278,
        13.0
@@ -1697,7 +1693,7 @@
   {
    "source": "tides4fishing",
    "url": "https://tides4fishing.com/nz/auckland/mahurangi-harbour",
-   "at": "2026-10-29T21:24:46+13:00",
+   "at": "2026-10-29T22:21:33+13:00",
    "ok": true,
    "attempts": 1,
    "fallback": {
@@ -1712,7 +1708,7 @@
   }
  ],
  "observations": {
-  "fetched": "2026-10-29T21:24:46+13:00",
+  "fetched": "2026-10-29T22:21:33+13:00",
   "kind": "airport",
   "blend": false,
   "stations": [
@@ -1722,12 +1718,12 @@
     "kind": "airport",
     "lat": -37.008,
     "lon": 174.792,
-    "time": "2026-10-29T21:00:00+13:00",
-    "windKn": 12.0,
+    "time": "2026-10-29T22:00:00+13:00",
+    "windKn": 16.0,
     "gustKn": null,
-    "windDirDeg": 240,
+    "windDirDeg": 230,
     "airC": 14,
-    "pressureHpa": 1005,
+    "pressureHpa": 1006,
     "rainRateMmH": null,
     "rainTodayMm": null,
     "raining": true,
