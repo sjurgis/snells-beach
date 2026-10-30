@@ -1,6 +1,6 @@
 {
  "schemaVersion": 1,
- "updated": "2026-10-30T18:24:11+13:00",
+ "updated": "2026-10-30T19:20:46+13:00",
  "timezone": "Pacific/Auckland",
  "location": {
   "name": "Snells Beach",
@@ -28,11 +28,6 @@
    "what": "Tides",
    "name": "tides4fishing Mahurangi Harbour",
    "url": "https://tides4fishing.com/nz/auckland/mahurangi-harbour"
-  },
-  {
-   "what": "Live wind (airport, shown only)",
-   "name": "aviationweather.gov METAR",
-   "url": "https://aviationweather.gov/"
   }
  ],
  "days": [
@@ -265,20 +260,16 @@
     },
     {
      "time": "17:00",
-     "windDirDeg": 252,
-     "windKn": 21.7,
+     "windDirDeg": 255,
+     "windKn": 21.6,
      "gustKn": 41.2,
      "rainMm": 0.4,
      "rainProbPct": 55,
      "airC": 16.8,
      "cloudPct": 51,
      "sky": "rain",
-     "src": "metno+openmeteo",
+     "src": "openmeteo",
      "models": {
-      "metno": [
-       250,
-       21.8
-      ],
       "openmeteo": [
        255,
        21.6
@@ -287,19 +278,19 @@
     },
     {
      "time": "18:00",
-     "windDirDeg": 249,
-     "windKn": 20.1,
+     "windDirDeg": 248,
+     "windKn": 19.5,
      "gustKn": 40.0,
-     "rainMm": 0.1,
+     "rainMm": 0.3,
      "rainProbPct": 83,
-     "airC": 16.2,
-     "cloudPct": 34,
-     "sky": "sun",
+     "airC": 16.3,
+     "cloudPct": 27,
+     "sky": "rain",
      "src": "metno+openmeteo",
      "models": {
       "metno": [
-       248,
-       20.6
+       245,
+       19.4
       ],
       "openmeteo": [
        250,
@@ -309,8 +300,8 @@
     },
     {
      "time": "19:00",
-     "windDirDeg": 246,
-     "windKn": 18.6,
+     "windDirDeg": 245,
+     "windKn": 18.1,
      "gustKn": 36.3,
      "rainMm": 0.1,
      "rainProbPct": 94,
@@ -320,8 +311,8 @@
      "src": "metno+openmeteo",
      "models": {
       "metno": [
-       247,
-       19.7
+       245,
+       18.6
       ],
       "openmeteo": [
        245,
@@ -1690,7 +1681,7 @@
   {
    "source": "tides4fishing",
    "url": "https://tides4fishing.com/nz/auckland/mahurangi-harbour",
-   "at": "2026-10-30T18:24:11+13:00",
+   "at": "2026-10-30T19:20:46+13:00",
    "ok": true,
    "attempts": 1,
    "fallback": {
@@ -1704,151 +1695,5 @@
     "2026-11-02": "computed"
    }
   }
- ],
- "observations": {
-  "fetched": "2026-10-30T18:24:11+13:00",
-  "kind": "airport",
-  "blend": false,
-  "stations": [
-   {
-    "id": "NZAA",
-    "name": "Auckland Intl",
-    "kind": "airport",
-    "lat": -37.008,
-    "lon": 174.792,
-    "time": "2026-10-30T18:00:00+13:00",
-    "windKn": 21.0,
-    "gustKn": 31.0,
-    "windDirDeg": 250,
-    "airC": 16,
-    "pressureHpa": 1008,
-    "rainRateMmH": null,
-    "rainTodayMm": null,
-    "raining": false,
-    "url": "https://aviationweather.gov/data/metar/?id=NZAA"
-   }
-  ],
-  "fetchLog": [
-   {
-    "id": "IWARKW15",
-    "ok": false,
-    "method": "render",
-    "attempts": 4,
-    "tries": [
-     "200:WuNext-Preview-Phased",
-     "200:WuNext-Preview-Phased",
-     "200:WuNext-Preview-Phased",
-     "200:WuNext-Preview-Phased"
-    ],
-    "pageError": "no readings in served page (client-rendered variant)",
-    "renderS": 22,
-    "error": "render timed out"
-   },
-   {
-    "id": "ISNELL2",
-    "ok": false,
-    "method": "render",
-    "attempts": 4,
-    "tries": [
-     "200:WuNext-Preview-Phased",
-     "200:WuNext-Preview-Phased",
-     "200:WuNext-Preview-Phased",
-     "200:WuNext-Preview-Phased"
-    ],
-    "pageError": "no readings in served page (client-rendered variant)",
-    "renderS": 22,
-    "error": "render timed out"
-   },
-   {
-    "id": "ISNELL1",
-    "ok": false,
-    "method": "render",
-    "attempts": 4,
-    "tries": [
-     "200:WuNext-Preview-Phased",
-     "200:WuNext-Preview-Phased",
-     "200:WuNext-Preview-Phased",
-     "200:WuNext-Preview-Phased"
-    ],
-    "pageError": "no readings in served page (client-rendered variant)",
-    "renderS": 22,
-    "error": "render timed out"
-   },
-   {
-    "id": "IWARKW128",
-    "ok": false,
-    "method": "render",
-    "attempts": 4,
-    "tries": [
-     "200:WuNext-Preview-Phased",
-     "200:WuNext-Preview-Phased",
-     "200:WuNext-Preview-Phased",
-     "200:WuNext-Preview-Phased"
-    ],
-    "pageError": "no readings in served page (client-rendered variant)",
-    "renderS": 22,
-    "error": "render timed out"
-   },
-   {
-    "id": "IWARKW125",
-    "ok": false,
-    "method": "render",
-    "attempts": 4,
-    "tries": [
-     "200:WuNext-Preview-Phased",
-     "200:WuNext-Preview-Phased",
-     "200:WuNext-Preview-Phased",
-     "200:WuNext-Preview-Phased"
-    ],
-    "pageError": "no readings in served page (client-rendered variant)",
-    "renderS": 22,
-    "error": "render timed out"
-   },
-   {
-    "id": "IWARKW107",
-    "ok": false,
-    "method": "render",
-    "attempts": 4,
-    "tries": [
-     "200:WuNext-Preview-Phased",
-     "200:WuNext-Preview-Phased",
-     "200:WuNext-Preview-Phased",
-     "200:WuNext-Preview-Phased"
-    ],
-    "pageError": "no readings in served page (client-rendered variant)",
-    "renderS": 22,
-    "error": "render timed out"
-   },
-   {
-    "id": "IWARKWOR11",
-    "ok": false,
-    "method": "render",
-    "attempts": 4,
-    "tries": [
-     "200:WuNext-Preview-Phased",
-     "200:WuNext-Preview-Phased",
-     "200:WuNext-Preview-Phased",
-     "200:WuNext-Preview-Phased"
-    ],
-    "pageError": "no readings in served page (client-rendered variant)",
-    "renderS": 22,
-    "error": "render timed out"
-   },
-   {
-    "id": "IWARKW99",
-    "ok": false,
-    "method": "render",
-    "attempts": 4,
-    "tries": [
-     "200:WuNext-Preview-Phased",
-     "200:WuNext-Preview-Phased",
-     "200:WuNext-Preview-Phased",
-     "200:WuNext-Preview-Phased"
-    ],
-    "pageError": "no readings in served page (client-rendered variant)",
-    "renderS": 22,
-    "error": "render timed out"
-   }
-  ]
- }
+ ]
 }
