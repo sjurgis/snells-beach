@@ -1,6 +1,6 @@
 {
  "schemaVersion": 1,
- "updated": "2026-10-30T16:23:26+13:00",
+ "updated": "2026-10-30T17:23:33+13:00",
  "timezone": "Pacific/Auckland",
  "location": {
   "name": "Snells Beach",
@@ -12,7 +12,7 @@
    "what": "Wind & weather (blended)",
    "name": "met.no Locationforecast (Snells Beach)",
    "url": "https://api.met.no/weatherapi/locationforecast/2.0/compact?lat=-36.42&lon=174.73",
-   "issued": "2026-10-30T14:17:49+13:00"
+   "issued": "2026-10-30T14:19:54+13:00"
   },
   {
    "what": "Wind (blended), gusts, rain chance, sun",
@@ -229,20 +229,16 @@
     },
     {
      "time": "15:00",
-     "windDirDeg": 255,
-     "windKn": 23.3,
+     "windDirDeg": 254,
+     "windKn": 22.1,
      "gustKn": 42.0,
      "rainMm": 0.0,
      "rainProbPct": 17,
      "airC": 18.4,
      "cloudPct": 100,
      "sky": "cloud",
-     "src": "metno+openmeteo",
+     "src": "openmeteo",
      "models": {
-      "metno": [
-       255,
-       24.5
-      ],
       "openmeteo": [
        254,
        22.1
@@ -251,19 +247,19 @@
     },
     {
      "time": "16:00",
-     "windDirDeg": 256,
-     "windKn": 22.5,
+     "windDirDeg": 255,
+     "windKn": 21.9,
      "gustKn": 42.2,
-     "rainMm": 0.2,
+     "rainMm": 0.1,
      "rainProbPct": 31,
      "airC": 17.7,
-     "cloudPct": 69,
-     "sky": "showers",
+     "cloudPct": 83,
+     "sky": "rain",
      "src": "metno+openmeteo",
      "models": {
       "metno": [
-       255,
-       23.4
+       254,
+       22.2
       ],
       "openmeteo": [
        257,
@@ -273,8 +269,8 @@
     },
     {
      "time": "17:00",
-     "windDirDeg": 254,
-     "windKn": 22.2,
+     "windDirDeg": 253,
+     "windKn": 21.8,
      "gustKn": 41.2,
      "rainMm": 0.3,
      "rainProbPct": 55,
@@ -284,8 +280,8 @@
      "src": "metno+openmeteo",
      "models": {
       "metno": [
-       253,
-       22.8
+       252,
+       22.0
       ],
       "openmeteo": [
        255,
@@ -1698,7 +1694,7 @@
   {
    "source": "tides4fishing",
    "url": "https://tides4fishing.com/nz/auckland/mahurangi-harbour",
-   "at": "2026-10-30T16:23:26+13:00",
+   "at": "2026-10-30T17:23:33+13:00",
    "ok": true,
    "attempts": 1,
    "fallback": {
@@ -1714,7 +1710,7 @@
   }
  ],
  "observations": {
-  "fetched": "2026-10-30T16:23:26+13:00",
+  "fetched": "2026-10-30T17:23:33+13:00",
   "kind": "airport",
   "blend": false,
   "stations": [
@@ -1724,11 +1720,11 @@
     "kind": "airport",
     "lat": -37.008,
     "lon": 174.792,
-    "time": "2026-10-30T16:00:00+13:00",
-    "windKn": 28.0,
-    "gustKn": 39.0,
+    "time": "2026-10-30T17:00:00+13:00",
+    "windKn": 24.0,
+    "gustKn": null,
     "windDirDeg": 260,
-    "airC": 18,
+    "airC": 15,
     "pressureHpa": 1008,
     "rainRateMmH": null,
     "rainTodayMm": null,
