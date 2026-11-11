@@ -1,0 +1,31 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Snells Beach has moved</title>
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="robots" content="noindex">
+<script>
+/* Old address: sjurgis.github.io/snells-beach -> beach.metacursion.com, keeping path, query and hash.
+   First remove any service worker installed on this old origin (it can break Safari navigations). */
+(function () {
+  var NEW = "https://beach.metacursion.com";
+  var path = location.pathname.replace(/^\/snells-beach(\/|$)/, "/");
+  var target = NEW + path + location.search + location.hash;
+  var go = function () { location.replace(target); };
+  try {
+    var jobs = [];
+    if ("serviceWorker" in navigator) jobs.push(navigator.serviceWorker.getRegistrations().then(function (rs) { return Promise.all(rs.map(function (r) { return r.unregister(); })); }));
+    if (window.caches) jobs.push(caches.keys().then(function (ks) { return Promise.all(ks.map(function (k) { return caches.delete(k); })); }));
+    Promise.race([Promise.all(jobs), new Promise(function (r) { setTimeout(r, 800); })]).then(go, go);
+  } catch (e) { go(); }
+  document.addEventListener("DOMContentLoaded", function () { var a = document.getElementById("go"); if (a) a.href = target; });
+})();
+</script>
+<meta http-equiv="refresh" content="2;url=https://beach.metacursion.com/">
+<style>body{font:16px/1.5 system-ui,sans-serif;background:#f4efe4;color:#1d4e4f;display:grid;place-items:center;min-height:90vh;margin:0;text-align:center}a{color:#167a78}</style>
+</head>
+<body>
+<p>Snells Beach has moved to <a id="go" href="https://beach.metacursion.com/">beach.metacursion.com</a>.<br>Taking you there now.</p>
+</body>
+</html>
