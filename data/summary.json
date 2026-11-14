@@ -1,5 +1,5 @@
 {
- "updated": "01:31",
+ "updated": "04:22",
  "date": "Sun 15 Nov",
  "picks": [
   {
@@ -18,32 +18,32 @@
    "note": "swim, deep enough, ENE 5-7kn"
   }
  ],
- "wind": "NE 4-7kn g15",
+ "wind": "NE 3-7kn g15",
  "swell": "1.0m 7s, surf up",
  "tide": "High 12:30pm",
  "weather": {
-  "now_c": 14.3,
+  "now_c": 13.8,
   "hi_c": 21,
   "lo_c": 13,
   "cond": "Showers, partly cloudy pm",
-  "rain": "1.1mm, 99%",
-  "wind": "ENE 4-7kn g15",
+  "rain": "1.3mm, 99%",
+  "wind": "NE 4-7kn g15",
   "sunset": "8:07pm",
   "later": [
    {
     "t": "6am",
     "c": 13,
-    "cond": "cloudy"
+    "cond": "clear"
    },
    {
     "t": "9am",
-    "c": 18,
+    "c": 19,
     "cond": "showers"
    },
    {
     "t": "12pm",
-    "c": 21,
-    "cond": "sunny"
+    "c": 20,
+    "cond": "showers"
    }
   ]
  }
