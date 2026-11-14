@@ -1,5 +1,5 @@
 {
- "updated": "22:30",
+ "updated": "01:31",
  "date": "Sun 15 Nov",
  "picks": [
   {
@@ -10,25 +10,25 @@
   {
    "name": "Scandretts Bay",
    "window": "6:00-8:30am",
-   "note": "almost still, dry"
+   "note": "almost still, sheltered, dry"
   },
   {
-   "name": "Algies Bay",
+   "name": "Snells Beach",
    "window": "9:00am-1:00pm",
    "note": "swim, deep enough, ENE 5-7kn"
   }
  ],
- "wind": "ENE 4-7kn g16",
- "swell": "1.0m, small surf",
+ "wind": "NE 4-7kn g15",
+ "swell": "1.0m 7s, surf up",
  "tide": "High 12:30pm",
  "weather": {
-  "now_c": 15.8,
-  "hi_c": 20,
-  "lo_c": 11,
-  "cond": "Partly cloudy, sunny pm",
-  "rain": "0mm, 0%",
-  "wind": "SE 4-8kn g17",
-  "sunset": "8:06pm",
+  "now_c": 14.3,
+  "hi_c": 21,
+  "lo_c": 13,
+  "cond": "Showers, partly cloudy pm",
+  "rain": "1.1mm, 99%",
+  "wind": "ENE 4-7kn g15",
+  "sunset": "8:07pm",
   "later": [
    {
     "t": "6am",
